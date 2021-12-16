@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/tester1c/Lobby](https://badges.gitter.im/tester1c/Lobby.svg)](https://gitter.im/tester1c/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Система сценарного тестирования решений на базе 1С:Предприятие 8.3, управляемые формы.
-Cправка здесь http://tester.help и внутри конфигурации.
+Cправка здесь http://tester.help и внутри конфигурации. Пример решения, написанного с использованием системы Тестер: https://github.com/Contabilizare/c5.
 
 Возможности:
 - Программирование и запуск сложных сценарных тестов в одной среде
