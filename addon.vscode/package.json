@@ -92,7 +92,7 @@
 	],
 	"devDependencies": {
 		"vscode": "^1.1.37",
-		"eslint": "^4.18.2",
+		"eslint": "^10.4.0",
 		"@types/node": "^7.0.43",
 		"@types/mocha": "^2.2.42",
 		"lodash.template": ">=4.5.0",
