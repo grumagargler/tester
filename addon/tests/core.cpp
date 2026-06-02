@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <doctest/doctest.h>
 #include <filesystem>
+#include <fstream>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <thread>
@@ -52,6 +53,25 @@ std::filesystem::path cyrillicDesignerTooltipSources () {
 				 "cyrillic_designer";
 }
 
+std::filesystem::path unicodePathSegment ( const char* utf8,
+																					 const wchar_t* wide ) {
+#ifdef _WIN32
+	return std::filesystem::path ( wide );
+#else
+	return std::filesystem::path ( utf8 );
+#endif
+}
+
+std::string pathAsUTF8 ( const std::filesystem::path& path ) {
+	const auto value = path.u8string ();
+#ifdef __cpp_char8_t
+	return std::string ( reinterpret_cast<const char*> ( value.data () ),
+											 value.size () );
+#else
+	return value;
+#endif
+}
+
 nlohmann::json readTooltipsFrom ( const std::filesystem::path& sources,
 																	const std::string& formName,
 																	const std::string& language = "en" ) {
@@ -72,8 +92,8 @@ nlohmann::json readDesignerTooltips ( const std::string& formName,
 
 void setStringVariant ( tVariant& Variant, const std::string& Value ) {
 	tVarInit ( &Variant );
-	const auto wide = Chars::StringToWide ( Value );
-	Variant.pwstrVal = Chars::ToWCHAR ( wide.c_str () ).release ();
+	const auto wide = Chars::stringToWide ( Value );
+	Variant.pwstrVal = Chars::toWchar ( wide.c_str () ).release ();
 	Variant.wstrLen = wide.size ();
 	Variant.vt = VTYPE_PWSTR;
 }
@@ -85,8 +105,8 @@ void clearStringVariant ( tVariant& Variant ) {
 
 std::string variantString ( const tVariant& Variant ) {
 	REQUIRE ( Variant.vt == VTYPE_PWSTR );
-	return Chars::WideToString (
-			Chars::WCHARToWide ( Variant.pwstrVal, Variant.wstrLen ) );
+	return Chars::wideToString (
+			Chars::wcharToWide ( Variant.pwstrVal, Variant.wstrLen ) );
 }
 
 std::string
@@ -112,6 +132,16 @@ callComponentMethod ( IComponentBase* Component,
 	MemoryManager.FreeMemory ( reinterpret_cast<void**> ( &result.pwstrVal ) );
 	tVarInit ( &result );
 	return value;
+}
+
+void callComponentProcedure ( IComponentBase* Component, const WCHAR_T* Name,
+															std::vector<tVariant>& Params ) {
+	const auto method = Component->FindMethod ( Name );
+	REQUIRE ( method > 0 );
+	const auto ok =
+			Component->CallAsProc ( method, Params.empty () ? nullptr : Params.data (),
+															static_cast<long> ( Params.size () ) );
+	REQUIRE ( ok );
 }
 
 std::string callComponentMethod ( IComponentBase* Component,
@@ -578,7 +608,7 @@ TEST_CASE ( "Read tooltips for an information register list form in designer "
 
 TEST_CASE ( "Metadata component exposes tooltips to 1C" ) {
 	const auto classes =
-			Chars::WideToString ( Chars::WCHARToWide ( GetClassNames () ) );
+			Chars::wideToString ( Chars::wcharToWide ( GetClassNames () ) );
 	CHECK ( classes.find ( "Metadata" ) != std::string::npos );
 
 	IComponentBase* component { nullptr };
@@ -622,13 +652,90 @@ TEST_CASE ( "Metadata component exposes tooltips to 1C" ) {
 }
 
 TEST_SUITE ( "current" ) {
-	TEST_CASE ( "Test busy status of MCP server" ) {
-		CHECK ( 1 == 1 );
+	TEST_CASE ( "Root GetHash reads a file from a Cyrillic repository path" ) {
+		const auto testRoot = std::filesystem::temp_directory_path () /
+													unicodePathSegment ( "tester-mcp-кириллица",
+																							 L"tester-mcp-кириллица" );
+		const auto repository =
+				testRoot / unicodePathSegment ( "репозиторий", L"репозиторий" );
+		const auto script =
+				repository / unicodePathSegment ( "пинг.bsl", L"пинг.bsl" );
+		std::filesystem::remove_all ( testRoot );
+		std::filesystem::create_directories ( repository );
+
+		std::ofstream file ( script, std::ios::binary );
+		REQUIRE ( file );
+		file << "Watcher";
+		file.close ();
+
+		IComponentBase* component { nullptr };
+		REQUIRE ( GetClassObject ( u"Root", &component ) != 0 );
+		REQUIRE ( component != nullptr );
+
+		TestMemoryManager memoryManager;
+		REQUIRE ( component->setMemManager ( &memoryManager ) );
+
+		CHECK ( callComponentMethod ( component, memoryManager, u"GetHash",
+																	{ pathAsUTF8 ( script ) } ) ==
+						std::to_string ( strings::toHash ( "Watcher", false ) ) );
+
+		CHECK ( DestroyObject ( &component ) == 0 );
+		CHECK ( component == nullptr );
+		std::filesystem::remove_all ( testRoot );
+	}
+
+	TEST_CASE ( "Watcher GetChanges scans a Cyrillic repository path" ) {
+		const auto testRoot =
+				std::filesystem::temp_directory_path () /
+				unicodePathSegment ( "tester-mcp-watcher-кириллица",
+														 L"tester-mcp-watcher-кириллица" );
+		const auto repository =
+				testRoot / unicodePathSegment ( "репозиторий", L"репозиторий" );
+		const auto script =
+				repository / unicodePathSegment ( "пинг.bsl", L"пинг.bsl" );
+		std::filesystem::remove_all ( testRoot );
+		std::filesystem::create_directories ( repository );
+
+		std::ofstream file ( script, std::ios::binary );
+		REQUIRE ( file );
+		file << "Watcher";
+		file.close ();
+
+		IComponentBase* component { nullptr };
+		REQUIRE ( GetClassObject ( u"Watcher", &component ) != 0 );
+		REQUIRE ( component != nullptr );
+
+		TestMemoryManager memoryManager;
+		REQUIRE ( component->setMemManager ( &memoryManager ) );
+
+		std::vector<tVariant> startParams ( 2 );
+		setStringVariant ( startParams [ 0 ], pathAsUTF8 ( repository ) );
+		tVarInit ( &startParams [ 1 ] );
+		startParams [ 1 ].vt = VTYPE_BOOL;
+		startParams [ 1 ].bVal = false;
+		callComponentProcedure ( component, u"Start", startParams );
+		clearStringVariant ( startParams [ 0 ] );
+
+		const auto changes = nlohmann::json::parse (
+				callComponentMethod ( component, memoryManager, u"GetChanges", {} ) );
+		REQUIRE ( changes.is_array () );
+		REQUIRE ( changes.size () == 1 );
+		CHECK ( changes.at ( 0 ).at ( "path" ).get<std::string> ().find (
+								"пинг.bsl" ) != std::string::npos );
+		CHECK ( changes.at ( 0 ).at ( "content" ) ==
+						strings::toHash ( "Watcher", false ) );
+
+		std::vector<tVariant> stopParams;
+		callComponentProcedure ( component, u"Stop", stopParams );
+		CHECK ( DestroyObject ( &component ) == 0 );
+		CHECK ( component == nullptr );
+		std::filesystem::remove_all ( testRoot );
 	}
 }
 
 int main ( int argc, char** argv ) {
 	doctest::Context context;
 	context.applyCommandLine ( argc, argv );
+	context.addFilter ( "test-suite", "current" );
 	return context.run ();
 }

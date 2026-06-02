@@ -33,7 +33,7 @@ std::wstring sql::get () {
 		}
 		start = end + 1;
 	}
-	return Chars::StringToWide ( json.dump () );
+	return Chars::stringToWide ( json.dump () );
 }
 
 std::wstring sql::adjust () {
@@ -47,7 +47,7 @@ void sql::addRecord () {
 		if ( commandBegins ) {
 			auto object = nlohmann::json::object ();
 			object [ "Name" ] =
-					Chars::WideToString ( { commandBegins, len - command.signatureLen } );
+					Chars::wideToString ( { commandBegins, len - command.signatureLen } );
 			object [ "Type" ] = command.type;
 			object [ "Index" ] = index;
 			json.push_back ( std::move ( object ) );

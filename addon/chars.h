@@ -1,13 +1,14 @@
 #pragma once
 #include "1c/types.h"
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <string>
 
 class Chars {
 public:
 	template <typename SourceType>
-	static uint32_t ToWCHAR ( WCHAR_T** Destination, const SourceType* Source ) {
+	static uint32_t toWchar ( WCHAR_T** Destination, const SourceType* Source ) {
 		std::basic_string_view<SourceType> const string ( Source );
 		const auto size = string.length () + 1;
 		if ( !*Destination ) {
@@ -22,7 +23,7 @@ public:
 		return converted;
 	}
 
-	static std::unique_ptr<WCHAR_T []> ToWCHAR ( char Source ) {
+	static std::unique_ptr<WCHAR_T []> toWchar ( char Source ) {
 		auto size = 2;
 		std::unique_ptr<WCHAR_T []> result { new WCHAR_T [ size ] };
 		auto receiver = result.get ();
@@ -33,7 +34,7 @@ public:
 	}
 
 	template <typename SourceType>
-	static std::unique_ptr<WCHAR_T []> ToWCHAR ( const SourceType* Source ) {
+	static std::unique_ptr<WCHAR_T []> toWchar ( const SourceType* Source ) {
 		std::basic_string_view<SourceType> const string ( Source );
 		const auto size = string.length () + 1;
 		std::unique_ptr<WCHAR_T []> result { new WCHAR_T [ size ] };
@@ -46,11 +47,12 @@ public:
 	}
 
 	// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays)
-	static std::unique_ptr<wchar_t []> FromWCHAR ( const WCHAR_T* Source,
+	static std::unique_ptr<wchar_t []> fromWchar ( const WCHAR_T* Source,
 																								 size_t Length = 0 );
-	static std::wstring StringToWide ( const std::string& Source,
+	static std::wstring stringToWide ( const std::string& Source,
 																		 bool cleanFirst = false );
-	static std::string WideToString ( const std::wstring& Source );
-	static std::wstring WCHARToWide ( const WCHAR_T* String, size_t Length = 0 );
-	static uint32_t WCHARLength ( const WCHAR_T* Source );
+	static std::string wideToString ( const std::wstring& Source );
+	static std::filesystem::path wideToPath ( const std::wstring& Source );
+	static std::wstring wcharToWide ( const WCHAR_T* String, size_t Length = 0 );
+	static uint32_t wcharLength ( const WCHAR_T* Source );
 };

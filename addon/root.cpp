@@ -244,10 +244,11 @@ bool Root::minimize ( tVariant* Params ) {
 }
 
 bool Root::getHash ( tVariant* Params, tVariant* Result ) {
-	std::string path;
-	if ( !readString ( Params [ 0 ], path, "path" ) ) {
+	std::wstring originalPath;
+	if ( !readWideString ( Params [ 0 ], originalPath, "path" ) ) {
 		return false;
 	}
+	const auto path = Chars::wideToPath ( originalPath );
 	try {
 		returnString ( Result, std::to_wstring ( files::toHash ( path ) ) );
 		return true;
@@ -277,7 +278,7 @@ bool Root::compareJSON ( tVariant* Params, tVariant* Result ) {
 		strings::trim ( json1 );
 		strings::trim ( json2 );
 		returnString ( Result,
-									 Chars::StringToWide ( JSON::compare ( json1, json2 ) ) );
+									 Chars::stringToWide ( JSON::compare ( json1, json2 ) ) );
 		return true;
 	} catch ( const std::exception& error ) {
 		ShowError ( error.what () );
@@ -303,9 +304,9 @@ bool Root::getEnvironment ( tVariant* Params, tVariant* Result ) {
 		return false;
 	}
 #if __linux__
-	auto value = std::getenv ( Chars::WideToString ( variable ).data () );
+	auto value = std::getenv ( Chars::wideToString ( variable ).data () );
 	if ( value ) {
-		result = Chars::StringToWide ( value );
+		result = Chars::stringToWide ( value );
 	}
 #elif _WIN32
 	auto variableName = variable.data ();

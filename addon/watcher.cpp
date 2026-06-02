@@ -17,11 +17,10 @@
 #include "watcher.h"
 
 Watcher::Watcher ()
-			: Extender ( L"Watcher" ), Active ( false ), Paused ( false ),
-				Thread ( nullptr ) {
-	addProcedure ( L"Start", L"Старт", 2, [ & ] ( tVariant* Params ) {
-		return watch ( Params );
-	} );
+		: Extender ( L"Watcher" ), Active ( false ), Paused ( false ),
+			Thread ( nullptr ) {
+	addProcedure ( L"Start", L"Старт", 2,
+								 [ & ] ( tVariant* Params ) { return watch ( Params ); } );
 	addProcedure ( L"Pause", L"Пауза", 0,
 								 [ & ] ( tVariant* Params ) { return pause (); } );
 	addProcedure ( L"Resume", L"Продолжать", 0,
@@ -166,7 +165,7 @@ void Watcher::Observer::sendMessage (
 	auto connector = Parent->getBaseConnector ();
 	connector->ExternalEvent (
 			Parent->getExtensionID (), actionToName ( Notification->Event ),
-			Chars::ToWCHAR ( Notification->File.string ().data () ).get () );
+			Chars::toWchar ( Notification->File.string ().data () ).get () );
 }
 
 bool Watcher::Observer::hasEvent ( const Inotify::Action& Source,
@@ -181,7 +180,7 @@ void Watcher::Observer::sendMessage ( DWORD Offset ) {
 																 info->FileNameLength / sizeof ( wchar_t ) );
 	if ( auto connector = Parent->getBaseConnector () ) {
 		connector->ExternalEvent ( Parent->getExtensionID (), actionToName (),
-															 Chars::ToWCHAR ( File.c_str () ).get () );
+															 Chars::toWchar ( File.c_str () ).get () );
 	}
 	if ( info->NextEntryOffset )
 		sendMessage ( Offset + info->NextEntryOffset );
@@ -272,30 +271,40 @@ void Watcher::deactivate () {
 std::optional<std::pair<uint64_t, uint64_t>>
 Watcher::storeInfo ( auto& entry ) {
 	const auto& path = entry->path ();
-	const auto size = entry->file_size ();
-	const auto changed = entry->last_write_time ();
-	const auto id = strings::toHash ( path.generic_string () );
-	const auto newFile = !files.contains ( id );
-	auto& recorded = files [ id ];
-	const auto sizeChanged = ( recorded.size != size );
-	if ( sizeChanged ) {
-		recorded.size = size;
+	std::error_code error;
+	const auto size = entry->file_size ( error );
+	if ( error ) {
+		return std::nullopt;
 	}
-	const auto dateChanged = ( changed != recorded.changed );
-	if ( dateChanged ) {
-		recorded.changed = changed;
+	error.clear ();
+	const auto changed = entry->last_write_time ( error );
+	if ( error ) {
+		return std::nullopt;
 	}
+	const auto pathText = files::pathToUtf8 ( path );
+	const auto id = strings::toHash ( pathText );
+	const auto found = files.find ( id );
+	const auto newFile = found == files.end ();
+	File next = newFile ? File {} : found->second;
+	const auto sizeChanged = newFile || next.size != size;
+	const auto dateChanged = newFile || next.changed != changed;
 	const auto rescan =
 			newFile || sizeChanged || dateChanged || changed == previousCheck;
+	auto content = next.content;
 	auto contentChanged = false;
-	uint64_t content;
 	if ( rescan ) {
-		content = files::toHash ( path );
-		if ( content != recorded.content ) {
-			recorded.content = content;
-			contentChanged = true;
+		try {
+			content = files::toHash ( path );
+		} catch ( ... ) {
+			return std::nullopt;
 		}
+		contentChanged = newFile || content != next.content;
 	}
+	next.name = pathText;
+	next.size = size;
+	next.changed = changed;
+	next.content = content;
+	files [ id ] = next;
 	if ( newFile || sizeChanged || contentChanged ) {
 		return { { id, content } };
 	} else {
@@ -308,34 +317,41 @@ bool Watcher::getChanges ( tVariant* Result ) {
 		previousCheck = lastCheck;
 		lastCheck = std::filesystem::file_time_type::clock::now ();
 		auto changed = nlohmann::json::array ();
+		std::error_code error;
 		std::filesystem::recursive_directory_iterator entry (
 				watchingFolder,
-				std::filesystem::directory_options::skip_permission_denied );
+				std::filesystem::directory_options::skip_permission_denied, error );
+		if ( error ) {
+			SetError ( "Failed to scan folder: " + error.message () );
+			return false;
+		}
 		const std::filesystem::recursive_directory_iterator end;
-		for ( ; entry != end; ++entry ) {
+		for ( ; entry != end; ) {
 			const auto& path = entry->path ();
-			const auto isDirectory = entry->is_directory ();
-			if ( isDirectory ) {
+
+			error.clear ();
+			const auto isDirectory = entry->is_directory ( error );
+			if ( error ) {
+				entry.disable_recursion_pending ();
+			} else if ( isDirectory ) {
 				if ( path.filename () == ".git" ) {
 					entry.disable_recursion_pending ();
 				}
-				continue;
+			} else if ( path.filename () != ".git" ) {
+				error.clear ();
+				if ( entry->is_regular_file ( error ) ) {
+					if ( auto info = storeInfo ( entry ) ) {
+						auto& [ id, content ] = *info;
+						changed.push_back ( { { "path", files::pathToUtf8 ( path ) },
+																	{ "id", id },
+																	{ "content", content } } );
+					}
+				}
 			}
-			if ( path.filename () == ".git" ) {
-				continue;
-			};
-			if ( isDirectory ) {
-				continue;
-			}
-			if ( auto info = storeInfo ( entry ) ) {
-				auto& [ id, content ] = *info;
-				changed.push_back (
-						{ { "path", path.generic_string () },
-							{ "id", id },
-							{ "content", content } } );
-			}
+			error.clear ();
+			entry.increment ( error );
 		}
-		returnString ( Result, Chars::StringToWide ( changed.dump () ) );
+		returnString ( Result, Chars::stringToWide ( changed.dump () ) );
 		return true;
 	} catch ( const std::exception& error ) {
 		SetError ( error.what () );
@@ -347,7 +363,7 @@ bool Watcher::getChanges ( tVariant* Result ) {
 }
 
 Watcher::Path& Watcher::Path::operator= ( const std::wstring& folder ) {
-	path = Chars::WideToString ( folder );
+	path = Chars::wideToPath ( folder );
 	return *this;
 }
 

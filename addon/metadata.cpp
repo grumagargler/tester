@@ -23,7 +23,7 @@ bool Metadata::getTooltips ( tVariant* Params, tVariant* Result ) {
 			SetError ( "Could not resolve tooltips for the requested form: " + formName );
 			return false;
 		}
-		returnString ( Result, Chars::StringToWide ( body ) );
+		returnString ( Result, Chars::stringToWide ( body ) );
 		return true;
 	} catch ( const std::exception& error ) {
 		SetError ( error.what () );

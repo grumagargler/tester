@@ -17,7 +17,7 @@ Extender::Extender ( const std::wstring& Extension )
 		: testingMode ( false ), baseConnector ( nullptr ),
 			memoryManager ( nullptr ) {
 	ExtensionID = nullptr;
-	Chars::ToWCHAR ( &ExtensionID, Extension.data () );
+	Chars::toWchar ( &ExtensionID, Extension.data () );
 	addFunction ( L"Version", L"Версия", 0,
 								[ & ] ( tVariant*, tVariant* Result ) {
 									version ( Result );
@@ -119,7 +119,7 @@ bool Extender::setMemManager ( void* Pointer ) {
 }
 
 long Extender::GetInfo () {
-	return 9047;
+	return 9050;
 }
 
 bool Extender::RegisterExtensionAs ( WCHAR_T** Entry ) {
@@ -130,7 +130,7 @@ bool Extender::allocate ( const WCHAR_T* Source, WCHAR_T** Destination ) const {
 	if ( !memoryManager ) {
 		return false;
 	}
-	auto size = Chars::WCHARLength ( Source ) + 1;
+	auto size = Chars::wcharLength ( Source ) + 1;
 	if ( !memoryManager->AllocMemory ( reinterpret_cast<void**> ( Destination ),
 																		 size * sizeof ( WCHAR_T ) ) ) {
 		return false;
@@ -166,7 +166,7 @@ bool Extender::readWideString ( const tVariant& Param, std::wstring& Value,
 		SetError ( std::string ( "Expected string parameter: " ) + Name );
 		return false;
 	}
-	Value = Chars::WCHARToWide ( Param.pwstrVal, Param.wstrLen );
+	Value = Chars::wcharToWide ( Param.pwstrVal, Param.wstrLen );
 	return true;
 }
 
@@ -176,7 +176,7 @@ bool Extender::readString ( const tVariant& Param, std::string& Value,
 	if ( !readWideString ( Param, wideValue, Name ) ) {
 		return false;
 	}
-	Value = Chars::WideToString ( wideValue );
+	Value = Chars::wideToString ( wideValue );
 	return true;
 }
 
@@ -185,7 +185,7 @@ long Extender::GetNProps () {
 }
 
 long Extender::FindProp ( const WCHAR_T* Name ) {
-	return getPropertyIndex ( Chars::FromWCHAR ( Name ).get () );
+	return getPropertyIndex ( Chars::fromWchar ( Name ).get () );
 }
 
 const WCHAR_T* Extender::GetPropName ( long Property, long Lang ) {
@@ -215,7 +215,7 @@ long Extender::GetNMethods () {
 
 long Extender::FindMethod ( const WCHAR_T* Name ) {
 	return getIndex ( methods.Methods, methods.MethodsRu,
-										Chars::FromWCHAR ( Name ).get () );
+										Chars::fromWchar ( Name ).get () );
 }
 
 const WCHAR_T* Extender::GetMethodName ( long Method, long Lang ) {
@@ -270,7 +270,7 @@ bool Extender::CallAsFunc ( long Method, tVariant* Result, tVariant* Params,
 
 void Extender::SetLocale ( const WCHAR_T* Locale ) {
 #if !defined( __linux__ ) && !defined( __APPLE__ )
-	const auto locale = Chars::WCHARToWide ( Locale );
+	const auto locale = Chars::wcharToWide ( Locale );
 	_wsetlocale ( LC_ALL, locale.c_str () );
 #else
 // We convert in char* char_locale
@@ -281,7 +281,7 @@ void Extender::SetLocale ( const WCHAR_T* Locale ) {
 
 void Extender::SetUserInterfaceLanguageCode ( const WCHAR_T* lang ) {
 #if !defined( __linux__ ) && !defined( __APPLE__ )
-	const auto locale = Chars::WCHARToWide ( lang );
+	const auto locale = Chars::wcharToWide ( lang );
 	_wsetlocale ( LC_ALL, locale.c_str () );
 #else
 // We convert in char* char_locale
@@ -308,14 +308,14 @@ void Extender::SetError ( std::wstring_view Message ) {
 }
 
 void Extender::SetError ( std::string_view Message ) {
-	LastError = Chars::StringToWide ( std::string ( Message ), true );
+	LastError = Chars::stringToWide ( std::string ( Message ), true );
 }
 
 void Extender::addError ( uint32_t Code, const wchar_t* Descriptor,
 													long Id ) const {
 	if ( baseConnector ) {
 		baseConnector->AddError ( Code, ExtensionID,
-															Chars::ToWCHAR ( Descriptor ).get (), Id );
+															Chars::toWchar ( Descriptor ).get (), Id );
 	}
 }
 
@@ -382,7 +382,7 @@ const WCHAR_T* Extender::getName ( std::map<long, std::wstring>& SetEn,
 		return nullptr;
 	}
 	WCHAR_T* yellowName { nullptr };
-	if ( allocate ( Chars::ToWCHAR ( name ).get (), &yellowName ) ) {
+	if ( allocate ( Chars::toWchar ( name ).get (), &yellowName ) ) {
 		return yellowName;
 	} else {
 		return nullptr;

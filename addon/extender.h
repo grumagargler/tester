@@ -61,12 +61,12 @@ public:
 		if constexpr ( std::is_same_v<T, std::wstring> ) {
 			text = Message;
 		} else if constexpr ( std::is_same_v<T, const char*> ) {
-			text = Chars::StringToWide ( std::string ( Message ), true );
+			text = Chars::stringToWide ( std::string ( Message ), true );
 		} else {
-			text = Chars::StringToWide ( Message, true );
+			text = Chars::stringToWide ( Message, true );
 		}
 		baseConnector->ExternalEvent ( ExtensionID, ErrorSignature,
-																	 Chars::ToWCHAR ( text.data () ).get () );
+																	 Chars::toWchar ( text.data () ).get () );
 	}
 	void addProcedure ( const wchar_t* English, const wchar_t* Russian,
 											int Parameters, procedure Handler );
