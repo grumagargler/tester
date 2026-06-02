@@ -1,10 +1,10 @@
 
-#if ( Server or ThickClientOrdinaryApplication or ExternalConnection ) then
+#if ( server or thickclientordinaryapplication or externalconnection ) then
 
-Procedure Run ( ID ) export
+procedure Run ( ID ) export
 	
 	DataProcessors.Update.Create ().Update ( ID );
 	
-EndProcedure 
+endprocedure 
 
 #endif

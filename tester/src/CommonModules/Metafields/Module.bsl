@@ -1,4 +1,4 @@
-Function Exists ( Ref, Field ) export
+function Exists ( Ref, Field ) export
 
 	fieldAndTable = getTableAndFieldName ( Field );
 	meta = Ref.Metadata ();
@@ -7,9 +7,9 @@ Function Exists ( Ref, Field ) export
 	endif; 
 	return meta.Attributes.Find ( fieldAndTable.Field ) <> undefined;
 
-EndFunction
+endfunction
 
-Function getTableAndFieldName ( Field )
+function getTableAndFieldName ( Field )
 	
 	parts = Conversion.StringToArray ( Field, "." );
 	result = new Structure ( "Table, Field" );
@@ -21,9 +21,9 @@ Function getTableAndFieldName ( Field )
 	endif; 
 	return result;
 	
-EndFunction 
+endfunction 
 
-Procedure Constructor ( Object ) export
+procedure Constructor ( Object ) export
 	
 	meta = Object.Metadata ();
 	catalog = Metadata.Catalogs.Contains ( meta );
@@ -51,9 +51,9 @@ Procedure Constructor ( Object ) export
 		Object [ item.Name ] = value;
 	enddo;
 
-EndProcedure
+endprocedure
 
-Function IsFolder ( Value ) export
+function IsFolder ( Value ) export
 	
 	meta = Metadata.FindByType ( TypeOf ( value ) );
 	if ( meta = undefined ) then
@@ -70,9 +70,9 @@ Function IsFolder ( Value ) export
 	endif;
 	return folder;
 
-EndFunction
+endfunction
 
-Function ToType ( Meta ) export
+function ToType ( Meta ) export
 	
 	if ( Metadata.Catalogs.Contains ( Meta ) ) then
 		class = "CatalogRef";
@@ -93,9 +93,9 @@ Function ToType ( Meta ) export
 	endif; 
 	return Type ( class + "." + Meta.Name );
 
-EndFunction
+endfunction
 
-Function GetManager ( Source ) export
+function GetManager ( Source ) export
 	
 	if ( TypeOf ( Source ) = Type ( "String" ) ) then
 		return getManagerByName ( Source );
@@ -103,9 +103,9 @@ Function GetManager ( Source ) export
 		return getManagerByObject ( Source );
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Function getManagerByObject ( Object )
+function getManagerByObject ( Object )
 	
 	classAndName = Metafields.ClassAndName ( Object.Metadata ().FullName () );
 	if ( classAndName.Class = "Catalog" or classAndName.Class = "Справочник" ) then
@@ -142,9 +142,9 @@ Function getManagerByObject ( Object )
 		return ExchangePlans [ classAndName.Name ];
 	endif; 
 	
-EndFunction
+endfunction
  
-Function getManagerByName ( Manager )
+function getManagerByName ( Manager )
 	
 	classAndName = Metafields.ClassAndName ( Manager );
 	if ( classAndName.Class = "Catalogs" or classAndName.Class = "Справочники" ) then
@@ -181,9 +181,9 @@ Function getManagerByName ( Manager )
 		return ExchangePlans [ classAndName.Name ];
 	endif; 
 	
-EndFunction
+endfunction
 
-Function ClassAndName ( FullName ) export
+function ClassAndName ( FullName ) export
 	
 	partsNames = Conversion.StringToArray ( FullName, "." );
 	classAndName = new Structure ();
@@ -191,4 +191,4 @@ Function ClassAndName ( FullName ) export
 	classAndName.Insert ( "Name", partsNames [ 1 ] );
 	return classAndName;
 	
-EndFunction
+endfunction

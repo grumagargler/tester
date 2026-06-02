@@ -1,5 +1,5 @@
-&AtServer
-Procedure ProcedureDescriptors ( Start, End ) export
+&atserver
+procedure ProcedureDescriptors ( Start, End ) export
 	
 	Start = new Map ();
 	Start [ "процедура" ] = new Structure ( "Len, Function", 10, false );
@@ -12,10 +12,10 @@ Procedure ProcedureDescriptors ( Start, End ) export
 	End.Add ( "конецфункции" );
 	End.Add ( "endfunction" );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure RegionDescriptors ( Start, End ) export
+&atserver
+procedure RegionDescriptors ( Start, End ) export
 	
 	Start = new Map ();
 	Start [ "#область" ] = new Structure ( "Len", 9 );
@@ -24,10 +24,10 @@ Procedure RegionDescriptors ( Start, End ) export
 	End.Add ( "#конецобласти" );
 	End.Add ( "#endregion" );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function Declaration ( Descriptors, NormalRow ) export
+&atserver
+function Declaration ( Descriptors, NormalRow ) export
 	
 	for each item in Descriptors do
 		if ( StrStartsWith ( NormalRow, item.Key ) ) then
@@ -39,10 +39,10 @@ Function Declaration ( Descriptors, NormalRow ) export
 		endif;
 	enddo;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function DeclarationEnds ( Descriptors, NormalRow ) export
+&atserver
+function DeclarationEnds ( Descriptors, NormalRow ) export
 	
 	for each item in Descriptors do
 		pattern = item + "($|\t| |\n)";
@@ -52,16 +52,16 @@ Function DeclarationEnds ( Descriptors, NormalRow ) export
 	enddo;
 	return false;
 	
-EndFunction
+endfunction
 
-Function IsComment ( NormalRow ) export
+function IsComment ( NormalRow ) export
 	
 	return StrStartsWith ( NormalRow, "//" );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function AreaComment ( Row ) export
+&atserver
+function AreaComment ( Row ) export
 	
 	pattern = "^\s*//\s*(!|#)\s*(.+)"; // #MyArea
 	matches = Regexp.Select ( Row, pattern );
@@ -71,10 +71,10 @@ Function AreaComment ( Row ) export
 		return matches [ 0 ].Groups [ 1 ];
 	endif; 
 	
-EndFunction
+endfunction
 
-&AtServer
-Function DeclarationName ( Row ) export
+&atserver
+function DeclarationName ( Row ) export
 	
 	pattern = "^\s*(процедура|функция|#область|procedure|function|#region)\s+([a-z,_,A-Z,а-я,А-Я,0-9]+)";
 	matches = Regexp.Select ( Row, pattern );
@@ -84,4 +84,4 @@ Function DeclarationName ( Row ) export
 		return matches [ 0 ].Groups [ 1 ];
 	endif; 
 	
-EndFunction
+endfunction

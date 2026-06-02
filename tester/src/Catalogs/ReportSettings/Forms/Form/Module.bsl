@@ -2,15 +2,15 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	protectSetting ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure protectSetting ()
+&atserver
+procedure protectSetting ()
 
 	if ( Object.User = SessionParameters.User ) then
 		Items.Warning.Visible = false;
@@ -19,4 +19,4 @@ Procedure protectSetting ()
 		ReadOnly = true;
 	endif;
 
-EndProcedure
+endprocedure

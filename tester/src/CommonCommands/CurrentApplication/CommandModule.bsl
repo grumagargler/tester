@@ -1,17 +1,17 @@
 
-&AtClient
-Procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
 	
 	OpenForm ( "Catalog.Applications.ChoiceForm", , , , , , new NotifyDescription ( "ApplicationSelection", ThisObject ) );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ApplicationSelection ( Application, Params ) export
+&atclient
+procedure ApplicationSelection ( Application, Params ) export
 	
 	if ( Application = undefined ) then
 		return;
 	endif; 
 	Environment.ChangeApplication ( Application );
 	
-EndProcedure 
+endprocedure 

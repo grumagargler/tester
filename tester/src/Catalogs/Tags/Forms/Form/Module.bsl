@@ -1,24 +1,24 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	OldName = Object.Description;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnWriteAtServer ( Cancel, CurrentObject, WriteParameters )
+&atserver
+procedure OnWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 	
 	if ( OldName <> "" and OldName <> Object.Description ) then
 		updateKeys ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure updateKeys ()
+&atserver
+procedure updateKeys ()
 	
 	lock ();
 	list = getKeys ();
@@ -28,20 +28,20 @@ Procedure updateKeys ()
 		obj.Write ();
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure lock ()
+&atserver
+procedure lock ()
 	
 	lock = new DataLock ();
 	item = lock.Add ( "Catalog.TagKeys" );
 	item.Mode = DataLockMode.Exclusive;
 	lock.Lock ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getKeys ()
+&atserver
+function getKeys ()
 	
 	s = "
 	|select Tags.Ref as Ref
@@ -52,4 +52,4 @@ Function getKeys ()
 	q.SetParameter ( "Tag", Object.Ref );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction 
+endfunction 

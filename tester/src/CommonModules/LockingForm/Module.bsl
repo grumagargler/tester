@@ -1,5 +1,5 @@
-&AtServer
-Procedure LoadScenarios ( Form ) export
+&atserver
+procedure LoadScenarios ( Form ) export
 	
 	list = Form.List;
 	for each scenario in getScenarios ( Form ) do
@@ -8,10 +8,10 @@ Procedure LoadScenarios ( Form ) export
 		row.Use = true;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getScenarios ( Form )
+&atserver
+function getScenarios ( Form )
 	
 	s = "
 	|select Scenarios.Ref as Ref, Scenarios.Path as Path,
@@ -35,10 +35,10 @@ Function getScenarios ( Form )
 	endif;
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-&AtServer
-Function lockedScenarios ()
+&atserver
+function lockedScenarios ()
 	
 	s = "
 	|select Editing.Scenario as Scenario
@@ -48,10 +48,10 @@ Function lockedScenarios ()
 	q.SetParameter ( "Me", SessionParameters.User );
 	return q.Execute ().Unload ().UnloadColumn ( "Scenario" );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function FetchScenarios ( Form ) export
+&atserver
+function FetchScenarios ( Form ) export
 	
 	applicationChanging = ( Form.FormName = "Catalog.Scenarios.Form.ChangeApplication" );
 	s = "
@@ -75,20 +75,20 @@ Function FetchScenarios ( Form ) export
 		return q.Execute ().Unload ();
 	endif; 
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure Lock ( Scenarios, Locked, Errors ) export
+&atserver
+procedure Lock ( Scenarios, Locked, Errors ) export
 	
 	BeginTransaction ();
 	LockingForm.LockEditing ( Scenarios );
 	lockScenarios ( Scenarios, Locked, Errors );
 	CommitTransaction ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure LockEditing ( DataSource ) export
+&atserver
+procedure LockEditing ( DataSource ) export
 	
 	lock = new DataLock ();
 	item = lock.Add ( "InformationRegister.Editing" );
@@ -97,10 +97,10 @@ Procedure LockEditing ( DataSource ) export
 	item.UseFromDataSource ( "Scenario", "Ref" );
 	lock.Lock ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure lockScenarios ( Scenarios, Locked, Errors )
+&atserver
+procedure lockScenarios ( Scenarios, Locked, Errors )
 	
 	errorsList = new Array ();
 	Locked = new Array ();
@@ -124,4 +124,4 @@ Procedure lockScenarios ( Scenarios, Locked, Errors )
 	enddo; 
 	Errors = ? ( errorsList.Count () = 0, undefined, errorsList );
 
-EndProcedure
+endprocedure

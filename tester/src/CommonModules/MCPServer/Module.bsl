@@ -1,10 +1,12 @@
-#if ( not WebClient ) then
+#if ( not webclient ) then
 
-Procedure Init () export
+procedure Init () export
 
 	settings = MCPServerSrv.Settings ();
 	if ( settings = undefined ) then
 		return;
+	elsif ( not settings.EditScenarios ) then
+		Output.MCPServerWrongAccess ();
 	endif;
 	MCPD = new ( "AddIn.Extender.MCPServer" );
 	try
@@ -14,9 +16,9 @@ Procedure Init () export
 			"" + settings.Address + ":" + settings.Port, MCPD.Problem () ) );
 	endtry;
 
-EndProcedure
+endprocedure
 
-Procedure Proceed ( Request ) export
+procedure Proceed ( Request ) export
 	
 	requestID = undefined;
 	toolName = "";
@@ -39,9 +41,9 @@ Procedure Proceed ( Request ) export
 			toolName, toolList () ) ), -32601 );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function prepareParams ( Request, RequestID, ToolName )
+function prepareParams ( Request, RequestID, ToolName )
 
 	params = Conversion.FromJSON ( Request );
 	if ( params = undefined ) then
@@ -54,17 +56,17 @@ Function prepareParams ( Request, RequestID, ToolName )
 	endif;
 	return params;
 
-EndFunction
+endfunction
 
-Procedure sendProtocolError ( RequestID, Message, Code )
+procedure sendProtocolError ( RequestID, Message, Code )
 
 	error = new Structure ( "code, message", Code, Message );
 	reply = new Structure ( "id, error", ? ( RequestID = undefined, "<absent>", RequestID ), error );
 	sendReply ( reply );
 	
-EndProcedure
+endprocedure
 
-Procedure sendToolError ( RequestID, Message, ExtraContent = undefined )
+procedure sendToolError ( RequestID, Message, ExtraContent = undefined )
 
 	content = new Structure ( "success, error", false, Message );
 	if ( ExtraContent <> undefined ) then
@@ -74,9 +76,9 @@ Procedure sendToolError ( RequestID, Message, ExtraContent = undefined )
 	endif;
 	sendToolResult ( RequestID, content, true );
 
-EndProcedure
+endprocedure
 
-Procedure sendToolResult ( RequestID, Content, IsError = false )
+procedure sendToolResult ( RequestID, Content, IsError = false )
 
 	result = new Structure ( "content", buildResultContent ( Content, IsError ) );
 	if ( Content <> undefined ) then
@@ -87,9 +89,9 @@ Procedure sendToolResult ( RequestID, Content, IsError = false )
 	endif;
 	sendReply ( new Structure ( "id, result", RequestID, result ) );
 	
-EndProcedure
+endprocedure
 
-Procedure sendReply ( Reply )
+procedure sendReply ( Reply )
 
 	result = Conversion.ToJSON ( Reply, false );
 	try
@@ -98,18 +100,18 @@ Procedure sendReply ( Reply )
 		Message ( MCPD.Problem () );
 	endtry
 	
-EndProcedure
+endprocedure
 
-Function buildResultContent ( StructuredContent, IsError )
+function buildResultContent ( StructuredContent, IsError )
 
 	text = ? ( IsError, errorText ( StructuredContent ), resultText ( StructuredContent ) );
 	content = new Array ();
 	content.Add ( new Structure ( "type, text", "text", text ) );
 	return content;
 
-EndFunction
+endfunction
 
-Function resultText ( StructuredContent )
+function resultText ( StructuredContent )
 
 	if ( StructuredContent = undefined ) then
 		return "";
@@ -120,9 +122,9 @@ Function resultText ( StructuredContent )
 	endif;
 	return Conversion.ToJSON ( StructuredContent, false );
 
-EndFunction
+endfunction
 
-Function errorText ( StructuredContent )
+function errorText ( StructuredContent )
 
 	message = "";
 	if ( StructuredContent <> undefined
@@ -132,17 +134,17 @@ Function errorText ( StructuredContent )
 	endif;
 	return Conversion.ToJSON ( StructuredContent, false );
 
-EndFunction
+endfunction
 
-Function toolList ()
+function toolList ()
 
 	list = new Array ();
 	list.Add ( Enum.MCPExecuteScript () );
 	return StrConcat ( list, ", " );
 
-EndFunction
+endfunction
 
-Procedure RunScenario ( Result, Params ) export
+procedure RunScenario ( Result, Params ) export
 	
 	Watcher.FetchChanges ();
 	requestID = Params.id;
@@ -177,9 +179,9 @@ Procedure RunScenario ( Result, Params ) export
 	endif;
 	sendToolResult ( requestID, content, failed );
 
-EndProcedure
+endprocedure
 
-Function prepareArguments ( Params )
+function prepareArguments ( Params )
 
 	args = undefined;
 	if ( not Params.Property ( "args", args )
@@ -188,9 +190,9 @@ Function prepareArguments ( Params )
 	endif;
 	return args;
 
-EndFunction
+endfunction
 
-Function hasRuntimeErrors ( Messages )
+function hasRuntimeErrors ( Messages )
 
 	runtimeMessages = undefined;
 	if ( not Messages.Property ( "runtime_messages", runtimeMessages )
@@ -204,9 +206,9 @@ Function hasRuntimeErrors ( Messages )
 	enddo;
 	return false;
 
-EndFunction
+endfunction
 
-Function findScenario ( RequestID, File )
+function findScenario ( RequestID, File )
 	
 	if ( FileSystem.Extension ( File ) <> RepositoryFiles.BSLFile () ) then
 		sendToolError ( RequestID, Output.WrongScenarioExtension (
@@ -228,6 +230,6 @@ Function findScenario ( RequestID, File )
 	endif;
 	return scenario;
 
-EndFunction
+endfunction
 
 #endif

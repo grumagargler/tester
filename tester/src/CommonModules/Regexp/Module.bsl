@@ -1,22 +1,22 @@
 
-Function Select ( From, How ) export
+function Select ( From, How ) export
 	
 	exp = Libraries.Init ( "Regex" );
 	result = exp.Select ( From, How );
 	return Conversion.FromJSON ( result );
 
-EndFunction
+endfunction
 
-Function Test ( What, How ) export
+function Test ( What, How ) export
 	
 	exp = Libraries.Init ( "Regex" );
 	return exp.Test ( What, How );
 
-EndFunction
+endfunction
 
-Function Replace ( What, How, Replacement ) export
+function Replace ( What, How, Replacement ) export
 	
 	exp = Libraries.Init ( "Regex" );
 	return exp.Replace ( What, How, Replacement );
 
-EndFunction
+endfunction

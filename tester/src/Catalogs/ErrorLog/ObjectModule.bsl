@@ -9,7 +9,7 @@ var Floor;
 var Entry;
 var CurrentLine;
 
-Function Compose ( Debug, Error, Picture ) export
+function Compose ( Debug, Error, Picture ) export
 	
 	DebuggerStack = RuntimeSrv.Stack ( Debug );
 	Date = CurrentSessionDate ();
@@ -36,9 +36,9 @@ Function Compose ( Debug, Error, Picture ) export
 	RuntimeSrv.WriteError ( data, Scenario, Date, Ref, Debug.Level, jobData );
 	return Ref;
 	
-EndFunction
+endfunction
 
-Function completeError ( Stack, Error )
+function completeError ( Stack, Error )
 	
 	p = new Structure ();
 	p.Insert ( "Message", Error );
@@ -59,9 +59,9 @@ Function completeError ( Stack, Error )
 	endif;
 	return new Structure ( "Long, Short", long, short );
 	
-EndFunction 
+endfunction 
 
-Procedure loadStack ()
+procedure loadStack ()
 	
 	firstArea = undefined;
 	for each call in DebuggerStack.Calls do
@@ -77,9 +77,9 @@ Procedure loadStack ()
 	enddo; 
 	Area = fall;
 	
-EndProcedure
+endprocedure
 
-Function findArea ( Call )
+function findArea ( Call )
 	
 	Script = CachedCalls.DF_Pick ( Call.Scenario, "Script" );
 	CurrentLine = Call.Row;
@@ -95,9 +95,9 @@ Function findArea ( Call )
 		endif;
 	enddo;
 	
-EndFunction
+endfunction
 
-Function getArea ( Fall )
+function getArea ( Fall )
 	
 	item = Catalogs.Areas.FindByDescription ( Fall, true );
 	if ( item.IsEmpty () ) then
@@ -108,9 +108,9 @@ Function getArea ( Fall )
 	endif;
 	return item;
 	
-EndFunction
+endfunction
 
-Procedure loadApplicationStack ( Debug )
+procedure loadApplicationStack ( Debug )
 	
 	erorrs = Debug.ApplicationStack;
 	if ( erorrs = undefined ) then
@@ -125,9 +125,9 @@ Procedure loadApplicationStack ( Debug )
 	enddo;
 	ApplicationError = ApplicationStack.Count () > 0;
 	
-EndProcedure
+endprocedure
 
-Procedure loadModule ()
+procedure loadModule ()
 	
 	Deep = Stack.Count ();
 	Floor = 0;
@@ -141,9 +141,9 @@ Procedure loadModule ()
 		enddo;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function contextBegins ()
+function contextBegins ()
 	
 	insideProcedure = Floor > 1
 	and Stack [ Deep ].Scenario = Stack [ Deep + 1 ].Scenario;
@@ -158,16 +158,16 @@ Function contextBegins ()
 	endif;
 	return 1;
 	
-EndFunction
+endfunction
 
-Function imProcedure ( LineNumber )
+function imProcedure ( LineNumber )
 	
 	normal = TrimL ( Lower ( StrGetLine ( Script, LineNumber ) ) );
 	return Lexer.Declaration ( procedureStarts, normal ) <> undefined;
 	
-EndFunction
+endfunction
 
-Procedure loadScript ()
+procedure loadScript ()
 	
 	newRow = Module.Add ();
 	newRow.Level = Floor;
@@ -207,7 +207,7 @@ Procedure loadScript ()
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Variables Initialization

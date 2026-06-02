@@ -1,23 +1,23 @@
-&AtServer
+&atserver
 var AllScenarios export;
-&AtServer
+&atserver
 var WorkingScope export;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	LockingForm.LoadScenarios ( ThisObject );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	var changed, locked, alreadyLocked, errors;
 	
@@ -26,29 +26,29 @@ Procedure OK ( Command )
 	RepositoryFiles.Sync ();
 	Close ( new Structure ( "AlreadyLocked, Errors", alreadyLocked, errors ) );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure change ( Changed, Locked, AlreadyLocked, Errors )
+&atserver
+procedure change ( Changed, Locked, AlreadyLocked, Errors )
 	
 	fetchScenarios ();
 	LockingForm.Lock ( AllScenarios, Locked, AlreadyLocked );
 	modify ( AlreadyLocked, Errors );
 	Changed = WorkingScope;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fetchScenarios ()
+&atserver
+procedure fetchScenarios ()
 	
 	data = LockingForm.FetchScenarios ( ThisObject );
 	AllScenarios = data [ 0 ].Unload ();
 	WorkingScope = data [ 1 ].Unload ().UnloadColumn ( "Ref" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure modify ( AlreadyLocked, Errors )
+&atserver
+procedure modify ( AlreadyLocked, Errors )
 	
 	errorsList = new Array ();
 	notMine = notMine ( AlreadyLocked );
@@ -73,10 +73,10 @@ Procedure modify ( AlreadyLocked, Errors )
 	enddo; 
 	Errors = ? ( errorsList.Count () = 0, undefined, errorsList );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function notMine ( AlreadyLocked )
+&atserver
+function notMine ( AlreadyLocked )
 	
 	set = new Map ();
 	if ( AlreadyLocked <> undefined ) then
@@ -86,29 +86,29 @@ Function notMine ( AlreadyLocked )
 	endif; 
 	return set;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure broadcast ( Changed )
+&atclient
+procedure broadcast ( Changed )
 	
 	Notify ( Enum.MessageApplicationChanged (), Changed );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Table List
 
-&AtClient
-Procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure ListBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure

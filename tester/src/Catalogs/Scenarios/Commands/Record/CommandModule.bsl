@@ -1,6 +1,6 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
 	
 	saveAll ();
 	ClearMessages ();
@@ -9,11 +9,11 @@ Procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
 	enddo; 
 	Output.TestComlete ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure saveAll ()
+&atclient
+procedure saveAll ()
 	
 	Notify ( Enum.MessageSaveAll () );
 	
-EndProcedure 
+endprocedure 

@@ -1,11 +1,11 @@
-Procedure Go ( Params ) export
+procedure Go ( Params ) export
 	
 	debug = getDebug ();
 	perform ( Constants.Webhook.Get (), Params, debug );
 
-EndProcedure
+endprocedure
 
-Function getDebug ()
+function getDebug ()
 	
 	Debug = new Structure();
 	Debug.Insert("Stack", new Array(1));
@@ -35,11 +35,11 @@ Function getDebug ()
 	Debug.Insert("Started");
 	return Debug;
 
-EndFunction
+endfunction
 
-Procedure perform ( Scenario, Params, Debug )
+procedure perform ( Scenario, Params, Debug )
 	
 	result = Compiler.Build ( Scenario, , true );
 	Runtime.RunScript ( result.Compiled, Params, Debug );
 	
-EndProcedure
+endprocedure

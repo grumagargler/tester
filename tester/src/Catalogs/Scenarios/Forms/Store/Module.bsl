@@ -1,21 +1,21 @@
-&AtServer
+&atserver
 var Stored;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	LockingForm.LoadScenarios ( ThisObject );
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -24,38 +24,38 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	JobPreparing = Parameters.JobPreparing;
 	Memo = Parameters.Memo;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	if ( silentMode () ) then
 		Cancel = true;
 		beginStoring ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function silentMode ()
+&atclient
+function silentMode ()
 	
 	return Parameters.Silent;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure beginStoring ()
+&atclient
+procedure beginStoring ()
 	
 	AllScenarios = fetchScenarios ();
 	Notify ( Enum.MessageSave (), AllScenarios );
@@ -66,17 +66,17 @@ Procedure beginStoring ()
 		Output.ContinueStoring ( ThisObject );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function fetchScenarios ()
+&atserver
+function fetchScenarios ()
 	
 	return new FixedArray ( LockingForm.FetchScenarios ( ThisObject ).UnloadColumn ( "Ref" ) );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function checkSyntax ()
+&atclient
+function checkSyntax ()
 
 	ok = true;
 	target = FormOwner.UUID;
@@ -89,19 +89,19 @@ Function checkSyntax ()
 	enddo;
 	return ok;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure startStoring ()
+&atclient
+procedure startStoring ()
 
 	stored = store ();
 	broadcast ( stored );
 	Close ();
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function store ()
+&atserver
+function store ()
 	
 	BeginTransaction ();
 	LockingForm.LockEditing ( scenariosTable () );
@@ -113,10 +113,10 @@ Function store ()
 	CommitTransaction ();
 	return Stored;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function scenariosTable ()
+&atserver
+function scenariosTable ()
 	
 	table = new ValueTable ();
 	table.Columns.Add ( "Ref", new TypeDescription ( "CatalogRef.Scenarios" ) );
@@ -126,10 +126,10 @@ Function scenariosTable ()
 	enddo; 
 	return table;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure userScenarios ()
+&atserver
+procedure userScenarios ()
 	
 	s = "
 	|select Editing.Scenario as Scenario
@@ -142,10 +142,10 @@ Procedure userScenarios ()
 	q.SetParameter ( "Scenarios", AllScenarios );
 	Stored = q.Execute ().Unload ().UnloadColumn ( "Scenario" );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure unlockScenarios ()
+&atserver
+procedure unlockScenarios ()
 	
 	for each scenario in Stored do
 		r = InformationRegisters.Editing.CreateRecordManager ();
@@ -153,34 +153,34 @@ Procedure unlockScenarios ()
 		r.Delete ();
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure createVersions ()
+&atserver
+procedure createVersions ()
 	
 	for each scenario in Stored do
 		Catalogs.Versions.Create ( scenario, Memo );
 	enddo; 
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure broadcast ( Scenarios )
+&atclient
+procedure broadcast ( Scenarios )
 	
 	Notify ( Enum.MessageStored (), Scenarios );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	beginStoring ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ContinueStoring ( Answer, Params ) export
+&atclient
+procedure ContinueStoring ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		Close ();
@@ -188,21 +188,21 @@ Procedure ContinueStoring ( Answer, Params ) export
 	endif;
 	startStoring ();
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Table List
 
-&AtClient
-Procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure ListBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure

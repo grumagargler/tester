@@ -1,13 +1,13 @@
 var Params export;
 
-Procedure OnCompose () export
+procedure OnCompose () export
 	
 	adjustFilter ();
 	hideStarter ();
 	
-EndProcedure
+endprocedure
 
-Procedure adjustFilter ()
+procedure adjustFilter ()
 	
 	settings = Params.Settings;
 	job = DC.FindFilter ( settings, "Job" );
@@ -26,9 +26,9 @@ Procedure adjustFilter ()
 		DC.FindParameter ( Params.Composer, "Period" ).Use = false;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure hideStarter ()
+procedure hideStarter ()
 	
 	settings = Params.Settings;
 	group = DCsrv.GetGroup ( settings, "Module" );
@@ -42,15 +42,15 @@ Procedure hideStarter ()
 	group = DCsrv.GetGroup ( settings, "Starter" );
 	group.Use = not filter.Use;
 	
-EndProcedure
+endprocedure
 
-Procedure AfterOutput () export
+procedure AfterOutput () export
 	
 	hideErrors ();
 
-EndProcedure
+endprocedure
 
-Procedure hideErrors ()
+procedure hideErrors ()
 	
 	result = Params.Result;
 	resultDetails = Params.Details.Items;
@@ -77,4 +77,4 @@ Procedure hideErrors ()
 		enddo;
 	endif;
 	
-EndProcedure
+endprocedure

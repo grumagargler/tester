@@ -1,26 +1,26 @@
 
-&AtClient
-Procedure Start ( Name ) export
+&atclient
+procedure Start ( Name ) export
 	
 	LocalFiles.Prepare ( new NotifyDescription ( "Download", ThisObject, Name ) );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Download ( Result, Name ) export
+&atclient
+procedure Download ( Result, Name ) export
 	
 	list = new Array ();
 	list.Add ( new TransferableFileDescription ( Name + ".epf", DownloadTemplateSrv.GetLocation ( Name ) ) );
 	BeginGettingFiles ( new NotifyDescription ( "Complete", ThisObject ), list, , true );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Complete ( Result, Params ) export
+&atclient
+procedure Complete ( Result, Params ) export
 	
 	if ( Result = undefined ) then
 		return;
 	endif; 
 	Output.DownloadCompleted ();
 	
-EndProcedure 
+endprocedure 

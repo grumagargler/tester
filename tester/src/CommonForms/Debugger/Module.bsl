@@ -1,28 +1,28 @@
-&AtClient
+&atclient
 var Closing;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	IsVersion = Parameters.IsVersion;
 	Row = Parameters.Row;
 	code = Parameters.Module;
 	Scenario = ? ( IsVersion, Catalogs.Versions.FindByCode ( code ), Catalogs.Scenarios.FindByCode ( code ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	if ( ScenariosPanel.TryActivate ( Scenario ) ) then
 		Notify ( Enum.MessageDebugger (), Row, Scenario );
@@ -32,18 +32,18 @@ Procedure OnOpen ( Cancel )
 		return;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure loadEvaluation ()
+&atclient
+procedure loadEvaluation ()
 	
 	EvaluationResult = Debug.EvaluationResult;
 	Items.EvaluationResult.TextColor = ? ( Debug.EvaluationError, new Color ( 255, 0, 0 ), new Color ( 0, 128, 0 ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure complete ( Command )
+&atclient
+procedure complete ( Command )
 	
 	if ( Closing ) then
 		return;
@@ -52,10 +52,10 @@ Procedure complete ( Command )
 	result = getResult ( Command );
 	Close ( result );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function getResult ( Command )
+&atclient
+function getResult ( Command )
 	
 	p = new Structure ();
 	p.Insert ( "Command", Command );
@@ -63,10 +63,10 @@ Function getResult ( Command )
 	p.Insert ( "Expression", Expression );
 	return p;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
+&atclient
+procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
 	
 	if ( Closing ) then
 		return;
@@ -74,48 +74,48 @@ Procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
 	Cancel = true;
 	complete ( Enum.DebuggerStop () );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Step ( Command )
+&atclient
+procedure Step ( Command )
 	
 	complete ( Enum.DebuggerStepInto () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StepOver ( Command )
+&atclient
+procedure StepOver ( Command )
 	
 	complete ( Enum.DebuggerStepOver () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StopScenario ( Command )
+&atclient
+procedure StopScenario ( Command )
 	
 	complete ( Enum.DebuggerStop () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ContinueRunning ( Command )
+&atclient
+procedure ContinueRunning ( Command )
 	
 	complete ( Enum.DebuggerContinue () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Evaluate ( Command )
+&atclient
+procedure Evaluate ( Command )
 	
 	calcResult ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure calcResult ()
+&atclient
+procedure calcResult ()
 	
 	if ( Closing
 		or IsBlankString ( Expression ) ) then
@@ -123,14 +123,14 @@ Procedure calcResult ()
 	endif; 
 	complete ( Enum.DebuggerEval () );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ExpressionOnChange ( Item )
+&atclient
+procedure ExpressionOnChange ( Item )
 	
 	calcResult ();
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Variables Initialization

@@ -1,48 +1,48 @@
 
-Function SMTPUser () export
+function SMTPUser () export
 	
 	return Constants.SMTPUser.Get ();
 	
-EndFunction 
+endfunction 
 
-Function SMTPPassword () export
+function SMTPPassword () export
 	
 	return Constants.SMTPPassword.Get ();
 	
-EndFunction 
+endfunction 
 
-Function SMTPServer () export
+function SMTPServer () export
 	
 	return Constants.SMTPServer.Get ();
 	
-EndFunction 
+endfunction 
 
-Function SMTPSSL () export
+function SMTPSSL () export
 	
 	return Constants.SMTPSSL.Get ();
 	
-EndFunction 
+endfunction 
 
-Function SMTPPort () export
+function SMTPPort () export
 	
 	return Constants.SMTPPort.Get ();
 	
-EndFunction 
+endfunction 
 
-Function Info () export
+function Info () export
 	
 	return Constants.InfoEmail.Get ();
 	
-EndFunction 
+endfunction 
 
-Function Website () export
+function Website () export
 	
 	return Constants.Website.Get ();
 	
-EndFunction 
+endfunction 
 
-Function ApplicationURL () export
+function ApplicationURL () export
 	
 	return Constants.ApplicationURL.Get ();
 	
-EndFunction 
+endfunction 

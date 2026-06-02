@@ -1,42 +1,42 @@
-&AtClient
+&atclient
 var TableRow export;
-&AtClient
+&atclient
 var ApplicationIndex;
-&AtClient
+&atclient
 var ApplicationLastIndex;
-&AtClient
+&atclient
 var FilesIndex;
-&AtClient
+&atclient
 var FilesLastIndex;
-&AtClient
+&atclient
 var FilesArray;
-&AtClient
+&atclient
 var CurrentFile;
-&AtClient
+&atclient
 var CurrentExtension;
-&AtClient
+&atclient
 var CurrentObjectName;
-&AtClient
+&atclient
 var ChangedRepositories;
-&AtClient
+&atclient
 var ChangedScenarios;
-&AtClient
+&atclient
 var PathBegins;
-&AtClient
+&atclient
 var FolderSuffix;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadRepositories ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadRepositories ()
+&atserver
+procedure loadRepositories ()
 	
 	s = "select allowed Repositories.Application as Application, Repositories.Folder as Folder,
 	|	case when Settings.Application is null then false else true end as Use
@@ -55,10 +55,10 @@ Procedure loadRepositories ()
 	q.SetParameter ( "Session", SessionParameters.Session );
 	Object.Repositories.Load ( q.Execute ().Unload () );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Proceed () export
+&atclient
+procedure Proceed () export
 	
 	prepareForm ();
 	if ( MCPRequestProcessing = true and not CheckFilling () ) then
@@ -66,33 +66,33 @@ Procedure Proceed () export
 	endif;
 	startLoading ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	prepareForm ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure prepareForm ()
+&atclient
+procedure prepareForm ()
 	
 	setConstants ();
 	RepositoryForm.SetFocus ( ThisObject );
 	LocalFiles.Prepare ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setConstants ()
+&atclient
+procedure setConstants ()
 	
 	FolderSuffix = RepositoryFiles.FolderSuffix ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 	
 	if ( not RepositoryForm.CheckSelection ( Object ) ) then
 		Cancel = true;
@@ -101,39 +101,39 @@ Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 		Cancel = true;
 	endif; 
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Load ( Command )
+&atclient
+procedure Load ( Command )
 	
 	if ( CheckFilling () ) then
 		startLoading ();
 	endif; 
 		
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure startLoading ()
+&atclient
+procedure startLoading ()
 
 	init ();
 	loadApplications ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure init ()
+&atclient
+procedure init ()
 	
 	ApplicationIndex = -1;
 	ApplicationLastIndex = Object.Repositories.Count () - 1;
 	ChangedRepositories = new Array ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure loadApplications ()
+&atclient
+procedure loadApplications ()
 	
 	ApplicationIndex = ApplicationIndex + 1;
 	if ( ApplicationIndex > ApplicationLastIndex ) then
@@ -152,39 +152,39 @@ Procedure loadApplications ()
 	endif; 
 	BeginFindingFiles ( new NotifyDescription ( "FindingFiles", ThisObject ), folder, "*.*", true );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure openChanges ()
+&atclient
+procedure openChanges ()
 	
 	OpenForm ( "DataProcessor.Load.Form.Changes",
 		new Structure ( "Changes, Silent", ChangedRepositories, Parameters.Silent ), ThisObject, , , ,
 		new NotifyDescription ( "AfterApplyingChanges", ThisObject ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure AfterApplyingChanges ( Result, Params ) export
+&atclient
+procedure AfterApplyingChanges ( Result, Params ) export
 	
 	if ( Result <> undefined
 		and Result ) then
 		Close ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure FindingFiles ( Files, Params ) export
+&atclient
+procedure FindingFiles ( Files, Params ) export
 	
 	FilesIndex = -1;
 	FilesLastIndex = Files.Count () - 1;
 	FilesArray = Files;
 	loadFiles ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure loadFiles ()
+&atclient
+procedure loadFiles ()
 	
 	while ( true ) do
 		FilesIndex = FilesIndex + 1;
@@ -201,27 +201,27 @@ Procedure loadFiles ()
 		endif; 
 	enddo;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function validFile ()
+&atclient
+function validFile ()
 	
 	return CurrentExtension = RepositoryFiles.BSLFile ()
 	or CurrentExtension = RepositoryFiles.MXLFile ()
 	or CurrentExtension = RepositoryFiles.JSONFile ();
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure GettingModificationUniversalTime ( Time, Params ) export
+&atclient
+procedure GettingModificationUniversalTime ( Time, Params ) export
 	
 	enrollChanges ( Time );
 	loadFiles ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure enrollChanges ( UTC )
+&atclient
+procedure enrollChanges ( UTC )
 	
 	p = new Structure ();
 	p.Insert ( "Path", RepositoryFiles.FileToPath ( CurrentFile.FullName, PathBegins ) );
@@ -230,66 +230,66 @@ Procedure enrollChanges ( UTC )
 	p.Insert ( "UTC", UTC );
 	ChangedScenarios.Add ( p );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Table Repositories
 
-&AtClient
-Procedure MarkAll ( Command )
+&atclient
+procedure MarkAll ( Command )
 	
 	checkbox ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkbox ( Value )
+&atclient
+procedure checkbox ( Value )
 	
 	for each row in Object.Repositories do
 		row.Use = Value;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UnmarkAll ( Command )
+&atclient
+procedure UnmarkAll ( Command )
 	
 	checkbox ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RepositoriesOnActivateRow ( Item )
+&atclient
+procedure RepositoriesOnActivateRow ( Item )
 	
 	TableRow = Item.CurrentData;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReporitoriesFolderStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure ReporitoriesFolderStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	StandardProcessing = false;
 	RepositoryForm.ChooseFolder ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReporitoriesFolderOnChange ( Item )
+&atclient
+procedure ReporitoriesFolderOnChange ( Item )
 	
 	RepositoryForm.ApplyFolder ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RepositoriesBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure RepositoriesBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RepositoriesBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure RepositoriesBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure

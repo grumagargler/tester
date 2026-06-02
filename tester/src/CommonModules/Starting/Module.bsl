@@ -1,4 +1,4 @@
-Function Allowed () export
+function Allowed () export
 	
 	if ( Logins.AccessDenies () ) then
 		Output.AccessDenied ( ThisObject, , , "Quit" );
@@ -6,10 +6,10 @@ Function Allowed () export
 	endif; 
 	return true;
 	
-EndFunction
+endfunction
 
-Procedure Quit ( Params ) export
+procedure Quit ( Params ) export
 	
 	Terminate ();
 	
-EndProcedure 
+endprocedure 

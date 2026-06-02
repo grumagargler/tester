@@ -1,5 +1,5 @@
 
-Procedure OnWrite ( Cancel )
+procedure OnWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -8,4 +8,4 @@ Procedure OnWrite ( Cancel )
 		Exchange.RecordChanges ( Ref );	
 	endif; 
 	
-EndProcedure
+endprocedure

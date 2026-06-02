@@ -1,11 +1,11 @@
-Function GetCurrentSessionDate () export
+function GetCurrentSessionDate () export
 	
 	return CurrentSessionDate ();
 	
-EndFunction 
+endfunction 
 
-Function CurrentUserDate ( val User ) export
+function CurrentUserDate ( val User ) export
 	
 	return ToLocalTime ( CurrentUniversalDate (), DF.Pick ( User, "TimeZone" ) );
 	
-EndFunction
+endfunction

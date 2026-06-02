@@ -1,5 +1,5 @@
 
-Procedure RunExchange ( Load = true, Unload = true ) export
+procedure RunExchange ( Load = true, Unload = true ) export
 	
 	activeJobs = ScheduledJobs.GetScheduledJobs ( new Structure ( "Key", Metadata.ScheduledJobs.Exchange.Key ) );
 	if ( activeJobs.Count () > 1 ) then
@@ -18,9 +18,9 @@ Procedure RunExchange ( Load = true, Unload = true ) export
 		DataProcessors.ExchangeData.Unload ( p );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure SendEMail ( Data ) export 
+procedure SendEMail ( Data ) export 
 	
 	if ( Data.TableReceivers <> undefined ) then
 		mail = new InternetMail ();
@@ -34,9 +34,9 @@ Procedure SendEMail ( Data ) export
 	endif; 
 	mail.Logoff ();
 	
-EndProcedure
+endprocedure
 
-Procedure sendReport ( Data, Mail )	
+procedure sendReport ( Data, Mail )	
 	
 	for each receiver in Data.TableReceivers do
 		msg = getEmailMessage ( Data.Profile.SMTPUser, receiver, Data.Theme, Data.TextMessage );
@@ -49,9 +49,9 @@ Procedure sendReport ( Data, Mail )
 		checkRecipients ( recipients ); 	
 	endif;
 			
-EndProcedure
+endprocedure
 	
-Procedure checkRecipients ( Recipients )
+procedure checkRecipients ( Recipients )
 	
 	for each item in Recipients do
 		p = new Structure ();
@@ -60,9 +60,9 @@ Procedure checkRecipients ( Recipients )
 		Output.IncorrectReportRecipients ();
 	enddo;
 	
-EndProcedure 
+endprocedure 
 
-Function getEmailMessage ( User, DataReceiver, Theme, TextMessage ) export
+function getEmailMessage ( User, DataReceiver, Theme, TextMessage ) export
 	
 	msg = new InternetMailMessage ();
 	msg.From = User;
@@ -73,9 +73,9 @@ Function getEmailMessage ( User, DataReceiver, Theme, TextMessage ) export
 	endif;
 	return msg;
 	
-EndFunction
+endfunction
 
-Procedure WSRead ( Params ) export
+procedure WSRead ( Params ) export
 	
 	proxy = getProxy ( Params );
 	Output.ConnectToWS ();	
@@ -89,9 +89,9 @@ Procedure WSRead ( Params ) export
 	binary = data.Get ();
 	binary.Write ( Params.Path );
 	
-EndProcedure
+endprocedure
 
-Procedure WSWrite ( Params ) export 	
+procedure WSWrite ( Params ) export 	
 	
 	proxy = getProxy ( Params );
 	Output.ConnectToWS ();
@@ -105,9 +105,9 @@ Procedure WSWrite ( Params ) export
 	data = new ValueStorage ( binData, new Deflation ( 9 ) );
 	proxy.Write ( Params.Node, data, Params.FileExchange );
 	
-EndProcedure
+endprocedure
 
-Function getProxy ( Params )
+function getProxy ( Params )
 	
 	address = Params.WebService + "/ws/wsExchange.1cws?wsdl";
 	definitions = new WSDefinitions ( address, Params.User, Params.Password, , 30 );
@@ -117,15 +117,15 @@ Function getProxy ( Params )
 	proxy.Password = Params.Password;
 	return proxy;
 	
-EndFunction
+endfunction
 
-Function wsExchange ()
+function wsExchange ()
     
     return "http://localhost/wsExchange";
     
-EndFunction
+endfunction
 
-Function CreateTempDir ( PostFix ) export
+function CreateTempDir ( PostFix ) export
 	
 	folder = new File ( TempFilesDir () + PostFix );
 	if ( folder.Exist () ) then
@@ -134,9 +134,9 @@ Function CreateTempDir ( PostFix ) export
 	CreateDirectory ( folder.FullName );
 	return ( folder.FullName + GetPathSeparator () );
 	
-EndFunction
+endfunction
 
-Function GetTempDir ( ID ) export
+function GetTempDir ( ID ) export
 	
 	postfix = "ExchangeDataTemp_" + ID;
 	f = new File ( TempFilesDir () + postfix );
@@ -146,15 +146,15 @@ Function GetTempDir ( ID ) export
 		return ""; 
 	endif;
 	
-EndFunction 
+endfunction 
 
-Procedure DeleteTempDirectory ( TempDirectory ) export
+procedure DeleteTempDirectory ( TempDirectory ) export
 	
 	EraseFile ( Mid ( TempDirectory, 1, ( StrLen ( TempDirectory ) - 1 ) ) );	
 	
-EndProcedure
+endprocedure
 
-Procedure EraseFile ( File ) export
+procedure EraseFile ( File ) export
 	
 	try
 		DeleteFiles ( File );
@@ -162,23 +162,23 @@ Procedure EraseFile ( File ) export
 		Output.FileDeletionError ( new Structure ( "File, Error", File, ErrorDescription () ) );	
 	endtry;
 	
-EndProcedure
+endprocedure
 
-Procedure RecordChanges ( Ref ) export
+procedure RecordChanges ( Ref ) export
 	
 	SetPrivilegedMode ( true );
 	registerScenario ( Ref );
 	
-EndProcedure
+endprocedure
 
-Procedure registerScenario ( Scenario )
+procedure registerScenario ( Scenario )
 	
 	nodes = getNodes ( Scenario );
 	ExchangePlans.RecordChanges ( nodes, Scenario );
 	
-EndProcedure
+endprocedure
 
-Function getNodes ( Ref )
+function getNodes ( Ref )
 	
 	s = "
 	|select
@@ -193,9 +193,9 @@ Function getNodes ( Ref )
 	result = q.Execute ();
 	return result.Unload ().UnloadColumn ( "Node" ); 
 	
-EndFunction
+endfunction
 
-Procedure RereadData () export 
+procedure RereadData () export 
 	
 	Output.StartReReadData ();
 	data = getData ();
@@ -216,9 +216,9 @@ Procedure RereadData () export
 	Output.CloseCurrentSession ();
 	Connections.DisconnectMe ();
 	
-EndProcedure
+endprocedure
 
-Function getData ()
+function getData ()
 
 	s = "
 	|select top 1 
@@ -241,9 +241,9 @@ Function getData ()
 		return selection;
 	endif;
 	
-EndFunction 
+endfunction 
 
-Procedure runRereadData ( Data, ID )
+procedure runRereadData ( Data, ID )
 	
 	p = new Structure ();
 	p.Insert ( "Node", data.Ref );
@@ -255,10 +255,10 @@ Procedure runRereadData ( Data, ID )
 	Output.ReReadUnLoad ();
 	DataProcessors.ExchangeData.UnLoad ( p );
 	
-EndProcedure
+endprocedure
 
-Procedure WriteLog ( Text ) export
+procedure WriteLog ( Text ) export
 	
 	WriteLogEvent ( "Exchange", EventLogLevel.Information, , , Text );
 	
-EndProcedure
+endprocedure

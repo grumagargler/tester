@@ -1,15 +1,15 @@
 var IsNew;
 
-Procedure FillCheckProcessing ( Cancel, CheckedAttributes )
+procedure FillCheckProcessing ( Cancel, CheckedAttributes )
 	
 	if ( not checkAgent () ) then
 		Cancel = true;
 		return;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function checkAgent ()
+function checkAgent ()
 	
 	if ( Agent.IsEmpty () ) then
 		return true;
@@ -31,9 +31,9 @@ Function checkAgent ()
 	endif;
 	return not error;
 	
-EndFunction
+endfunction
 
-Procedure BeforeWrite ( Cancel, WriteMode, PostingMode )
+procedure BeforeWrite ( Cancel, WriteMode, PostingMode )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -49,9 +49,9 @@ Procedure BeforeWrite ( Cancel, WriteMode, PostingMode )
 	endif;
 	adjustSchedule ();
 	
-EndProcedure
+endprocedure
 
-Procedure remove ()
+procedure remove ()
 	
 	r = InformationRegisters.Jobs.CreateRecordManager ();
 	r.Job = Ref;
@@ -66,9 +66,9 @@ Procedure remove ()
 		Jobs.Remove ( Ref );
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure defaultScenario ()
+procedure defaultScenario ()
 	
 	table = Scenarios;
 	if ( table.Count () = 0 ) then
@@ -77,17 +77,17 @@ Procedure defaultScenario ()
 		Scenario = table [ 0 ].Scenario;
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure adjustSchedule ()
+procedure adjustSchedule ()
 	
 	if ( Mode = Enums.Running.Now ) then
 		Schedule = undefined;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure OnWrite ( Cancel )
+procedure OnWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -103,9 +103,9 @@ Procedure OnWrite ( Cancel )
 		initJob ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure initJob ()
+procedure initJob ()
 	
 	var task;
 	
@@ -124,4 +124,4 @@ Procedure initJob ()
 	task.Schedule = Conversion.JSONToObject ( Schedule, Type ( "JobSchedule" ) );
 	task.Write ();
 	
-EndProcedure 
+endprocedure 

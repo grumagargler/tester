@@ -1,59 +1,59 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	setDefaults ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setDefaults ()
+&atserver
+procedure setDefaults ()
 	
 	Mode = Enums.Recording.Tester;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	fixLang ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fixLang ()
+&atclient
+procedure fixLang ()
 	
 	if ( Items.Lang.ChoiceList.FindByValue ( Lang ) = undefined ) then
 		Lang = CurrentLanguage ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Convert ( Command )
+&atclient
+procedure Convert ( Command )
 	
 	if ( CheckFilling () ) then
 		Close ( getLog () );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function getLog ()
+&atclient
+function getLog ()
 	
 	return new Structure ( "Log, Lang, Mode", Log, Lang, Mode );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure ModeClearing ( Item, StandardProcessing )
+&atclient
+procedure ModeClearing ( Item, StandardProcessing )
 	
 	StandardProcessing = false;
 	
-EndProcedure
+endprocedure
  

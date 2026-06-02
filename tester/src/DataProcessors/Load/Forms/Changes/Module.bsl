@@ -1,48 +1,48 @@
-#if ( Server or ThinClient or ThickClientManagedApplication ) then
+#if ( server or thinclient or thickclientmanagedapplication ) then
 
-&AtServer
+&atserver
 var Tree;
-&AtServer
+&atserver
 var CurrentApplication;
-&AtServer
+&atserver
 var CurrentData;
-&AtClient
+&atclient
 var ScenarioIndex;
-&AtClient
+&atclient
 var LastScenario;
-&AtServer
+&atserver
 var CommonApplication;
-&AtClient
+&atclient
 var ScenariosSet;
-&AtClient
+&atclient
 var CurrentData;
-&AtClient
+&atclient
 var FilesContent;
-&AtClient
+&atclient
 var FilesList;
-&AtClient
+&atclient
 var CurrentFile;
-&AtClient
+&atclient
 var FileIndex;
-&AtClient
+&atclient
 var LastFile;
-&AtClient
+&atclient
 var RenewList;
-&AtServer
+&atserver
 var CommonRows;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadScenarios ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadScenarios ()
+&atserver
+procedure loadScenarios ()
 	
 	createTree ();
 	q = getQuery ();
@@ -55,10 +55,10 @@ Procedure loadScenarios ()
 	formatTree ( Tree.Rows );
 	ValueToFormAttribute ( Tree, "ChangesTree" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure createTree ()
+&atserver
+procedure createTree ()
 	
 	Tree = new ValueTree ();
 	columns = Tree.Columns;
@@ -83,10 +83,10 @@ Procedure createTree ()
 	columns.Add ( "UTC", datetime );
 	columns.Add ( "Extensions", string );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getApplications ()
+&atserver
+function getApplications ()
 	
 	list = new Array ();
 	for each row in Parameters.Changes do
@@ -94,10 +94,10 @@ Function getApplications ()
 	enddo; 
 	return list;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function getQuery ()
+&atserver
+function getQuery ()
 	
 	s = "
 	|select allowed Scenarios.Ref as Scenario, Scenarios.Application as Application, Scenarios.Path as Path,
@@ -128,20 +128,20 @@ Function getQuery ()
 	q.SetParameter ( "User", SessionParameters.User );
 	return q;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function newApplication ()
+&atserver
+function newApplication ()
 	
 	row = Tree.Rows.Add ();
 	row.Application = CurrentApplication;
 	row.Presentation = "" + ? ( CurrentApplication.IsEmpty (), Output.CommonApplicationName (), CurrentApplication );
 	return row.Rows;
 
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure loadSelection ( Selection, Destination, LastScenario = undefined )
+&atserver
+procedure loadSelection ( Selection, Destination, LastScenario = undefined )
 	
 	detail = QueryRecordType.DetailRecord;
 	bygroup = QueryRecordType.GroupTotal;
@@ -171,10 +171,10 @@ Procedure loadSelection ( Selection, Destination, LastScenario = undefined )
 		endif;
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadChanges ()
+&atserver
+procedure loadChanges ()
 	
 	defineCommon ();
 	for each repository in Parameters.Changes do
@@ -184,19 +184,19 @@ Procedure loadChanges ()
 		enddo; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure defineCommon ()
+&atserver
+procedure defineCommon ()
 	
 	CommonApplication = Catalogs.Applications.EmptyRef ();
 	row = Tree.Rows.Find ( CommonApplication, "Application" );
 	CommonRows = ? ( row = undefined, undefined, row.Rows );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure addScenario ()
+&atserver
+procedure addScenario ()
 	
 	path = CurrentData.Path;
 	row = findScenario ( path );
@@ -212,10 +212,10 @@ Procedure addScenario ()
 		row.Extensions = row.Extensions + ext + ";";
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function findScenario ( Path )
+&atserver
+function findScenario ( Path )
 	
 	found = Tree.Rows.FindRows ( new Structure ( "Application, Path", CurrentApplication, Path ), true );
 	if ( found.Count () = 0 ) then
@@ -224,18 +224,18 @@ Function findScenario ( Path )
 	endif;
 	return ? ( found.Count () = 0, undefined, found [ 0 ] );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function findRoot ()
+&atserver
+function findRoot ()
 	
 	row = Tree.Rows.Find ( CurrentApplication, "Application" );
 	return ? ( row = undefined, undefined, row.Rows );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function newRow ( Rows, Path )
+&atserver
+function newRow ( Rows, Path )
 	
 	row = Rows.Add ();
 	if ( CommonRows = undefined ) then
@@ -252,10 +252,10 @@ Function newRow ( Rows, Path )
 	endif; 
 	return row;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function defineParent ()
+&atserver
+function defineParent ()
 	
 	parts = StrSplit ( CurrentData.Path, "." );
 	parts.Delete ( parts.UBound () );
@@ -272,10 +272,10 @@ Function defineParent ()
 	enddo; 
 	return parent;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure formatTree ( Rows )
+&atserver
+procedure formatTree ( Rows )
 	
 	for each row in Rows do
 		setType ( row );
@@ -288,10 +288,10 @@ Procedure formatTree ( Rows )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setType ( Row )
+&atserver
+procedure setType ( Row )
 	
 	if ( not Row.New ) then
 		return;
@@ -300,10 +300,10 @@ Procedure setType ( Row )
 	type = ? ( folder, Enums.Scenarios.Folder, Enums.Scenarios.Scenario );
 	Row.Type = type;
 		
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setPicture ( Row )
+&atserver
+procedure setPicture ( Row )
 	
 	if ( not Row.New ) then
 		return;
@@ -323,10 +323,10 @@ Procedure setPicture ( Row )
 	endif;
 	Row.Picture = picture;
 		
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setUsage ( Row )
+&atserver
+procedure setUsage ( Row )
 	
 	usage = Row.Path <> ""
 	and ( Row.Extensions <> "" and ( Row.New or Row.Locked = 1 )
@@ -339,57 +339,57 @@ Procedure setUsage ( Row )
 		Row.Use = usage;
 	endif; 
 		
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setPresentation ( Row )
+&atserver
+procedure setPresentation ( Row )
 	
 	if ( Row.Presentation = "" ) then
 		Row.Presentation = Row.Path;
 	endif; 
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 
 	if ( Parameters.Silent ) then
 		Cancel = true;
 		runLoading ();
 	endif;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Load ( Command )
+&atclient
+procedure Load ( Command )
 	
 	runLoading ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure runLoading ()
+&atclient
+procedure runLoading ()
 
 	prepareScenarios ();
 	prepareCounters ();
 	initProgress ();
 	startLoading ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure prepareScenarios ()
+&atclient
+procedure prepareScenarios ()
 	
 	ScenariosSet = new Array ();
 	fillScenarios ( ChangesTree.GetItems () );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure fillScenarios ( Rows )
+&atclient
+procedure fillScenarios ( Rows )
 	
 	for each row in Rows do
 		if ( row.Use ) then
@@ -401,28 +401,28 @@ Procedure fillScenarios ( Rows )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure prepareCounters ()
+&atclient
+procedure prepareCounters ()
 	
 	ScenarioIndex = -1;
 	LastScenario = ScenariosSet.UBound ();
 	RenewList = new Array ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure initProgress ()
+&atclient
+procedure initProgress ()
 	
 	ProgressBar = 0;
 	Items.ProgressBar.MaxValue = 1 + LastScenario;
 	Items.ProgressBar.ShowPercent = true;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure startLoading ()
+&atclient
+procedure startLoading ()
 	
 	ScenarioIndex = ScenarioIndex + 1;
 	ProgressBar = ProgressBar + 1;
@@ -446,10 +446,10 @@ Procedure startLoading ()
 	LastFile = FilesList.UBound ();
 	loadFiles ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function filesList ()
+&atclient
+function filesList ()
 	
 	list = new Array ();
 	for each ext in StrSplit ( CurrentData.Extensions, ";", false ) do
@@ -457,10 +457,10 @@ Function filesList ()
 	enddo; 
 	return list;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure loadFiles ()
+&atclient
+procedure loadFiles ()
 	
 	FileIndex = FileIndex + 1;
 	if ( FileIndex > LastFile ) then
@@ -487,51 +487,51 @@ Procedure loadFiles ()
 		doc.BeginReading ( new NotifyDescription ( "ReadingComplete", ThisObject, doc ), file, TextEncoding.UTF8 );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure PutMXL ( Result, Address, File, Params ) export
+&atclient
+procedure PutMXL ( Result, Address, File, Params ) export
 	
 	if ( Result ) then
 		FilesContent [ CurrentFile.Extension ] = Address;
 	endif; 
 	loadFiles ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure broadcastChanges ()
+&atclient
+procedure broadcastChanges ()
 
 	Notify ( Enum.MessageReload (), RenewList );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showInfo ()
+&atclient
+procedure showInfo ()
 	
 	Output.ScenariosProcessed ( ThisObject, , new Structure ( "Counter", Format ( LastScenario + 1, "NZ=; NG=" ) ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ScenariosProcessed ( Params ) export
+&atclient
+procedure ScenariosProcessed ( Params ) export
 	
 	broadcastChanges ();
 	Close ( true );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ReadingComplete ( Document ) export
+&atclient
+procedure ReadingComplete ( Document ) export
 	
 	FilesContent [ CurrentFile.Extension ] = Document.GetText ();
 	loadFiles ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Function updateScenario ( val Application, val IsCommon, val Parent, val Path, val Content, val Type, val Remove, val UTC, val SourceFile )
+&atservernocontext
+function updateScenario ( val Application, val IsCommon, val Parent, val Path, val Content, val Type, val Remove, val UTC, val SourceFile )
 	
 	targetApplication = ? ( IsCommon, Catalogs.Applications.EmptyRef (), Application );
 	scenario = getScenario ( Path, targetApplication );
@@ -578,10 +578,10 @@ Function updateScenario ( val Application, val IsCommon, val Parent, val Path, v
 	endif;
 	return ref;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getScenario ( Path, Application )
+&atservernocontext
+function getScenario ( Path, Application )
 	
 	s = "
 	|select top 1 Scenarios.Ref as Ref
@@ -595,10 +595,10 @@ Function getScenario ( Path, Application )
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Ref );
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Procedure deleteScenario ( Scenario )
+&atservernocontext
+procedure deleteScenario ( Scenario )
 	
 	if ( Catalogs.Scenarios.Locked ( Scenario ) ) then
 		raise Output.LoadingError ();
@@ -624,10 +624,10 @@ Procedure deleteScenario ( Scenario )
 		Output.LoadingError ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Procedure loadFields ( Obj, Path, Parent )
+&atservernocontext
+procedure loadFields ( Obj, Path, Parent )
 	
 	Obj.SetNewCode ();
 	Obj.Creator = SessionParameters.User;
@@ -637,10 +637,10 @@ Procedure loadFields ( Obj, Path, Parent )
 	Obj.Description = parts [ level ];
 	Obj.Parent = Parent;
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Procedure loadProperties ( Scenario, Content, File )
+&atservernocontext
+procedure loadProperties ( Scenario, Content, File )
 	
 	s = Content [ RepositoryFiles.JSONFile () ];
 	if ( s = undefined ) then
@@ -652,17 +652,17 @@ Procedure loadProperties ( Scenario, Content, File )
 		raise Output.ScenarioPropertiesLoadingError ( new Structure ( "File, Error", File, ErrorDescription () ) );
 	endtry;
 
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Procedure loadScript ( Scenario, Content )
+&atservernocontext
+procedure loadScript ( Scenario, Content )
 	
 	Scenario.Script = Content [ RepositoryFiles.BSLFile () ];
 
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Procedure loadTemplate ( Scenario, Content )
+&atservernocontext
+procedure loadTemplate ( Scenario, Content )
 	
 	address = Content [ RepositoryFiles.MXLFile () ];
 	if ( address = undefined ) then
@@ -671,20 +671,20 @@ Procedure loadTemplate ( Scenario, Content )
 		DataProcessors.Load.AssembleTemplate ( address, Scenario );
 	endif; 
 
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Tree
 
-&AtClient
-Procedure MarkAll ( Command )
+&atclient
+procedure MarkAll ( Command )
 	
 	checkbox ( ChangesTree.GetItems (), true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkbox ( Rows, Value )
+&atclient
+procedure checkbox ( Rows, Value )
 	
 	for each row in Rows do
 		if ( row.Usage ) then
@@ -696,27 +696,27 @@ Procedure checkbox ( Rows, Value )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UnmarkAll ( Command )
+&atclient
+procedure UnmarkAll ( Command )
 	
 	checkbox ( ChangesTree.GetItems (), false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ChangesTreeBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure ChangesTreeBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ChangesTreeBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure ChangesTreeBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
 #endif

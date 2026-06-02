@@ -1,12 +1,12 @@
-Function GetParams ( ReportName = undefined ) export
+function GetParams ( ReportName = undefined ) export
 	
 	p = new Structure ();
 	setParams ( p, ReportName );
 	return p;
 	
-EndFunction
+endfunction
 
-Procedure setParams ( Params, ReportName )
+procedure setParams ( Params, ReportName )
 	
 	Params.Insert ( "ReportName", ReportName );
 	Params.Insert ( "Command", "OpenReport" );
@@ -17,21 +17,21 @@ Procedure setParams ( Params, ReportName )
 	Params.Insert ( "StoredSettings" );
 	Params.Insert ( "GenerateOnOpen", false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Open ( Params, Owner = undefined, Unique = undefined,
+&atclient
+procedure Open ( Params, Owner = undefined, Unique = undefined,
 	Window = undefined ) export
 
 	OpenForm ( "Report." + Params.ReportName + ".Form", Params, Owner, Unique );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function URL ( Params ) export
+&atserver
+function URL ( Params ) export
 	
 	report = GetUrl ( Metadata.Reports [ Params.ReportName ],
 		String ( new UUID () ), Params );
 	return report;
 		
-EndFunction
+endfunction

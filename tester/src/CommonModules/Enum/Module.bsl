@@ -1,339 +1,339 @@
 
 #region Messages
 
-&AtClient
-Function MessageSaveAll () export
+&atclient
+function MessageSaveAll () export
 	
 	return "1";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageActivateError () export
+&atclient
+function MessageActivateError () export
 	
 	return "2";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageMainScenarioChanged () export
+&atclient
+function MessageMainScenarioChanged () export
 	
 	return "3";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageUserGroupCreated () export
+&atclient
+function MessageUserGroupCreated () export
 	
 	return "4";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageUserRightsChanged () export
+&atclient
+function MessageUserRightsChanged () export
 	
 	return "5";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageUserGroupModified () export
+&atclient
+function MessageUserGroupModified () export
 	
 	return "6";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageSave () export
+&atclient
+function MessageSave () export
 	
 	return "7";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageReload () export
+&atclient
+function MessageReload () export
 	
 	return "8";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageLocked () export
+&atclient
+function MessageLocked () export
 	
 	return "9";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageStored () export
+&atclient
+function MessageStored () export
 	
 	return "10";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageApplicationSettingsSaved () export
+&atclient
+function MessageApplicationSettingsSaved () export
 	
 	return "11";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageDebugger () export
+&atclient
+function MessageDebugger () export
 	
 	return "12";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageApplicationChanged () export
+&atclient
+function MessageApplicationChanged () export
 	
 	return "13";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageRunExternally () export
+&atclient
+function MessageRunExternally () export
 	
 	return "14";
 	
-EndFunction 
+endfunction 
 
 #endregion
 
 #region Settings
 
-&AtServer
-Function SettingsShowSettingsButtonState () export
+&atserver
+function SettingsShowSettingsButtonState () export
 	
 	return "ShowSettingsButtonState";
 	
-EndFunction 
+endfunction 
 
-Function SettingsWorkplaceFilter () export
+function SettingsWorkplaceFilter () export
 	
 	return "WorkplaceFilter";
 	
-EndFunction 
+endfunction 
 
 #endregion
 
 #region Debugger
 
-&AtClient
-Function DebuggerStop () export
+&atclient
+function DebuggerStop () export
 	
 	return "DebuggerStop";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function DebuggerContinue () export
+&atclient
+function DebuggerContinue () export
 	
 	return "DebuggerContinue";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function DebuggerStepInto () export
+&atclient
+function DebuggerStepInto () export
 	
 	return "DebuggerStepInto";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function DebuggerStepOver () export
+&atclient
+function DebuggerStepOver () export
 	
 	return "DebuggerStepOver";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function DebuggerOpenScenario () export
+&atclient
+function DebuggerOpenScenario () export
 	
 	return "DebuggerOpenScenario";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function DebuggerEval () export
+&atclient
+function DebuggerEval () export
 	
 	return "DebuggerEval";
 	
-EndFunction 
+endfunction 
 
 #endregion
 
 #region ExternalRequests
 
-&AtClient
-Function ExternalRequestsSaveFile () export
+&atclient
+function ExternalRequestsSaveFile () export
 	
 	return "SaveFile";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsNewFile () export
+&atclient
+function ExternalRequestsNewFile () export
 	
 	return "NewFile";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsRenaming () export
+&atclient
+function ExternalRequestsRenaming () export
 	
 	return "Renaming";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsRemoving () export
+&atclient
+function ExternalRequestsRemoving () export
 	
 	return "Removing";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsRun () export
+&atclient
+function ExternalRequestsRun () export
 	
 	return "Run";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsCheckSyntax () export
+&atclient
+function ExternalRequestsCheckSyntax () export
 	
 	return "CheckSyntax";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsSaveBeforeCheckSyntax () export
+&atclient
+function ExternalRequestsSaveBeforeCheckSyntax () export
 	
 	return "SaveBeforeCheckSyntax";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsSaveBeforeRun () export
+&atclient
+function ExternalRequestsSaveBeforeRun () export
 	
 	return "SaveBeforeRun";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsSetMain () export
+&atclient
+function ExternalRequestsSetMain () export
 	
 	return "SetMain";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsSaveBeforeRunSelected () export
+&atclient
+function ExternalRequestsSaveBeforeRunSelected () export
 	
 	return "SaveBeforeRunSelected";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsRunSelected () export
+&atclient
+function ExternalRequestsRunSelected () export
 	
 	return "RunSelected";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsSaveBeforeAssigning () export
+&atclient
+function ExternalRequestsSaveBeforeAssigning () export
 	
 	return "SaveBeforeAssigning";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsPickField () export
+&atclient
+function ExternalRequestsPickField () export
 	
 	return "PickField";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsPickScenario () export
+&atclient
+function ExternalRequestsPickScenario () export
 	
 	return "PickScenario";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ExternalRequestsGenerateID () export
+&atclient
+function ExternalRequestsGenerateID () export
 	
 	return "GenerateID";
 	
-EndFunction 
+endfunction 
 
 #endregion
 
 #region ExternalStatuses
 
-&AtClient
-Function ExternalStatusesCompleted () export
+&atclient
+function ExternalStatusesCompleted () export
 	
 	return "Completed";
 	
-EndFunction 
+endfunction 
 
 #endregion
 
 #region MessageTypes
 
-&AtClient
-Function MessageTypesInfo () export
+&atclient
+function MessageTypesInfo () export
 	
 	return "I";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageTypesError () export
+&atclient
+function MessageTypesError () export
 	
 	return "E";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageTypesWarning () export
+&atclient
+function MessageTypesWarning () export
 	
 	return "W";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageTypesHint () export
+&atclient
+function MessageTypesHint () export
 	
 	return "H";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageTypesPopup () export
+&atclient
+function MessageTypesPopup () export
 	
 	return "P";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function MessageTypesPopupWarning () export
+&atclient
+function MessageTypesPopupWarning () export
 	
 	return "PW";
 	
-EndFunction 
+endfunction 
 
 #endregion
 
 #region Framework
 
-&AtClient
-Function FrameworkManagedForm () export
+&atclient
+function FrameworkManagedForm () export
 	
 	if ( Framework.VersionLess ( "8.3.14" ) ) then
 		return "ManagedForm";
@@ -341,126 +341,126 @@ Function FrameworkManagedForm () export
 		return "ClientApplicationForm";
 	endif;
 	
-EndFunction
+endfunction
 
 #endregion
 
 #region Others
 
-&AtServer
-Function OthersVersionPrefix () export
+&atserver
+function OthersVersionPrefix () export
 	
 	return "v.";
 	
-EndFunction
+endfunction
 
 #endregion
 
 #region ReportCommands
 
-Function ReportCommandsOpenModule () export
+function ReportCommandsOpenModule () export
 	
 	return "ReportCommandsOpenModule";
 	
-EndFunction
+endfunction
 
 #endregion
 
 #region FSUserActions
 
-&AtServer
-Function FSUserActionsCreate () export
+&atserver
+function FSUserActionsCreate () export
 	
 	return 1;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function FSUserActionsChange () export
+&atserver
+function FSUserActionsChange () export
 	
 	return 2;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function FSUserActionsRename () export
+&atserver
+function FSUserActionsRename () export
 	
 	return 3;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function FSUserActionsDelete () export
+&atserver
+function FSUserActionsDelete () export
 	
 	return 4;
 	
-EndFunction
+endfunction
 
 #endregion
 
 #region ShowMessages
 
-&AtClient
-Function ShowMessagesInParentWindow () export
+&atclient
+function ShowMessagesInParentWindow () export
 	
 	return 0;
 
-EndFunction
+endfunction
 
-&AtClient
-Function ShowMessagesInSeparateWindow () export
+&atclient
+function ShowMessagesInSeparateWindow () export
 	
 	return 1;
 
-EndFunction
+endfunction
 
 #endregion
 
 #region MCPServerCommands
 
-&AtClient
-Function MCPExecuteScript () export
+&atclient
+function MCPExecuteScript () export
 
 	return "execute_script";
 
-EndFunction
+endfunction
 
-&AtClient
-Function httpServerExecute () export
+&atclient
+function httpServerExecute () export
 	
 	return MCPExecuteScript ();
 	
-EndFunction
+endfunction
 
 #endregion
 
 #region Constants
 
-Function ConstantsFormatVersion () export
+function ConstantsFormatVersion () export
 	
 	return "1.3.4.6";
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ConstantsTableContentLimit () export
+&atclient
+function ConstantsTableContentLimit () export
 	
 	return 100;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ConstantsSavingXMLWaitTime () export
+&atclient
+function ConstantsSavingXMLWaitTime () export
 
 	return 15;
 
-EndFunction
+endfunction
 
-&AtClient
-Function ConstantsEntityInfoMark () export
+&atclient
+function ConstantsEntityInfoMark () export
 
 	return "___info___";
 
-EndFunction
+endfunction
 
 #endregion

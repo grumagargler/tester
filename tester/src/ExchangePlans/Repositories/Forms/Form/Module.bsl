@@ -1,16 +1,16 @@
 // *****************************************
 // *********** Form events
-&AtServer
-Procedure OnCreateAtServer(Cancel, StandardProcessing)
+&atserver
+procedure OnCreateAtServer(Cancel, StandardProcessing)
 
 	if (Object.Ref.IsEmpty()) then
 		fillNew();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillNew()
+&atserver
+procedure fillNew()
 
 	if (not Parameters.CopyingValue.IsEmpty()) then
 		return;
@@ -24,10 +24,10 @@ Procedure fillNew()
 	setNode();
 	InitFolder = true;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setNode()
+&atserver
+procedure setNode()
 
 	session = Object.Session;
 	if (session.IsEmpty()) then
@@ -39,10 +39,10 @@ Procedure setNode()
 	Object.Description = data.ApplicationName + ": " + data.UserName + " ("
 		+ session + ")";
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function nodeData()
+&atserver
+function nodeData()
 
 	result = new Structure("SessionCode, UserName, UserCode, ApplicationName, ApplicationCode");
 	q = new Query();
@@ -70,20 +70,20 @@ Function nodeData()
 	endif;
 	return result;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure FillCheckProcessingAtServer(Cancel, CheckedAttributes)
+&atserver
+procedure FillCheckProcessingAtServer(Cancel, CheckedAttributes)
 
 	if (not checkFolder()) then
 		Cancel = true;
 		return;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkFolder()
+&atserver
+function checkFolder()
 
 	folder = Object.Folder;
 	if (IsBlankString(folder)) then
@@ -108,10 +108,10 @@ Function checkFolder()
 	enddo;
 	return true;
 
-EndFunction
+endfunction
 
-&AtServer
-Function getFolders()
+&atserver
+function getFolders()
 
 	s = "select allowed Repositories.Folder as Folder, Repositories.Application as Application
 		|from ExchangePlan.Repositories as Repositories
@@ -124,10 +124,10 @@ Function getFolders()
 	q.SetParameter("Ref", Object.Ref);
 	return q.Execute().Unload();
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure AfterWrite(WriteParameters)
+&atclient
+procedure AfterWrite(WriteParameters)
 
 	restartWatcher();
 	if ( InitFolder
@@ -136,10 +136,10 @@ Procedure AfterWrite(WriteParameters)
 		LocalFiles.CheckExistence ( file, new NotifyDescription ( "GitignoreExists", ThisObject, file ) );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure restartWatcher()
+&atclient
+procedure restartWatcher()
 
 	#if ( not WebClient ) then
 	if (myRepositry(Object.Session)) then
@@ -147,17 +147,17 @@ Procedure restartWatcher()
 	endif;
 	#endif
 
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function myRepositry(val Session)
+&atservernocontext
+function myRepositry(val Session)
 
 	return Session = SessionParameters.Session;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure GitignoreExists ( Exists, File ) export
+&atclient
+procedure GitignoreExists ( Exists, File ) export
 	
 	#if ( not MobileClient ) then
 		if ( not Exists ) then
@@ -168,10 +168,10 @@ Procedure GitignoreExists ( Exists, File ) export
 		createBSLSettings ();
 	#endif
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure createBSLSettings ()
+&atclient
+procedure createBSLSettings ()
 	
 	settings = new Structure ();
 	lang = CurrentLanguage ();
@@ -211,61 +211,61 @@ Procedure createBSLSettings ()
 	text.SetText ( Conversion.ToJSON ( settings ) );
 	text.Write ( file, , Chars.LF );
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
-&AtClient
-Procedure SessionOnChange(Item)
+&atclient
+procedure SessionOnChange(Item)
 
 	setNode();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ApplicationOnChange(Item)
+&atclient
+procedure ApplicationOnChange(Item)
 
 	setNode();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FolderStartChoice(Item, ChoiceData, StandardProcessing)
+&atclient
+procedure FolderStartChoice(Item, ChoiceData, StandardProcessing)
 
 	StandardProcessing = false;
 	chooseFolder();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure chooseFolder()
+&atclient
+procedure chooseFolder()
 
 	dialog = new FileDialog(FileDialogMode.ChooseDirectory);
 	dialog.Show(new NotifyDescription("selectFolder", ThisObject));
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure selectFolder(Folder, Params) export
+&atclient
+procedure selectFolder(Folder, Params) export
 
 	if (Folder = undefined) then
 		return;
 	endif;
 	Object.Folder = Folder[0];
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FolderOnChange(Item)
+&atclient
+procedure FolderOnChange(Item)
 
 	adjustPath();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure adjustPath()
+&atclient
+procedure adjustPath()
 
 	Object.Folder = FileSystem.RemoveSlash(Object.Folder);
 
-EndProcedure
+endprocedure
 

@@ -1,12 +1,12 @@
 var Params export;
 
-Procedure OnCompose () export
+procedure OnCompose () export
 	
 	adjustFilter ();
 	
-EndProcedure
+endprocedure
 
-Procedure adjustFilter ()
+procedure adjustFilter ()
 	
 	settings = Params.Settings;
 	job = DC.FindFilter ( settings, "Job" );
@@ -25,4 +25,4 @@ Procedure adjustFilter ()
 		DC.FindParameter ( Params.Composer, "Period" ).Use = false;
 	endif;
 	
-EndProcedure
+endprocedure

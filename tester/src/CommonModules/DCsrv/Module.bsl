@@ -1,5 +1,5 @@
 
-Function GetGroup ( Source, Name, SearchInFields = false ) export
+function GetGroup ( Source, Name, SearchInFields = false ) export
 	
 	composer = ( TypeOf ( Source ) = Type ( "DataCompositionSettingsComposer" ) );
 	settings = ? ( composer, Source.Settings, Source );
@@ -19,9 +19,9 @@ Function GetGroup ( Source, Name, SearchInFields = false ) export
 	endif; 
 	return ? ( groups.Count () = 1, groups [ 0 ], groups );
 	
-EndFunction
+endfunction
  
-Procedure groupsByName ( Container, Name, SearchInFields, Groups )
+procedure groupsByName ( Container, Name, SearchInFields, Groups )
 	
 	groupType = Type ( "DataCompositionGroup" );
 	tableType = Type ( "DataCompositionTable" );
@@ -54,9 +54,9 @@ Procedure groupsByName ( Container, Name, SearchInFields, Groups )
 		endif; 
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Function FindField ( Group, Name ) export
+function FindField ( Group, Name ) export
 	
 	field = new DataCompositionField ( Name );
 	for each item in Group.GroupFields.Items do
@@ -66,9 +66,9 @@ Function FindField ( Group, Name ) export
 	enddo; 
 	return undefined;
 	
-EndFunction 
+endfunction 
 
-Function GetField ( Selection, Path ) export
+function GetField ( Selection, Path ) export
 	
 	field = new DataCompositionField ( Path );
 	groupType = Type ( "DataCompositionSelectedFieldGroup" );
@@ -88,15 +88,15 @@ Function GetField ( Selection, Path ) export
 	enddo; 
 	return undefined;
 	
-EndFunction
+endfunction
 
-Function Insert ( Item, Destination ) export
+function Insert ( Item, Destination ) export
 	
 	return runCopying ( Item.Parent, Item, Destination, undefined, new Map () );
 	
-EndFunction 
+endfunction 
 
-Function runCopying ( Node, Item, Destination, Index, Map )
+function runCopying ( Node, Item, Destination, Index, Map )
 	
 	type = TypeOf ( Item );
 	params = copyingParams ( type, Destination );
@@ -288,9 +288,9 @@ Function runCopying ( Node, Item, Destination, Index, Map )
 	endif;
 	return row;
 	
-EndFunction
+endfunction
 
-Function copyingParams ( Type, Set )
+function copyingParams ( Type, Set )
 	
 	result = new Structure ();
 	result.Insert ( "TypeRequired", false );
@@ -375,4 +375,4 @@ Function copyingParams ( Type, Set )
 	endif;
 	return result;
 	
-EndFunction
+endfunction

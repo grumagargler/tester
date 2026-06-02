@@ -1,16 +1,16 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	init ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	User = SessionParameters.User;
 	
-EndProcedure
+endprocedure

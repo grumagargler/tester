@@ -1,5 +1,5 @@
-&AtServer
-Function FillRights ( Form ) export
+&atserver
+function FillRights ( Form ) export
 	
 	env = GetEnv ( Form );
 	PrepareRightsTable ( env );
@@ -9,10 +9,10 @@ Function FillRights ( Form ) export
 	Form.ValueToFormAttribute ( env.RightsTable, "Rights" );
 	return relations;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function GetEnv ( Form ) export
+&atserver
+function GetEnv ( Form ) export
 	
 	env = new Structure ();
 	env.Insert ( "Form", Form );
@@ -21,10 +21,10 @@ Function GetEnv ( Form ) export
 	env.Insert ( "CurrentGroup" );
 	return env;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure PrepareRightsTable ( Env ) export
+&atserver
+procedure PrepareRightsTable ( Env ) export
 	
 	stringType = new TypeDescription ( "String" );
 	numberType = new TypeDescription ( "Number" );
@@ -34,24 +34,24 @@ Procedure PrepareRightsTable ( Env ) export
 	Env.RightsTable.Columns.Add ( "Use", numberType );
 	Env.RightsTable.Columns.Add ( "Confirmed", numberType );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure getSelectedRights ( Env )
+&atserver
+procedure getSelectedRights ( Env )
 	
 	Env.Insert ( "SelectedRights", getRoleNamesFromObject(Env.Object));
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getRoleNamesFromObject ( Object )
+&atserver
+function getRoleNamesFromObject ( Object )
 	
 	return Object.Rights.Unload ().UnloadColumn ( "RoleName" );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function FillRightsTable ( Env ) export
+&atserver
+function FillRightsTable ( Env ) export
 	
 	table = rightsTable ();
 	relations = new Array ();	
@@ -61,10 +61,10 @@ Function FillRightsTable ( Env ) export
 	enddo;	
 	return new FixedArray ( relations )
 	
-EndFunction
+endfunction
 
-&AtServer
-Function rightsTable ()
+&atserver
+function rightsTable ()
 	
 	template = GetCommonTemplate ( "Rights" );
 	table = new ValueTable();
@@ -89,10 +89,10 @@ Function rightsTable ()
 	enddo; 	
 	return table;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure addNodeToTable ( Env, Node )
+&atserver
+procedure addNodeToTable ( Env, Node )
 	
 	if ( Node.Group <> "" ) then
 		Env.CurrentGroup = Env.RightsTable.Rows.Add ();		
@@ -112,10 +112,10 @@ Procedure addNodeToTable ( Env, Node )
 		row.Use = InRole ( Env, row.RoleName );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getRoleName ( Name )
+&atserver
+function getRoleName ( Name )
 	
 	if ( Name = "UseAnalysisOfWorkingTime" ) then
 		return "WorkingTimeAnalysis";
@@ -137,20 +137,20 @@ Function getRoleName ( Name )
 		return Name;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure addNodeToRelations ( Node, Relations )
+&atserver
+procedure addNodeToRelations ( Node, Relations )
 	
 	if ( Node.Roles.Count () = 0 ) then
 		return;
 	endif; 
 	Relations.Add ( new Structure ( "RoleName, Roles", Node.Name, Node.Roles ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function GetRelations () export
+&atserver
+function GetRelations () export
 	
 	table = rightsTable ();
 	relations = new Array ();	
@@ -159,16 +159,16 @@ Function GetRelations () export
 	enddo;	
 	return new FixedArray ( relations );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function InRole ( Env, RoleName ) export
+&atserver
+function InRole ( Env, RoleName ) export
 	
 	return Env.SelectedRights.Find ( RoleName ) <> undefined;
 	
-EndFunction 
+endfunction 
 
-Procedure SetCheckboxesForGroups ( Groups ) export
+procedure SetCheckboxesForGroups ( Groups ) export
 	
 	for each row in Groups do
 		#if ( Server ) then
@@ -178,9 +178,9 @@ Procedure SetCheckboxesForGroups ( Groups ) export
 		#endif
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function GetGroupCheckboxState ( Rows ) export
+function GetGroupCheckboxState ( Rows ) export
 	
 	currentState = undefined;
 	for each row in Rows do
@@ -192,18 +192,18 @@ Function GetGroupCheckboxState ( Rows ) export
 	enddo; 
 	return currentState;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function FillCheck ( Form ) export
+&atserver
+function FillCheck ( Form ) export
 	
 	tree = Form.FormAttributeToValue ( "Rights" );
 	return tree.Rows.Find ( 1, "Use", true ) <> undefined;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure SaveSeletedRights ( Form, CurrentObject ) export
+&atserver
+procedure SaveSeletedRights ( Form, CurrentObject ) export
 	
 	rights = CurrentObject.Rights;
 	tree = Form.FormAttributeToValue ( "Rights" );
@@ -220,10 +220,10 @@ Procedure SaveSeletedRights ( Form, CurrentObject ) export
 		enddo; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function UseChanged ( Form ) export
+&atclient
+function UseChanged ( Form ) export
 	
 	tree = Form.Rights;
 	roles = tree.GetItems ();
@@ -244,10 +244,10 @@ Function UseChanged ( Form ) export
 	SetCheckboxesForGroups ( roles );	
 	return mustConfirmChanges ( roles );	
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function getRolesMap ( RolesTree )
+&atclient
+function getRolesMap ( RolesTree )
 	
 	roles = new Map ();
 	groups = RolesTree.GetItems ();
@@ -259,10 +259,10 @@ Function getRolesMap ( RolesTree )
 	enddo;
 	return roles;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure RevertRights ( Form ) export
+&atclient
+procedure RevertRights ( Form ) export
 	
 	revertChanges ( Form.Rights.GetItems () );
 	Form.RightsChanges.GetItems ().Clear ();
@@ -270,19 +270,19 @@ Procedure RevertRights ( Form ) export
 	Form.Items.ConfirmPage.Enabled = false;
 	Form.Items.RightsPage.Enabled = true;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ShowConfirmation ( Form ) export
+&atserver
+procedure ShowConfirmation ( Form ) export
 	
 	Form.Items.RightsPages.CurrentPage = Form.Items.ConfirmPage;
 	Form.Items.ConfirmPage.Enabled = true;
 	Form.Items.RightsPage.Enabled = false;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Expand ( Form, Control = "RightsChanges" ) export
+&atclient
+procedure Expand ( Form, Control = "RightsChanges" ) export
 	
 	tree = Form.Items [ Control ];
 	table = Form [ Control ];
@@ -290,29 +290,29 @@ Procedure Expand ( Form, Control = "RightsChanges" ) export
 		tree.Expand ( row.GetID (), true );
 	enddo;	
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure HideConfirmation ( Form ) export
+&atclient
+procedure HideConfirmation ( Form ) export
 	
 	Form.Items.RightsPages.CurrentPage = Form.Items.RightsPage;
 	Form.Items.ConfirmPage.Enabled = false; // Bug workaround: in some cases "CurrentPage" does not work
 	Form.Items.RightsPage.Enabled = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure captureCurrentRoles ( Rows )
+&atclient
+procedure captureCurrentRoles ( Rows )
 	
 	for each row in Rows do
 		row.Confirmed = row.Use;
 		captureCurrentRoles ( row.GetItems () );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function mustConfirmChanges ( Groups )	
+&atclient
+function mustConfirmChanges ( Groups )	
 	
 	groupCount = 0;
 	for each group in Groups do
@@ -336,19 +336,19 @@ Function mustConfirmChanges ( Groups )
 		return false;
 	endif;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure FillChanges ( Form ) export
+&atserver
+procedure FillChanges ( Form ) export
 	
 	tree = Form.FormAttributeToValue ( "Rights" );	
 	removeConfirmedRows ( tree );	
 	Form.ValueToFormAttribute ( tree, "RightsChanges" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure removeConfirmedRows ( Tree )
+&atserver
+procedure removeConfirmedRows ( Tree )
 	
 	i = 0;
 	while ( i < Tree.Rows.Count () ) do
@@ -371,29 +371,29 @@ Procedure removeConfirmedRows ( Tree )
 		endif;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure RoleChangesRejected ( Answer, Params ) export
+&atclient
+procedure RoleChangesRejected ( Answer, Params ) export
 	
 	if ( Answer <> DialogReturnCode.Yes ) then		
 		revertChanges ( Params.Roles );
 	endif;		
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure revertChanges ( Rows )
+&atclient
+procedure revertChanges ( Rows )
 	
 	for each row in Rows do		
 		row.Use = row.Confirmed;		
 		revertChanges ( row.GetItems () );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure getRoleUseChanges ( Rows, Changed )
+&atclient
+procedure getRoleUseChanges ( Rows, Changed )
 	for each row in Rows do
 		if ( isGroup ( row ) ) then
 			getRoleUseChanges ( row.GetItems(), Changed );
@@ -401,17 +401,17 @@ Procedure getRoleUseChanges ( Rows, Changed )
 			Changed.Add ( row.RoleName );
 		endif;
 	enddo;
-EndProcedure
+endprocedure
 
-&AtClient
-Function isGroup ( Row )
+&atclient
+function isGroup ( Row )
 	
 	return Row.RoleName = "";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure setCheckboxesByGroup ( Group, RolesTree, RolesMap, RightsRelations )
+&atclient
+procedure setCheckboxesByGroup ( Group, RolesTree, RolesMap, RightsRelations )
 	
 	rows = Group.GetItems ();
 	for each row in rows do
@@ -419,10 +419,10 @@ Procedure setCheckboxesByGroup ( Group, RolesTree, RolesMap, RightsRelations )
 		setCheckboxes ( row, RolesTree, RolesMap, RightsRelations );
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure setCheckboxes ( Row, RolesTree, RolesMap, RightsRelations )
+&atclient
+procedure setCheckboxes ( Row, RolesTree, RolesMap, RightsRelations )
 	
 	if ( Row.Use = 1 ) then
 		enableBasedRoles ( Row.RoleName, RolesMap, RightsRelations );
@@ -430,10 +430,10 @@ Procedure setCheckboxes ( Row, RolesTree, RolesMap, RightsRelations )
 		resetSubordinatedRoles ( Row.RoleName, rolesMap, RightsRelations );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure enableBasedRoles ( RoleName, RolesMap, RightsRelations )
+&atclient
+procedure enableBasedRoles ( RoleName, RolesMap, RightsRelations )
 	
 	basedRoles = findBasedRoles ( RoleName, RightsRelations );
 	if ( basedRoles = undefined ) then
@@ -450,10 +450,10 @@ Procedure enableBasedRoles ( RoleName, RolesMap, RightsRelations )
 		endif; 
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function findBasedRoles ( RoleName, RightsRelations )
+&atclient
+function findBasedRoles ( RoleName, RightsRelations )
 	
 	for each item in RightsRelations do
 		if ( item.RoleName = RoleName ) then
@@ -462,10 +462,10 @@ Function findBasedRoles ( RoleName, RightsRelations )
 	enddo; 
 	return undefined;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function basedRolesChecked ( RolesMap, BasedRoles )
+&atclient
+function basedRolesChecked ( RolesMap, BasedRoles )
 	
 	for each role in BasedRoles.Roles do
 		if ( not RolesMap [ role ].Use = 1 ) then
@@ -474,10 +474,10 @@ Function basedRolesChecked ( RolesMap, BasedRoles )
 	enddo; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure resetSubordinatedRoles ( RoleName, RolesMap, RightsRelations )
+&atclient
+procedure resetSubordinatedRoles ( RoleName, RolesMap, RightsRelations )
 	
 	for each subordinatedRole in RightsRelations do
 		subordinatedRoleName = subordinatedRole.RoleName;
@@ -497,24 +497,24 @@ Procedure resetSubordinatedRoles ( RoleName, RolesMap, RightsRelations )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure MarkAll ( RightsTable ) export
+&atclient
+procedure MarkAll ( RightsTable ) export
 	
 	markRows ( RightsTable, 1 );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UnmarkAll ( RightsTable ) export
+&atclient
+procedure UnmarkAll ( RightsTable ) export
 	
 	markRows ( RightsTable, 0 );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure markRows ( RightsTable, Marker )
+&atclient
+procedure markRows ( RightsTable, Marker )
 	
 	groups = RightsTable.GetItems ();
 	for each group in groups do
@@ -525,4 +525,4 @@ Procedure markRows ( RightsTable, Marker )
 		enddo; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 

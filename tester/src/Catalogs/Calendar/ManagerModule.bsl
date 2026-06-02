@@ -1,20 +1,20 @@
-#if ( Server or ThickClientOrdinaryApplication or ExternalConnection ) then
+#if ( server or thickclientordinaryapplication or externalconnection ) then
 
-Procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
+procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
 	
 	StandardProcessing = false;
 	Fields.Add ( "Date" );
 	
-EndProcedure
+endprocedure
 
-Procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
+procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
 	
 	StandardProcessing = false;
 	Presentation = Format ( Data.Date, "DLF=D" );
 	
-EndProcedure
+endprocedure
 
-Function GetDate ( Date ) export
+function GetDate ( Date ) export
 	
 	SetPrivilegedMode ( true );
 	BeginTransaction ();
@@ -31,15 +31,15 @@ Function GetDate ( Date ) export
 	endif;
 	return result;
 	
-EndFunction
+endfunction
 
-Procedure lock ()
+procedure lock ()
 	
 	lock = new DataLock ();
 	item = lock.Add ( "Catalog.Calendar");
 	item.Mode = DataLockMode.Exclusive;
 	lock.Lock ();
 	
-EndProcedure
+endprocedure
 
 #endif

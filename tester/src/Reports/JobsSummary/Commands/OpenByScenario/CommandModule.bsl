@@ -1,13 +1,13 @@
 
-&AtClient
-Procedure CommandProcessing ( References, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( References, ExecuteParameters )
 	
 	openReport ( References, ExecuteParameters );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openReport ( References, ExecuteParameters )
+&atclient
+procedure openReport ( References, ExecuteParameters )
 	
 	parameter = References [ 0 ];
 	p = ReportsSystem.GetParams ( "JobsSummary" );
@@ -31,4 +31,4 @@ Procedure openReport ( References, ExecuteParameters )
 	p.GenerateOnOpen = true;
 	ReportsSystem.Open ( p, ExecuteParameters.Source, true, ExecuteParameters.Window );
 	
-EndProcedure 
+endprocedure 

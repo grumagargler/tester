@@ -1,5 +1,5 @@
 	
-Function Events () export
+function Events () export
 	
 	p = new Structure ();
 	p.Insert ( "FullAccessRequest", false );
@@ -14,21 +14,21 @@ Function Events () export
 	p.Insert ( "AfterOutput", false );
 	return p;
 	
-EndFunction 
+endfunction 
 
-Function GetVariants ( User, Report ) export
+function GetVariants ( User, Report ) export
 	
 	return getSettings ( User, Report );
 	
-EndFunction
+endfunction
 
-Function GetUserSettings ( User, Report, ReportVariant ) export
+function GetUserSettings ( User, Report, ReportVariant ) export
 	
 	return getSettings ( User, Report, ReportVariant );
 	
-EndFunction
+endfunction
 
-Function getSettings ( User, Report, Variant = undefined )
+function getSettings ( User, Report, Variant = undefined )
 	
 	s = "
 	|select allowed Ref as Ref, Code as Code, Description as Description, LastUpdateDate as LastUpdateDate
@@ -51,15 +51,15 @@ Function getSettings ( User, Report, Variant = undefined )
 	q.SetParameter ( "User", User );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-Function GetSchema ( Report ) export
+function GetSchema ( Report ) export
 	
 	return Reports [ Report ].GetTemplate ( Metadata.Reports [ Report ].MainDataCompositionSchema.Name );
 	
-EndFunction
+endfunction
  
-Procedure ApplyFilters ( Composer, Params ) export
+procedure ApplyFilters ( Composer, Params ) export
 	
 	filters = undefined;
 	Params.Property ( "Filters", filters );
@@ -92,9 +92,9 @@ Procedure ApplyFilters ( Composer, Params ) export
 		fixComparison ( item );
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Function Prepare ( Report ) export
+function Prepare ( Report ) export
 	
 	SetPrivilegedMode ( true );
 	p = getParams ( Report );
@@ -102,9 +102,9 @@ Function Prepare ( Report ) export
 	obj.Params = p;
 	return obj;
 	
-EndFunction 
+endfunction 
 
-Function getParams ( Report )
+function getParams ( Report )
 	
 	p = new Structure ();
 	p.Insert ( "Name", Report );
@@ -130,15 +130,15 @@ Function getParams ( Report )
 	p.Insert ( "ClearTable", true );
 	return p;
 	
-EndFunction 
+endfunction 
 
-Procedure setupPage ( Params )
+procedure setupPage ( Params )
 	
 	Params.Result.FitToPage = true;
 	
-EndProcedure
+endprocedure
 
-Procedure setKey ( Params )
+procedure setKey ( Params )
 	
 	if ( TypeOf ( Params.Variant ) = Type ( "String" ) ) then
 		code = StrReplace ( Params.Variant, "#", "" );
@@ -147,9 +147,9 @@ Procedure setKey ( Params )
 	endif; 
 	Params.Result.PrintParametersKey = Params.Name + code;
 	
-EndProcedure
+endprocedure
 
-Function FindField ( Path, Schema ) export
+function FindField ( Path, Schema ) export
 	
 	i = StrFind ( Path, "." );
 	if ( i = 0 ) then
@@ -167,9 +167,9 @@ Function FindField ( Path, Schema ) export
 	endif; 
 	return field;
 	
-EndFunction 
+endfunction 
 
-Procedure getOutputParams ( Params )
+procedure getOutputParams ( Params )
 	
 	Params.Insert ( "ShowTitle", showTitle ( Params ) );
 	Params.Insert ( "ShowDataVersion", showDataVersion ( Params ) );
@@ -179,9 +179,9 @@ Procedure getOutputParams ( Params )
 	Params.Insert ( "ShowParams", showParams );
 	Params.Insert ( "HideParams", showParams and Params.HiddenParams.Count () > 0 );
 	
-EndProcedure 
+endprocedure 
 
-Function showTitle ( Params )
+function showTitle ( Params )
 	
 	p = Params.Settings.OutputParameters.FindParameterValue ( new DataCompositionParameter ( "TitleOutput" ) );
 	if ( p.Use ) then
@@ -194,16 +194,16 @@ Function showTitle ( Params )
 	p = Params.Settings.OutputParameters.FindParameterValue ( new DataCompositionParameter ( "Title" ) );
 	return p.Use and ( p.Value <> "" );
 	
-EndFunction 
+endfunction 
 
-Function showDataVersion ( Params )
+function showDataVersion ( Params )
 	
 	p = Params.Settings.OutputParameters.FindParameterValue ( new DataCompositionParameter ( "DataRelevanceOutput" ) );
 	return not p.Use or p.Value <> DataCompositionDataRelevanceOutputType.DontOutput;
 	
-EndFunction 
+endfunction 
 
-Function showInfo ( Params, Parameter )
+function showInfo ( Params, Parameter )
 	
 	settings = Params.Settings;
 	p = settings.OutputParameters.FindParameterValue ( new DataCompositionParameter ( Parameter ) );
@@ -235,9 +235,9 @@ Function showInfo ( Params, Parameter )
 	endif; 
 	return false;
 	
-EndFunction 
+endfunction 
 
-Procedure encodeParams ( Params )
+procedure encodeParams ( Params )
 	
 	if ( not Params.HideParams ) then
 		return;
@@ -250,9 +250,9 @@ Procedure encodeParams ( Params )
 	enddo; 
 	Params.Insert ( "ParametersMap", names );
 	
-EndProcedure 
+endprocedure 
 
-Function executeComposer ( Composer, Params, Details )
+function executeComposer ( Composer, Params, Details )
 	
 	try
 		template = buildTemplate ( Params, Composer, Details );
@@ -270,17 +270,17 @@ Function executeComposer ( Composer, Params, Details )
 	endif; 
 	return template;
 	
-EndFunction
+endfunction
 
-Procedure outputError ( Params, Error )
+procedure outputError ( Params, Error )
 	
 	area = GetCommonTemplate ( "ReportMessages" ).GetArea ( "Error" );
 	area.Parameters.Error = Error;
 	Params.Result.Put ( area );
 	
-EndProcedure
+endprocedure
 
-Procedure getParts ( Params, DataTemplate )
+procedure getParts ( Params, DataTemplate )
 	
 	parts = new Array ();
 	parts.Add ( "StartIndex" );
@@ -311,9 +311,9 @@ Procedure getParts ( Params, DataTemplate )
 	enddo;
 	Params.Insert ( "Parts", parts );
 	
-EndProcedure
+endprocedure
 
-Procedure hideParams ( Params, DataTemplate )
+procedure hideParams ( Params, DataTemplate )
 	
 	if ( not Params.HideParams ) then
 		return;
@@ -343,9 +343,9 @@ Procedure hideParams ( Params, DataTemplate )
 		enddo; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure adjustHeader ( Params, DataTemplate )
+procedure adjustHeader ( Params, DataTemplate )
 	
 	templates = DataTemplate.Templates;
 	i = Params.Parts.Find ( "ParamsIndex" );
@@ -372,9 +372,9 @@ Procedure adjustHeader ( Params, DataTemplate )
 		templates [ i ].Template.Delete ( 0 );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure groupHeader ( Params, DataTemplate )
+procedure groupHeader ( Params, DataTemplate )
 	
 	header = Params.Parts.Find ( "ReportIndex" );
 	if ( header = undefined
@@ -406,9 +406,9 @@ Procedure groupHeader ( Params, DataTemplate )
 		endif;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Procedure decodeParams ( Params, DataTemplate = undefined )
+procedure decodeParams ( Params, DataTemplate = undefined )
 	
 	if ( not Params.HideParams ) then
 		return;
@@ -418,9 +418,9 @@ Procedure decodeParams ( Params, DataTemplate = undefined )
 		replaceIDs ( Params, ids, DataTemplate );
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-Function restoreParams ( Params )
+function restoreParams ( Params )
 	
 	set = Params.Schema.Parameters;
 	map = new Map ();
@@ -431,9 +431,9 @@ Function restoreParams ( Params )
 	enddo; 
 	return map;
 	
-EndFunction 
+endfunction 
 
-Procedure replaceIDs ( Params, IDs, DataTemplate )
+procedure replaceIDs ( Params, IDs, DataTemplate )
 	
 	i = Params.Parts.Find ( "ParamsIndex" );
 	template = DataTemplate.Templates [ i ].Template;
@@ -449,9 +449,9 @@ Procedure replaceIDs ( Params, IDs, DataTemplate )
 		enddo; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function reportIsEmpty ( Params )
+function reportIsEmpty ( Params )
 	
 	if ( Params.Empty ) then
 		return Params.Interactive or Params.Result.TableHeight = 0;
@@ -459,15 +459,15 @@ Function reportIsEmpty ( Params )
 		return false;
 	endif;
 	
-EndFunction 
+endfunction 
 
-Procedure showEmpty ( Params )
+procedure showEmpty ( Params )
 	
 	Params.Result.Put ( GetCommonTemplate ( "ReportMessages" ).GetArea ( "Empty" ) );
 	
-EndProcedure 
+endprocedure 
 
-Procedure headerFooter ( Params )
+procedure headerFooter ( Params )
 	
 	if ( Params.StandardFooter ) then
 		footer = Params.Result.Footer;
@@ -475,9 +475,9 @@ Procedure headerFooter ( Params )
 		footer.RightText = Output.PageFooter ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure output ( Params, Processor, Builder, DataTemplate )
+procedure output ( Params, Processor, Builder, DataTemplate )
 	
 	interactive = Params.Interactive;
 	if ( interactive ) then
@@ -527,9 +527,9 @@ Procedure output ( Params, Processor, Builder, DataTemplate )
 	Builder.EndOutput ();
 	Params.Empty = not interactive and empty;
 	
-EndProcedure
+endprocedure
 
-Function Make ( Report, Variant, Settings ) export
+function Make ( Report, Variant, Settings ) export
 
 	obj = prepareToMake ( Report, Variant, Settings );
 	p = obj.Params;
@@ -548,9 +548,9 @@ Function Make ( Report, Variant, Settings ) export
 	Reporter.ComposeResult ( obj );
 	return obj;
 	
-EndFunction 
+endfunction 
 
-Function prepareToMake ( Report, Variant, Settings )
+function prepareToMake ( Report, Variant, Settings )
 	
 	obj = Reporter.Prepare ( Report );
 	p = obj.Params;
@@ -576,18 +576,18 @@ Function prepareToMake ( Report, Variant, Settings )
 	p.Composer = composer;
 	return obj;
 	
-EndFunction 
+endfunction 
 
-Procedure loadJSONsettings ( Composer, Settings )
+procedure loadJSONsettings ( Composer, Settings )
 
 	Composer.LoadUserSettings ( new DataCompositionUserSettings () );
 	params = new Structure ( "Filters",
 		Reporter.FiltersFromJSON ( Composer, Settings ) );
 	Reporter.ApplyFilters ( Composer, params );
 
-EndProcedure
+endprocedure
 
-Function FiltersFromJSON ( Composer, Params ) export
+function FiltersFromJSON ( Composer, Params ) export
 	
 	filters = new Array ();
 	parameter = Type ( "DataCompositionSettingsParameterValue" );
@@ -609,9 +609,9 @@ Function FiltersFromJSON ( Composer, Params ) export
 	enddo;
 	return filters;
 	
-EndFunction
+endfunction
 
-Function adjustValue ( Composer, Name, Value, IsParameter )
+function adjustValue ( Composer, Name, Value, IsParameter )
 	
 	if ( IsParameter ) then
 		field = Composer.Settings.DataParametersAvailableFields.FindField (
@@ -653,9 +653,9 @@ Function adjustValue ( Composer, Name, Value, IsParameter )
 	enddo;
 	return ? ( valueType = arrayType, valuesList, valuesList [ 0 ] );
 	
-EndFunction
+endfunction
 
-Function Build ( Params ) export
+function Build ( Params ) export
 
 	obj = prepareToGet ( Params );
 	p = obj.Params;
@@ -670,9 +670,9 @@ Function Build ( Params ) export
 	Reporter.ComposeResult ( obj );
 	return p.Result;
 	
-EndFunction 
+endfunction 
 
-Function prepareToGet ( Params )
+function prepareToGet ( Params )
 	
 	report = Params.ReportName;
 	variant = Params.Variant;
@@ -692,9 +692,9 @@ Function prepareToGet ( Params )
 	p.Columns = Params.Columns;
 	return obj;
 	
-EndFunction 
+endfunction 
 
-Function FindDefinition ( Template, Name ) export
+function FindDefinition ( Template, Name ) export
 	
 	result = findTemplate ( Template, Name );
 	if ( result = undefined ) then
@@ -703,9 +703,9 @@ Function FindDefinition ( Template, Name ) export
 		return Template.Templates [ result ];
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Function findTemplate ( Template, Name )
+function findTemplate ( Template, Name )
 	
 	for each item in Template.Body do
 		itemType = TypeOf ( item );
@@ -726,9 +726,9 @@ Function findTemplate ( Template, Name )
 	enddo; 
 	return undefined;
 	
-EndFunction 
+endfunction 
 
-Function targetTemplate ( Item, Name )
+function targetTemplate ( Item, Name )
 	
 	if ( Item.Name = Name ) then
 		return Item.Body [ 0 ].Template;
@@ -739,9 +739,9 @@ Function targetTemplate ( Item, Name )
 		endif; 
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Procedure ReplaceExpression ( Definition, Expression, NewExpression ) export
+procedure ReplaceExpression ( Definition, Expression, NewExpression ) export
 	
 	area = Type ( "DataCompositionExpressionAreaParameter" );
 	for each p in Definition.Parameters do
@@ -751,9 +751,9 @@ Procedure ReplaceExpression ( Definition, Expression, NewExpression ) export
 		endif; 
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Procedure MakeFlat ( Template ) export
+procedure MakeFlat ( Template ) export
 	
 	chart = Type ( "DataCompositionAreaTemplateChartTemplate" );
 	document = Type ( "DataCompositionAreaDocumentTemplate" );
@@ -769,11 +769,11 @@ Procedure MakeFlat ( Template ) export
     enddo;
   enddo;
 	
-EndProcedure
+endprocedure
 
 #region Details
 
-Procedure ApplyDetails ( Composer, Filters ) export
+procedure ApplyDetails ( Composer, Filters ) export
 	
 	localFilters = getFilters ( Composer );
 	availFilters = Composer.Settings.FilterAvailableFields;
@@ -809,9 +809,9 @@ Procedure ApplyDetails ( Composer, Filters ) export
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function getFilters ( Composer )
+function getFilters ( Composer )
 	
 	id = Composer.Settings.Filter.UserSettingID;
 	if ( id = "" ) then
@@ -820,15 +820,15 @@ Function getFilters ( Composer )
 		return Composer.UserSettings.Items.Find ( id ).Items;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Procedure downloadFilter ( Filter, Destination )
+procedure downloadFilter ( Filter, Destination )
 	
 	FillPropertyValues ( Destination, Filter, "Use, RightValue, ComparisonType" );
 	
-EndProcedure 
+endprocedure 
 
-Procedure loadFilter ( Filter, AvailFields, Items )
+procedure loadFilter ( Filter, AvailFields, Items )
 	
 	group = Type ( "DataCompositionFilterItemGroup" );
 	if ( TypeOf ( Filter ) = group ) then
@@ -846,24 +846,24 @@ Procedure loadFilter ( Filter, AvailFields, Items )
 		FillPropertyValues ( item, Filter );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure AddCommand ( List, Name, Parameters ) export
+procedure AddCommand ( List, Name, Parameters ) export
 	
 	List.Add ( new Structure ( "Command, Parameters", Name, Parameters ) );
 	
-EndProcedure 
+endprocedure 
 
-Procedure AddReport ( List, Name ) export
+procedure AddReport ( List, Name ) export
 	
 	report = Metadata.Reports [ Name ];
 	if ( AccessRight ( "View", report ) ) then
 		List.Add ( Name, report.Presentation () );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure DateToPeriod ( Composer, Filter ) export
+procedure DateToPeriod ( Composer, Filter ) export
 	
 	periodItem = DC.FindParameter ( Composer, "Period" );
 	periodItem.Use = true;
@@ -879,23 +879,23 @@ Procedure DateToPeriod ( Composer, Filter ) export
 	period.EndDate = EndOfDay ( endDate );
 	Filter.StandardProcessing = false;
 	
-EndProcedure 
+endprocedure 
 
 #endregion
 
-Function IsFilling ( Variant ) export
+function IsFilling ( Variant ) export
 	
 	return StrStartsWith ( Variant, "#Fill" );
 
-EndFunction 
+endfunction 
 
-Function ColumnStruct ( Path, MaximumWidth ) export
+function ColumnStruct ( Path, MaximumWidth ) export
 	
 	return new Structure ( "Path, MaximumWidth", Path, MaximumWidth );
 	
-EndFunction 
+endfunction 
 
-Procedure loadRightValue ( Item, Filter )
+procedure loadRightValue ( Item, Filter )
 	
 	value = Filter.RightValue;
 	if ( TypeOf ( value ) = Type ( "Array" ) ) then
@@ -906,9 +906,9 @@ Procedure loadRightValue ( Item, Filter )
 		Item.RightValue = value;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure fixComparison ( Filter )
+procedure fixComparison ( Filter )
 	
 	parameter = TypeOf ( Filter ) = Type ( "DataCompositionSettingsParameterValue" );
 	if ( parameter ) then
@@ -929,9 +929,9 @@ Procedure fixComparison ( Filter )
 		Filter.ComparisonType = candidate;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Function ComposeResult ( Report ) export
+function ComposeResult ( Report ) export
 	
 	p = Report.Params;
 	setupPage ( p );
@@ -947,9 +947,9 @@ Function ComposeResult ( Report ) export
 	endif; 
 	return ok;
 
-EndFunction
+endfunction
 
-Function putReport ( Report )
+function putReport ( Report )
 	
 	p = Report.Params;
 	manager = Reports [ p.Name ];
@@ -990,9 +990,9 @@ Function putReport ( Report )
 	endif;
 	return true;
 
-EndFunction
+endfunction
 
-Procedure setupColumns ( Params )
+procedure setupColumns ( Params )
 	
 	if ( Params.Columns = undefined ) then
 		return;
@@ -1011,15 +1011,15 @@ Procedure setupColumns ( Params )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function buildTemplate ( Params, Composer, Details )
+function buildTemplate ( Params, Composer, Details )
 	
 	return Composer.Execute ( Params.Schema, Params.Settings, Details, , , Params.CheckAccess );
 	
-EndFunction 
+endfunction 
 
-Procedure applyDirectives ( DataTemplate )
+procedure applyDirectives ( DataTemplate )
 	
 	area = Type ( "DataCompositionAreaTemplate" );
 	for each item in DataTemplate.Templates do
@@ -1060,16 +1060,16 @@ Procedure applyDirectives ( DataTemplate )
 		endif; 
 	enddo;
 
-EndProcedure 
+endprocedure 
 
-Procedure cleanCell ( Cells )
+procedure cleanCell ( Cells )
 	
 	Cells.Appearance.SetParameterValue ( "VerticalMerge", true );
 	Cells.Items.Clear ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure cleanTemplate ( Template, Rows )
+procedure cleanTemplate ( Template, Rows )
 	
 	for each rowIndex in Rows do
 		row = Template [ rowIndex ];
@@ -1078,9 +1078,9 @@ Procedure cleanTemplate ( Template, Rows )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function rowEmpty ( Row )
+function rowEmpty ( Row )
 	
 	cells = Row.Cells;
 	lastColumn = cells.Count () - 1;
@@ -1094,15 +1094,15 @@ Function rowEmpty ( Row )
 	enddo; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-Procedure DisableMenu ( Menu ) export
+procedure DisableMenu ( Menu ) export
 	
 	Menu = null;
 	
-EndProcedure
+endprocedure
 
-Procedure AdjustGroupping ( Object, Name ) export
+procedure AdjustGroupping ( Object, Name ) export
 	
 	group = DCsrv.GetGroup ( Object.Params.Settings, Name );
 	if ( group = undefined ) then
@@ -1125,4 +1125,4 @@ Procedure AdjustGroupping ( Object, Name ) export
 		enddo;
 	enddo;
 	
-EndProcedure
+endprocedure

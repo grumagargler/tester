@@ -1,5 +1,5 @@
-Function DF_Pick ( Ref, Field, Default = undefined ) export
+function DF_Pick ( Ref, Field, Default = undefined ) export
 	
 	return DF.Pick ( Ref, Field, Default );
 	
-EndFunction
+endfunction

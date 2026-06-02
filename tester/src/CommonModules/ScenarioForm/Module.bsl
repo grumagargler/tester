@@ -1,6 +1,6 @@
 
-&AtClient
-Function IsOpen ( Scenario, FoundWindow = undefined ) export
+&atclient
+function IsOpen ( Scenario, FoundWindow = undefined ) export
 	
 	if ( Scenario.IsEmpty () ) then
 		return false;
@@ -21,19 +21,19 @@ Function IsOpen ( Scenario, FoundWindow = undefined ) export
 	enddo; 
 	return false;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function findScenario ( Form, Scenario )
+&atclient
+function findScenario ( Form, Scenario )
 	
 	return TypeOf ( Form ) = Type ( Enum.FrameworkManagedForm () )
 	and StrFind ( "Catalog.Scenarios.Form.Form, Catalog.Versions.Form.Form", Form.FormName ) > 0
 	and Form.Parameters.Key = Scenario;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function GetPicture ( Type ) export
+&atclient
+function GetPicture ( Type ) export
 	
 	if ( Type = PredefinedValue ( "Enum.Controls.Window" ) ) then
 		return 0;
@@ -63,10 +63,10 @@ Function GetPicture ( Type ) export
 		return 3;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function FieldType ( Field, Stringify = false ) export
+&atclient
+function FieldType ( Field, Stringify = false ) export
 	
 	type = TypeOf ( Field );
 	if ( type = Type ( "TestedClientApplicationWindow" ) ) then
@@ -101,10 +101,10 @@ Function FieldType ( Field, Stringify = false ) export
 		return ? ( Stringify, "Field", PredefinedValue ( "Enum.Controls.Field" ) );
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Picking ( Owner, SelectOnly ) export
+&atclient
+procedure Picking ( Owner, SelectOnly ) export
 	
 	Test.AttachApplication ( SessionScenario );
 	p = new Structure ();
@@ -117,10 +117,10 @@ Procedure Picking ( Owner, SelectOnly ) export
 	endif; 
 	OpenForm ( "Catalog.Scenarios.Form.Picking", p, Owner );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function getActiveForm ()
+&atclient
+function getActiveForm ()
 	
 	try
 		Test.ConnectClient ( false );
@@ -135,27 +135,27 @@ Function getActiveForm ()
 		return new Structure ( "Name, Title", form.FormName, form.TitleText );
 	endif;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure ExecuteExpression ( Expression ) export
+&atclient
+procedure ExecuteExpression ( Expression ) export
 	
 	Execute ( Expression );
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OpenAssistant ( Table, NameColumn, Picking, Form, Application ) export
+&atclient
+procedure OpenAssistant ( Table, NameColumn, Picking, Form, Application ) export
 	
 	name = ScenarioForm.ControlName ( Table, NameColumn );
 	p = new Structure ( "ControlName, ControlType, Picking, Form, Application",
 		name, Table.CurrentData.Type, Picking, Form, Application );
 	OpenForm ( "Catalog.Assistant.ChoiceForm", p, Table );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function ControlName ( Table, NameColumn ) export
+&atclient
+function ControlName ( Table, NameColumn ) export
 	
 	row = Table.CurrentData;
 	if ( row.Type = PredefinedValue ( "Enum.Controls.Form" ) ) then
@@ -165,16 +165,16 @@ Function ControlName ( Table, NameColumn ) export
 		return ? ( Table.CurrentItem = NameColumn, perfix + row.Name, row.TitleText );
 	endif; 
 	
-EndFunction
+endfunction
 
-Function NamePrefix ( Lang ) export
+function NamePrefix ( Lang ) export
 
 	return ? ( Lang = "ru", "!", "#" );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ApplyAction ( Action ) export
+&atclient
+function ApplyAction ( Action ) export
 	
 	expression = Action.Expression;
 	error = false;
@@ -188,10 +188,10 @@ Function ApplyAction ( Action ) export
 	endif; 
 	return not error;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure Init ( Form ) export
+&atserver
+procedure Init ( Form ) export
 	
 	object = Form.Object;
 	setCreator ( object );
@@ -202,17 +202,17 @@ Procedure Init ( Form ) export
 	endif;
 	setApplication ( Form );
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setCreator ( Object )
+&atserver
+procedure setCreator ( Object )
 	
 	Object.Creator = SessionParameters.User;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setParent ( Object, Data )
+&atserver
+procedure setParent ( Object, Data )
 	
 	Data = undefined;
 	parent = Object.Parent;
@@ -225,10 +225,10 @@ Procedure setParent ( Object, Data )
 		Object.Parent = Data.Parent;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setType ( Object, ParentData )
+&atserver
+procedure setType ( Object, ParentData )
 	
 	if ( ParentData = undefined ) then
 		Object.Type = Enums.Scenarios.Scenario;
@@ -242,10 +242,10 @@ Procedure setType ( Object, ParentData )
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setApplication ( Form )
+&atserver
+procedure setApplication ( Form )
 	
 	value = undefined;
 	object = Form.Object;
@@ -268,10 +268,10 @@ Procedure setApplication ( Form )
 		endif; 
 	endif;
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function SaveParents ( Object, OldParent ) export
+&atclient
+function SaveParents ( Object, OldParent ) export
 	
 	if ( wrongParent ( Object ) ) then
 		return false;
@@ -281,10 +281,10 @@ Function SaveParents ( Object, OldParent ) export
 	enddo;
 	return true;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function wrongParent ( Object )
+&atclient
+function wrongParent ( Object )
 	
 	ref = Object.Ref;
 	if ( Object.Parent = ref
@@ -294,10 +294,10 @@ Function wrongParent ( Object )
 	endif;
 	return false;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function scenarioParents ( CurrentParent, OldParent )
+&atclient
+function scenarioParents ( CurrentParent, OldParent )
 	
 	parents = new Array ();
 	if ( ValueIsFilled ( OldParent ) ) then
@@ -309,19 +309,19 @@ Function scenarioParents ( CurrentParent, OldParent )
 	endif;
 	return parents;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure RereadParents ( Object, OldParent ) export
+&atclient
+procedure RereadParents ( Object, OldParent ) export
 	
 	for each parent in scenarioParents ( Object.Parent, OldParent ) do
 		ScenariosPanel.Reread ( parent );
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListDrag ( Form, Params, StandardProcessing, Target ) export
+&atclient
+procedure ListDrag ( Form, Params, StandardProcessing, Target ) export
 	
 	#if ( not MobileClient ) then
 		if ( not draggingScenarios ( Params ) ) then
@@ -336,19 +336,19 @@ Procedure ListDrag ( Form, Params, StandardProcessing, Target ) export
 		endif;
 	#endif
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function draggingScenarios ( Params )
+&atclient
+function draggingScenarios ( Params )
 	
 	scenarios = Params.Value;
 	return TypeOf ( scenarios ) = Type ( "Array" )
 		or TypeOf ( scenarios [ 0 ] ) = Type ( "CatalogRef.Scenarios" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure CopyMove ( Scenarios, Target, Copying ) export
+&atclient
+procedure CopyMove ( Scenarios, Target, Copying ) export
 	
 	list = ScenarioFormSrv.HierarchyList ( Scenarios );
 	if ( ValueIsFilled ( Target ) ) then
@@ -376,10 +376,10 @@ Procedure CopyMove ( Scenarios, Target, Copying ) export
 		Output.CopyMoveConfirmation ( ThisObject, context, new Structure ( "Application", newApplication ) );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure startCopyMove ( Context )
+&atclient
+procedure startCopyMove ( Context )
 	
 	copying = Context.Copying;
 	target = Context.Target;
@@ -397,20 +397,20 @@ Procedure startCopyMove ( Context )
 	endif;
 	RepositoryFiles.Sync ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure CopyMoveConfirmation ( Answer, Context ) export
+&atclient
+procedure CopyMoveConfirmation ( Answer, Context ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
 	endif;
 	startCopyMove ( Context );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure GotoLine ( Scenario, Line, Error ) export
+&atclient
+procedure GotoLine ( Scenario, Line, Error ) export
 	
 	p = new Structure ( "Key", Scenario );
 	if ( TypeOf ( Scenario ) = Type ( "CatalogRef.Versions" ) ) then
@@ -422,10 +422,10 @@ Procedure GotoLine ( Scenario, Line, Error ) export
 	Output.PutMessage ( Error, undefined, undefined, Error, , form.UUID );
 	Notify ( Enum.MessageActivateError (), Line, Scenario );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure InitPort ( Port ) export
+&atserver
+procedure InitPort ( Port ) export
 	
 	set = Port.ChoiceList;
 	format = Metadata.Catalogs.Applications.Attributes.Port.Format;
@@ -434,10 +434,10 @@ Procedure InitPort ( Port ) export
 		set.Add ( p, item.Code + " | " + Format ( p, format ), , ? ( item.Main, PictureLib.Pin, undefined ) );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function getApplications ()
+&atserver
+function getApplications ()
 	
 	s = "
 	|select allowed Applications.Code as Code,
@@ -459,9 +459,9 @@ Function getApplications ()
 	q.SetParameter ( "Session", SessionParameters.Session );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-Function CheckName ( Name ) export
+function CheckName ( Name ) export
 
 	forbidden = "\ / : * ? "" < > | . ^ , $ # @ ` ~ & % ( ) { } - + =";
 	description = Name;
@@ -472,4 +472,4 @@ Function CheckName ( Name ) export
 	enddo;
 	return true;
 
-EndFunction
+endfunction

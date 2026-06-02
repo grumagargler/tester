@@ -1,13 +1,13 @@
-&AtServer
+&atserver
 var NameDefined;
-&AtClient
+&atclient
 var NavigationComplete;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	applyParams ();
@@ -16,10 +16,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -32,18 +32,18 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	Picking = Parameters.Picking;
 	Help = OnlineHelp.Href ( Parameters.Help );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyParams ()
+&atserver
+procedure applyParams ()
 	
 	Running = Picking;
 	params = putMethod ();
@@ -54,10 +54,10 @@ Procedure applyParams ()
 		EnterKeyBehavior = EnterKeyBehaviorType.DefaultButton;
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function putMethod ()
+&atserver
+function putMethod ()
 
 	s = Parameters.Method;
 	pattern = "(.+)\(";
@@ -72,10 +72,10 @@ Function putMethod ()
 	ParamsCount = params.Count ();
 	return params;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure putParams ( Params )
+&atserver
+procedure putParams ( Params )
 	
 	NameDefined = ( Parameters.ControlName = "" );
 	pattern = "(.+)=(.+)";
@@ -99,10 +99,10 @@ Procedure putParams ( Params )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure putName ( Field, Label )
+&atserver
+procedure putName ( Field, Label )
 	
 	s = Lower ( label );
 	if ( s = "name"
@@ -113,10 +113,10 @@ Procedure putName ( Field, Label )
 		NameDefined = true;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setFocus ()
+&atserver
+procedure setFocus ()
 	
 	if ( ParamsCount = 0 ) then
 		CurrentItem = Items.Method;
@@ -124,35 +124,35 @@ Procedure setFocus ()
 		CurrentItem = Items.Param1;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	init ();
 	Appearance.Apply ( ThisObject, "Connected" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure init ()
+&atclient
+procedure init ()
 	
 	Connected = AppData <> undefined and AppData.Connected;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	Close ( getResult () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function getResult ()
+&atclient
+function getResult ()
 	
 	if ( Picking ) then
 		return new Structure ( "Picking, Expression, Running", Picking, Expression, Picking and Running and Connected );
@@ -160,28 +160,28 @@ Function getResult ()
 		return Expression;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure ParamStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure ParamStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	StandardProcessing = false;
 	ScenarioForm.Picking ( Item, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ParamOnChange ( Item )
+&atclient
+procedure ParamOnChange ( Item )
 	
 	if ( Quotes ) then
 		quote ( Item.Name );
 	endif; 
 	buildExpression ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure quote ( Parameter )
+&atclient
+procedure quote ( Parameter )
 	
 	q = """";
 	field = ThisObject [ Parameter ];
@@ -197,10 +197,10 @@ Procedure quote ( Parameter )
 	endif;
 	ThisObject [ Parameter ] = q + StrReplace ( field, q, q + q ) + q;
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Procedure buildExpression ( Form )
+&atclientatservernocontext
+procedure buildExpression ( Form )
 	
 	params = buildParams ( Form );
 	if ( params = "" ) then
@@ -209,10 +209,10 @@ Procedure buildExpression ( Form )
 		Form.Expression = Form.Method + " ( " + params + " );";
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Function buildParams ( Form )
+&atclientatservernocontext
+function buildParams ( Form )
 	
 	params = new Array ();
 	for i = 0 to Form.ParamsCount - 1 do
@@ -231,13 +231,13 @@ Function buildParams ( Form )
 	enddo; 
 	return StrConcat ( params, ", " );
 	
-EndFunction 
+endfunction 
 
 // *****************************************
 // *********** Help
 
-&AtClient
-Procedure HelpDocumentComplete ( Item )
+&atclient
+procedure HelpDocumentComplete ( Item )
 	
 	if ( Framework.VersionLess ( "8.3.14" ) ) then
 		return;
@@ -247,4 +247,4 @@ Procedure HelpDocumentComplete ( Item )
 		Item.Document.location.hash = "#" + Parameters.Help;
 	endif;
 
-EndProcedure
+endprocedure

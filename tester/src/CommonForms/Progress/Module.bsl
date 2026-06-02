@@ -1,29 +1,29 @@
-&AtClient
+&atclient
 var Completed;
-&AtClient
+&atclient
 var Messages;
-&AtClient
+&atclient
 var ClosingStarted;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	initStatus ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initStatus ()
+&atserver
+procedure initStatus ()
 	
 	Status = Output.Processing ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	init ();
 	if ( Parameters.ShowStatus ) then
@@ -32,18 +32,18 @@ Procedure OnOpen ( Cancel )
 		AttachIdleHandler ( "checkFinish", 1 );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure init ()
+&atclient
+procedure init ()
 
 	Completed = false;
 	ClosingStarted = false;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkStatus () export
+&atclient
+procedure checkStatus () export
 	
 	currentStatus = "";
 	error = false;
@@ -60,10 +60,10 @@ Procedure checkStatus () export
 		showMessages ( error );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Function getStatus ( val JobKey, Status, Error, Messages )
+&atservernocontext
+function getStatus ( val JobKey, Status, Error, Messages )
 	
 	failed = false;
 	active = jobIsActive ( JobKey, Messages, failed );
@@ -77,10 +77,10 @@ Function getStatus ( val JobKey, Status, Error, Messages )
 	endif;
 	return active;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function jobIsActive ( val JobKey, Messages, Failed )
+&atservernocontext
+function jobIsActive ( val JobKey, Messages, Failed )
 	
 	Failed = false;
 	job = Jobs.GetBackground ( JobKey, false );
@@ -101,10 +101,10 @@ Function jobIsActive ( val JobKey, Messages, Failed )
 		return false;
 	endif;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getMessages ( Messages )
+&atservernocontext
+function getMessages ( Messages )
 	
 	list = new Array ();
 	limit = Messages.UBound ();
@@ -133,19 +133,19 @@ Function getMessages ( Messages )
 	enddo;
 	return list;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function exceptionMessage ( Exception )
+&atservernocontext
+function exceptionMessage ( Exception )
 	
 	msg = new UserMessage ();
 	msg.Text = Exception.Description;
 	return msg;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure showMessages ( Error )
+&atclient
+procedure showMessages ( Error )
 	
 	havingMessages = Messages <> undefined;
 	if ( not ( Error or havingMessages ) ) then
@@ -187,18 +187,18 @@ Procedure showMessages ( Error )
 		closeProgress ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure closeProgress ()
+&atclient
+procedure closeProgress ()
 	
 	ClosingStarted = true;
 	Close ( Completed );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure checkFinish () export
+&atclient
+procedure checkFinish () export
 	
 	failed = false;
 	if ( jobIsActive ( Parameters.JobKey, Messages, failed ) ) then
@@ -210,10 +210,10 @@ Procedure checkFinish () export
 	endif;
 	showMessages ( failed );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
+&atclient
+procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
 	
 	if ( ClosingStarted ) then
 		return;
@@ -222,12 +222,12 @@ Procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
 	ClosingStarted = true;
 	AttachIdleHandler ( "startClosing", 0.1, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure startClosing ()
+&atclient
+procedure startClosing ()
 	
 	// Bug workaround to prevent 8.3.14 failing into infinite loop
 	Close ( Completed );
 	
-EndProcedure
+endprocedure

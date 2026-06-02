@@ -1,47 +1,47 @@
 // *****************************************
 // *********** Form events
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 
 	if ( Framework.IsLinux () ) then
 		adjustHint ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure adjustHint ()
+&atclient
+procedure adjustHint ()
 	
 	Items.VSCode.InputHint = Output.LinuxVSCode ();
 	
-EndProcedure
+endprocedure
  
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure VSCodeStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure VSCodeStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	StandardProcessing = false;
 	chooseFile ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure chooseFile ()
+&atclient
+procedure chooseFile ()
 	
 	dialog = new FileDialog ( FileDialogMode.Open );
 	dialog.Show ( new NotifyDescription ( "SelectFile", ThisObject ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure SelectFile ( File, Params ) export
+&atclient
+procedure SelectFile ( File, Params ) export
 	
 	if ( File = undefined ) then
 		return;
 	endif; 
 	Object.VSCode = File [ 0 ];
 	
-EndProcedure
+endprocedure

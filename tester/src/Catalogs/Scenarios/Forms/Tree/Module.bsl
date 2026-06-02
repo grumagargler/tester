@@ -1,31 +1,31 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	init ();
 	
-EndProcedure
+endprocedure
 
-Procedure init ()
+procedure init ()
 	
 	DC.SetParameter ( List, "User", SessionParameters.User );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure ApplicationFilterOnChange ( Item )
+&atclient
+procedure ApplicationFilterOnChange ( Item )
 	
 	filterByApplication ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByApplication ()
+&atserver
+procedure filterByApplication ()
 	
 	if ( ApplicationFilter.IsEmpty () ) then
 		DC.ChangeFilter ( List, "Application", undefined, false );
@@ -36,4 +36,4 @@ Procedure filterByApplication ()
 		DC.ChangeFilter ( List, "Application", filter, true, DataCompositionComparisonType.InList );
 	endif; 
 	
-EndProcedure 
+endprocedure 

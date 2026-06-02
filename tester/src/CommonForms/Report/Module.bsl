@@ -1,25 +1,25 @@
-&AtServer
+&atserver
 var GenerateOnOpen export;
-&AtClient
+&atclient
 var SelectedVariant;
-&AtClient
+&atclient
 var ChoiceForm;
-&AtClient
+&atclient
 var PreviousArea;
-&AtClient
+&atclient
 var WorkAroundSelectedActionParameters;
-&AtClient
+&atclient
 var WorkAroundDetails;
-&AtClient
+&atclient
 var TotalsEnv;
-&AtServer
+&atserver
 var StoredSettings;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	init ();
 	uploadStoredSettings ();
@@ -27,10 +27,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	applyParams ();
 	getSchema ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnLoadUserSettingsAtServer ( UserSettings, StandardSettingsUsed )
+&atserver
+procedure OnLoadUserSettingsAtServer ( UserSettings, StandardSettingsUsed )
 
 	events = reportManager ().Events ();
 	if ( events.FullAccessRequest ) then
@@ -65,10 +65,10 @@ Procedure OnLoadUserSettingsAtServer ( UserSettings, StandardSettingsUsed )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure giveAChanceToChangeSettings ()
+&atserver
+procedure giveAChanceToChangeSettings ()
 
 	try
 		makeReport ( false );
@@ -76,10 +76,10 @@ Procedure giveAChanceToChangeSettings ()
 		Message ( ErrorProcessing.BriefErrorDescription ( ErrorInfo () ) );
 	endtry;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -92,18 +92,18 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	WebClient = SystemEnvironment.WebClient ();
 	ReportName = reportObject ().Metadata ().Name;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure uploadStoredSettings ()
+&atserver
+procedure uploadStoredSettings ()
 
 	Parameters.Property ( "Variant", StoredSettings );
 	if ( StoredSettings = undefined ) then
@@ -112,17 +112,17 @@ Procedure uploadStoredSettings ()
 		Parameters.Variant = undefined;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function reportObject ()
+&atserver
+function reportObject ()
 	
 	return FormAttributeToValue ( "Object" );
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure fix1cMetodologicalProblem ()
+&atserver
+procedure fix1cMetodologicalProblem ()
 	
 	SetPrivilegedMode ( true );
 	selection = SystemSettingsStorage.Select (
@@ -132,10 +132,10 @@ Procedure fix1cMetodologicalProblem ()
 		SystemSettingsStorage.Delete(selection.ObjectKey, selection.SettingsKey, selection.User);
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyParams ()
+&atserver
+procedure applyParams ()
 	
 	SimpleReport = simpleReport ();
 	OnDetailEvent = reportManager ().Events ().OnDetail;
@@ -149,10 +149,10 @@ Procedure applyParams ()
 	endif; 
 	setVariantAndSettings ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setVariantAndSettings ()
+&atserver
+procedure setVariantAndSettings ()
 
 	if ( StoredSettings = undefined ) then
 		if ( Parameters.Property ( "ReportVariant" ) ) then
@@ -171,33 +171,33 @@ Procedure setVariantAndSettings ()
 		endif;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function simpleReport ()
+&atserver
+function simpleReport ()
 	
 	report = ReportName;
 	return report = "Scenarios";
 		
-EndFunction 
+endfunction 
 
-&AtServer
-Function reportManager ()
+&atserver
+function reportManager ()
 	
 	return Reports [ ReportName ];
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure getSchema ()
+&atserver
+procedure getSchema ()
 	
 	dataSchema = Reporter.GetSchema ( ReportName );
 	SchemaAddress = PutToTempStorage ( dataSchema, UUID );
 		
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure openReport ()
+&atserver
+procedure openReport ()
 	
 	loadVariantServer ( ReportVariant, undefined );
 	composer = Object.SettingsComposer;
@@ -208,10 +208,10 @@ Procedure openReport ()
 		composer.LoadSettings ( StoredSettings );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure restorePeriod ()
+&atserver
+procedure restorePeriod ()
 	
 	value = CommonSettingsStorage.Load ( periodSetting ( ThisObject ) );
 	if ( value = undefined ) then
@@ -224,17 +224,17 @@ Procedure restorePeriod ()
 	endif;
 	parameter.Value = value;
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Function periodSetting ( Form )
+&atclientatservernocontext
+function periodSetting ( Form )
 	
 	return "ReportPeriod/" + Form.ReportName;
 	
-EndFunction
+endfunction
 
-&AtClientAtServerNoContext
-Function getPeriod ( Form )
+&atclientatservernocontext
+function getPeriod ( Form )
 	
 	variants = new Array ();
 	variants.Add ( "Period" );
@@ -250,10 +250,10 @@ Function getPeriod ( Form )
 	enddo;
 	return undefined;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure drillDown ()
+&atserver
+procedure drillDown ()
 	
 	detailsProcess = new DataCompositionDetailsProcess ( GetFromTempStorage ( Parameters.DetailsDescription.Data ), new DataCompositionAvailableSettingsSource ( SchemaAddress ) );
 	usedSettings = detailsProcess.ApplySettings ( Parameters.DetailsDescription.ID, Parameters.DetailsDescription.UsedSettings );
@@ -264,41 +264,41 @@ Procedure drillDown ()
 		Object.SettingsComposer.LoadUserSettings ( usedSettings );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure detail ()
+&atserver
+procedure detail ()
 	
 	loadVariantServer ( "#Default", undefined );
 	Reports [ ReportName ].ApplyDetails ( Object.SettingsComposer, Parameters );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure openReportForNewWindow ()
+&atserver
+procedure openReportForNewWindow ()
 	
 	composer = Object.SettingsComposer;
 	composer.LoadSettings ( StoredSettings );
 	disableActualState ( Items.Result );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure showStatus ()
+&atserver
+procedure showStatus ()
 	
 	Items.Result.StatePresentation.Text = Output.ClickGenerateReport ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure restoreSettingsButton ()
+&atserver
+procedure restoreSettingsButton ()
 	
 	ShowSettings = CommonSettingsStorage.Load ( "Report.Common", Enum.SettingsShowSettingsButtonState () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setCurrentItem ()
+&atserver
+procedure setCurrentItem ()
 	
 	if ( GenerateOnOpen ) then
 		setResultCurrentItem ( ThisObject );
@@ -307,18 +307,18 @@ Procedure setCurrentItem ()
 		activateSettings ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Procedure setResultCurrentItem ( Form )
+&atclientatservernocontext
+procedure setResultCurrentItem ( Form )
 	
 	items = Form.Items;
 	Form.CurrentItem = items.Result;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure activateSettings ()
+&atserver
+procedure activateSettings ()
 	
 	if ( ShowSettings ) then
 		CurrentItem = Items.UserSettings;
@@ -328,10 +328,10 @@ Procedure activateSettings ()
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function makeReport ( Quickly )
+&atserver
+function makeReport ( Quickly )
 	
 	enableActualState ();
 	Result.Clear ();
@@ -352,10 +352,10 @@ Function makeReport ( Quickly )
 	storeDetailsData ( p );
 	return true;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function prepareReport ()
+&atserver
+function prepareReport ()
  	
 	report = Reporter.Prepare ( ReportName );
 	p = report.Params;
@@ -366,10 +366,10 @@ Function prepareReport ()
 	p.Composer = Object.SettingsComposer;
 	return report;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure storeDetailsData ( Params )
+&atserver
+procedure storeDetailsData ( Params )
 	
 	if ( IsTempStorageURL ( DetailsAddress ) ) then
 		DeleteFromTempStorage ( DetailsAddress );
@@ -377,27 +377,27 @@ Procedure storeDetailsData ( Params )
 	endif; 
 	DetailsAddress = PutToTempStorage ( Params.Details, DetailsAddress );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure enableActualState ()
+&atserver
+procedure enableActualState ()
 	
 	Items.Result.StatePresentation.AdditionalShowMode = AdditionalShowMode.DontUse;
 	Items.Result.StatePresentation.Visible = false;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure afterLoadSettings ()
+&atserver
+procedure afterLoadSettings ()
 	
 	if ( not ShowSettings ) then
 		buildFilter ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Procedure setReportTitle ( Form )
+&atclientatservernocontext
+procedure setReportTitle ( Form )
 	
 	object = Form.Object;
 	report = Form.ReportName;
@@ -407,10 +407,10 @@ Procedure setReportTitle ( Form )
 	addPart ( parts, composer, "Period" );
 	Form.Title = StrConcat ( parts, ", " );
 
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Procedure addPart ( Parts, Composer, Fields )
+&atclientatservernocontext
+procedure addPart ( Parts, Composer, Fields )
 	
 	for each name in StrSplit ( Fields, ", " ) do
 		value = DC.FindValue ( Composer, name );
@@ -419,10 +419,10 @@ Procedure addPart ( Parts, Composer, Fields )
 		endif; 
 	enddo;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
+&atclient
+procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
 	
 	if ( Exit ) then
 		return;
@@ -433,10 +433,10 @@ Procedure BeforeClose ( Cancel, Exit, MessageText, StandardProcessing )
 		Output.ReportVariantModified2 ( ThisObject, , , "SaveVariantBeforeClose" );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure storePeriod ( Form )
+&atclientatservernocontext
+procedure storePeriod ( Form )
 	
 	parameter = getPeriod ( Form );
 	if ( parameter = undefined ) then
@@ -444,10 +444,10 @@ Procedure storePeriod ( Form )
 	endif;
 	Logins.SaveSettings ( periodSetting ( Form ), , parameter.Value );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SaveVariantBeforeClose ( Answer, Params ) export
+&atclient
+procedure SaveVariantBeforeClose ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.Yes ) then
 		saveReportVariant ( "closeAfterSavingVariant" );
@@ -456,19 +456,19 @@ Procedure SaveVariantBeforeClose ( Answer, Params ) export
 		Close ();
 	endif; 
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure closeAfterSavingVariant ( SavedSettings, IsSettings ) export
+&atclient
+procedure closeAfterSavingVariant ( SavedSettings, IsSettings ) export
 	
 	if ( CommonSaveSettings ( SavedSettings, IsSettings ) ) then
 		Close ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure URLListGetProcessing ( URLList, DefaultKey )
+&atclient
+procedure URLListGetProcessing ( URLList, DefaultKey )
 	
 	for each entry in URLList do
 		entryKey = entry.Key;
@@ -481,20 +481,20 @@ Procedure URLListGetProcessing ( URLList, DefaultKey )
 		endif;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function getVariantPresentation ()
+&atclient
+function getVariantPresentation ()
 
 	parts = new Array ();
 	parts.Add ( ReportPresentation );
 	parts.Add ( VariantPresentation );
 	return StrConcat ( parts, ", " );
 
-EndFunction
+endfunction
 
-&AtClient
-Function getReportPresentation ()
+&atclient
+function getReportPresentation ()
 	
 	parts = new Array ();
 	parts.Add ( ReportPresentation );
@@ -524,18 +524,18 @@ Function getReportPresentation ()
 	enddo;
 	return StrConcat ( parts, ", " );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function parameterPresentation ( Item )
+&atclient
+function parameterPresentation ( Item )
 	
 	parameter = Object.SettingsComposer.Settings.DataParameters.AvailableParameters.Items.Find ( Item.Parameter );
 	return parameter.Title + " = " + String ( Item.Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function filterPresentation ( Filter, Item )
+&atclient
+function filterPresentation ( Filter, Item )
 	
 	type = Filter.ComparisonType;
 	if ( type = DataCompositionComparisonType.Equal ) then
@@ -547,47 +547,47 @@ Function filterPresentation ( Filter, Item )
 	endif;
 	return String ( Filter.LeftValue ) + " " + comparison + " " + String ( Item.RightValue );
 	
-EndFunction
+endfunction
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Make ( Command )
+&atclient
+procedure Make ( Command )
 	
 	buildReport ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure buildReport ( Quickly )
+&atclient
+procedure buildReport ( Quickly )
 	
 	invalidateSelection ();
 	if ( makeReport ( Quickly ) ) then
 		setResultCurrentItem ( ThisObject );
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure invalidateSelection ()
+&atclient
+procedure invalidateSelection ()
 	
 	PreviousArea = undefined;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure SendReportBySchedule ( Command )
+&atclient
+procedure SendReportBySchedule ( Command )
 	
 	if ( not checkScheduling () ) then
 		return;
 	endif; 
 	organizeSendingBySchedule ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkScheduling ()
+&atserver
+function checkScheduling ()
 	
 	class = Reports [ ReportName ];
 	events = class.Events ();
@@ -605,10 +605,10 @@ Function checkScheduling ()
 	endif; 
 	return not cancel;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function checkPeriod ( Composer, Name )
+&atserver
+function checkPeriod ( Composer, Name )
 	
 	period = DC.FindParameter ( Composer, Name );
 	if ( period <> undefined
@@ -619,10 +619,10 @@ Function checkPeriod ( Composer, Name )
 	endif; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure organizeSendingBySchedule ()
+&atclient
+procedure organizeSendingBySchedule ()
 	
 	values = new Structure ();
 	values.Insert ( "Report", ReportRef );
@@ -631,24 +631,24 @@ Procedure organizeSendingBySchedule ()
 	p = new Structure ( "FillingValues", values );
 	OpenForm ( "InformationRegister.ScheduledReports.RecordForm", p );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure LoadVariant ( Command )
+&atclient
+procedure LoadVariant ( Command )
 	
 	loadReportVariant ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure loadReportVariant ()
+&atclient
+procedure loadReportVariant ()
 	
 	showSettings ( false, false, "CommonLoadSettings" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showSettings ( IsSettings, IsSaving, Callback )
+&atclient
+procedure showSettings ( IsSettings, IsSaving, Callback )
 	
 	p = new Structure ();
 	address = PutToTempStorage ( ? ( IsSettings, Object.SettingsComposer.UserSettings, Object.SettingsComposer.Settings ), UUID );
@@ -660,10 +660,10 @@ Procedure showSettings ( IsSettings, IsSaving, Callback )
 	p.Insert ( "ReportSettings", ReportSettings );
 	OpenForm ( "Catalog.ReportSettings.Form.SaveLoad", p, , , , , new CallbackDescription ( Callback, ThisObject, IsSettings ), FormWindowOpeningMode.LockWholeInterface );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure CommonLoadSettings ( SelectedItem, IsSettings ) export
+&atclient
+procedure CommonLoadSettings ( SelectedItem, IsSettings ) export
 	
 	if ( SelectedItem = undefined ) then
 		return;
@@ -679,18 +679,18 @@ Procedure CommonLoadSettings ( SelectedItem, IsSettings ) export
 		endif; 
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure applySettings ( val Setting )
+&atserver
+procedure applySettings ( val Setting )
 	
 	loadSettingsServer ( Setting );
 	afterLoadSettings ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure loadSettingsServer ( Item )
+&atserver
+procedure loadSettingsServer ( Item )
 	
 	if ( IsTempStorageURL ( Item ) ) then
 		settingsReport = GetFromTempStorage ( Item );
@@ -704,34 +704,34 @@ Procedure loadSettingsServer ( Item )
 	Object.SettingsComposer.LoadUserSettings ( settingsReport );
 	disableActualState ( Items.Result );
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure setReportSettings ( Form, Value )
+&atclientatservernocontext
+procedure setReportSettings ( Form, Value )
 	
 	Form.ReportSettings = Value;
 	Form.Object.SettingsComposer.Settings.AdditionalProperties.Insert ( "ReportSettings", Value );
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure disableActualState ( Result )
+&atclientatservernocontext
+procedure disableActualState ( Result )
 	
 	Result.StatePresentation.AdditionalShowMode = AdditionalShowMode.Irrelevance;
 	Result.StatePresentation.Visible = true;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyVariant ( val Setting )
+&atserver
+procedure applyVariant ( val Setting )
 	
 	loadVariantServer ( Setting, undefined );
 	afterLoadSettings ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure loadVariantServer ( Variant, SettingsCode )
+&atserver
+procedure loadVariantServer ( Variant, SettingsCode )
 	
 	if ( Variant = undefined ) then
 		code = undefined;
@@ -756,10 +756,10 @@ Procedure loadVariantServer ( Variant, SettingsCode )
 	endif;
 	disableActualState ( Items.Result );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadDefaultSettings ()
+&atserver
+procedure loadDefaultSettings ()
 	
 	settingsReport = InformationRegisters.UsersReportSettings.Get ( new Structure ( "User, Report", SessionParameters.User, ReportRef ) );
 	if ( ValueIsFilled ( settingsReport.Variant ) ) then
@@ -769,10 +769,10 @@ Procedure loadDefaultSettings ()
 		loadVariantServer ( "#Default", undefined );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadPredefinedVariant ( Code )
+&atserver
+procedure loadPredefinedVariant ( Code )
 	
 	dataSchema = Reporter.GetSchema ( ReportName );
 	variants = dataSchema.SettingVariants;
@@ -789,18 +789,18 @@ Procedure loadPredefinedVariant ( Code )
 	composer.Refresh ();
 	setReportVariant ( ThisObject, variant );
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure setReportVariant ( Form, Value )
+&atclientatservernocontext
+procedure setReportVariant ( Form, Value )
 	
 	Form.ReportVariant = Value;
 	Form.Object.SettingsComposer.Settings.AdditionalProperties.Insert ( "ReportVariant", Value );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadUserVariant ( Code )
+&atserver
+procedure loadUserVariant ( Code )
 	
 	ReportVariant = Catalogs.ReportSettings.FindByCode ( Code );
 	VariantPresentation = "" + ReportVariant;
@@ -809,18 +809,18 @@ Procedure loadUserVariant ( Code )
 	composer.Refresh ();
 	setReportVariant ( ThisObject, ReportVariant );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure resetReportSettings ()
+&atserver
+procedure resetReportSettings ()
 	
 	setReportSettings ( ThisObject, undefined );
 	resetUserSettings ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure LoadConfirmedVariant ( Answer, Params ) export
+&atclient
+procedure LoadConfirmedVariant ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.Yes ) then
 		saveReportVariant ( "loadVariantAfterSavePrevious" );
@@ -829,61 +829,61 @@ Procedure LoadConfirmedVariant ( Answer, Params ) export
 		applyVariant ( SelectedVariant );
 	endif; 
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure loadVariantAfterSavePrevious ( SavedSettings, IsSettings ) export
+&atclient
+procedure loadVariantAfterSavePrevious ( SavedSettings, IsSettings ) export
 	
 	if ( CommonSaveSettings ( SavedSettings, IsSettings ) ) then
 		applyVariant ( SelectedVariant );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure LoadSettings ( Command )
+&atclient
+procedure LoadSettings ( Command )
 	
 	loadUserSettings ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure loadUserSettings ()
+&atclient
+procedure loadUserSettings ()
 	
 	showSettings ( true, false, "CommonLoadSettings" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SaveVariant ( Command )
+&atclient
+procedure SaveVariant ( Command )
 	
 	saveReportVariant ( "CommonSaveSettings" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure saveReportVariant ( ProcAfterSave )
+&atclient
+procedure saveReportVariant ( ProcAfterSave )
 	
 	showSettings ( false, true, ProcAfterSave );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SaveSettings ( Command )
+&atclient
+procedure SaveSettings ( Command )
 	
 	userSettingsSave ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure userSettingsSave ()
+&atclient
+procedure userSettingsSave ()
 	
 	showSettings ( true, true, "CommonSaveSettings" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function CommonSaveSettings ( SavedSettings, IsSettings ) export
+&atclient
+function CommonSaveSettings ( SavedSettings, IsSettings ) export
 	
 	if ( TypeOf ( SavedSettings ) = Type ( "CatalogRef.ReportSettings" ) ) then
 		if ( IsSettings ) then
@@ -896,17 +896,17 @@ Function CommonSaveSettings ( SavedSettings, IsSettings ) export
 	endif;
 	return false;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure OpenSettings ( Command )
+&atclient
+procedure OpenSettings ( Command )
 	
 	toggleSettings ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure toggleSettings ()
+&atserver
+procedure toggleSettings ()
 	
 	if ( ShowSettings ) then
 		buildFilter ();
@@ -918,10 +918,10 @@ Procedure toggleSettings ()
 	activateSettings ();
 	saveSettingsState ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure buildFilter ()
+&atserver
+procedure buildFilter ()
 	
 	clearFilter ();
 	settings = Object.SettingsComposer.Settings;
@@ -971,10 +971,10 @@ Procedure buildFilter ()
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure clearFilter ()
+&atserver
+procedure clearFilter ()
 	
 	fields = Items.GroupQuickSettings.ChildItems;
 	i = fields.Count () - 1;
@@ -983,10 +983,10 @@ Procedure clearFilter ()
 		i = i - 1;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure adjustFilter ( Item, Type )
+&atserver
+procedure adjustFilter ( Item, Type )
 	
 	if ( Item.Use ) then
 		return;
@@ -1001,10 +1001,10 @@ Procedure adjustFilter ( Item, Type )
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure drawFilter ( Index, Label )
+&atserver
+procedure drawFilter ( Index, Label )
 	
 	i = Format ( Index, "NZ=" );
 	field = Items.Add ( "_" + i, Type ( "FormField" ), Items.GroupQuickSettings );
@@ -1021,10 +1021,10 @@ Procedure drawFilter ( Index, Label )
 	endif;
 	field.SetAction ( "OnChange", "FilterOnChange" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function calendarFilter ( Index )
+&atserver
+function calendarFilter ( Index )
 	
 	parameterType = Type ( "DataCompositionSettingsParameterValue" );
 	composer = Object.SettingsComposer;
@@ -1043,24 +1043,24 @@ Function calendarFilter ( Index )
 	enddo;
 	return false;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure saveSettingsState ()
+&atserver
+procedure saveSettingsState ()
 	
 	Logins.SaveSettings ( "Report.Common", Enum.SettingsShowSettingsButtonState (), ShowSettings );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ChangeVariant ( Command )
+&atclient
+procedure ChangeVariant ( Command )
 	
 	changeReportVariant ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure changeReportVariant ()
+&atclient
+procedure changeReportVariant ()
 	
 	p = new Structure ();
 	p.Insert ( "Variant", Object.SettingsComposer.Settings );
@@ -1071,10 +1071,10 @@ Procedure changeReportVariant ()
 	ChoiceForm.WindowOpeningMode = FormWindowOpeningMode.LockWholeInterface;
 	OpenForm ( ChoiceForm );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure LoadChangedVariant ( Result, Params ) export
+&atclient
+procedure LoadChangedVariant ( Result, Params ) export
 	
 	if ( Result = true ) then
 		//@skip-warning
@@ -1086,40 +1086,40 @@ Procedure LoadChangedVariant ( Result, Params ) export
 		afterLoadSettings ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ResetSettings ( Command )
+&atclient
+procedure ResetSettings ( Command )
 	
 	initSettings ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initSettings ()
+&atserver
+procedure initSettings ()
 	
 	resetUserSettings ();
 	afterLoadSettings ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure resetUserSettings ()
+&atserver
+procedure resetUserSettings ()
 	
 	Object.SettingsComposer.LoadUserSettings ( new DataCompositionUserSettings () );
 	disableActualState ( Items.Result );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure NewWindow ( Command )
+&atclient
+procedure NewWindow ( Command )
 	
 	openReportInNewWindow ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openReportInNewWindow ()
+&atclient
+procedure openReportInNewWindow ()
 	
 	p = ReportsSystem.GetParams ( ReportName );
 	p.Command = "NewWindow";
@@ -1127,46 +1127,46 @@ Procedure openReportInNewWindow ()
 	p.Insert ( "VariantPresentation", VariantPresentation );
 	ReportsSystem.Open ( p, , true );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function getSettings ()
+&atserver
+function getSettings ()
 	
 	return Object.SettingsComposer.GetSettings ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure SetVariantAsDefault ( Command )
+&atclient
+procedure SetVariantAsDefault ( Command )
 	
 	setReportVariantAsDefault ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setReportVariantAsDefault ()
+&atclient
+procedure setReportVariantAsDefault ()
 	
 	setUserSettings ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SetSettingsAsDefault ( Command )
+&atclient
+procedure SetSettingsAsDefault ( Command )
 	
 	setUserVariantAndSettingsAsDefault ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setUserVariantAndSettingsAsDefault ()
+&atserver
+procedure setUserVariantAndSettingsAsDefault ()
 	
 	setUserSettings ( false );
 	setUserSettings ( true );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setUserSettings ( IsSettings )
+&atserver
+procedure setUserSettings ( IsSettings )
 	
 	record = InformationRegisters.UsersReportSettings.CreateRecordManager ();
 	record.User = SessionParameters.User;
@@ -1181,34 +1181,34 @@ Procedure setUserSettings ( IsSettings )
 	endif; 
 	record.Write ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SelectReportVariant ( Command )
+&atclient
+procedure SelectReportVariant ( Command )
 	
 	loadReportVariant ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Help ( Command )
+&atclient
+procedure Help ( Command )
 	
 	OpenHelp ( "Report." + ReportName );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** UserSettings
 
-&AtClient
-Procedure UserSettingsOnChange ( Item )
+&atclient
+procedure UserSettingsOnChange ( Item )
 	
 	applyUserSetting ( Object.SettingsComposer.UserSettings.GetObjectByID ( Items.UserSettings.CurrentRow ) );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyUserSetting ( Setting )
+&atclient
+procedure applyUserSetting ( Setting )
 	
 	updated = onChange ( Setting );
 	#if ( not WebClient ) then
@@ -1217,10 +1217,10 @@ Procedure applyUserSetting ( Setting )
 		endif; 
 	#endif
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function onChange ( Setting )
+&atclient
+function onChange ( Setting )
 
 	setReportTitle ( ThisObject );
 	if ( SimpleReport ) then
@@ -1229,19 +1229,19 @@ Function onChange ( Setting )
 	endif; 
 	return false;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure FilterOnChange ( Item )
+&atclient
+procedure FilterOnChange ( Item )
 	
 	setting = getSetting ( Item );
 	fixComparison ( setting );
 	applyUserSetting ( setting );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function getSetting ( Item )
+&atclient
+function getSetting ( Item )
 	
 	i = Number ( Mid ( Item.Name, 2 ) );
 	setting = Object.SettingsComposer.UserSettings.Items [ i ];
@@ -1252,10 +1252,10 @@ Function getSetting ( Item )
 	endif; 
 	return setting;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure fixComparison ( Setting )
+&atclient
+procedure fixComparison ( Setting )
 	
 	if ( TypeOf ( Setting ) <> Type ( "DataCompositionFilterItem" ) ) then
 		return;
@@ -1281,36 +1281,36 @@ Procedure fixComparison ( Setting )
 	endif;
 	Setting.ComparisonType = candidate;
 
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function isFolder ( val Value )
+&atservernocontext
+function isFolder ( val Value )
 	
 	return Metafields.IsFolder ( Value );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure UserSettingsValueOnChange ( Item )
+&atclient
+procedure UserSettingsValueOnChange ( Item )
 	
 	applyValue ( Object.SettingsComposer.UserSettings.GetObjectByID ( Items.UserSettings.CurrentRow ) );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyValue ( Setting )
+&atclient
+procedure applyValue ( Setting )
 	
 	if ( TypeOf ( Setting ) = Type ( "DataCompositionFilterItem" ) ) then
 		fixComparison ( Setting );
 	endif;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Result
 
-&AtClient
-Procedure ResultDetailProcessing ( Item, Details, StandardProcessing )
+&atclient
+procedure ResultDetailProcessing ( Item, Details, StandardProcessing )
 	
 	if ( TypeOf ( Details ) <> Type ( "DataCompositionDetailsID" ) ) then
 		return;	
@@ -1324,10 +1324,10 @@ Procedure ResultDetailProcessing ( Item, Details, StandardProcessing )
 	endif;
 	doDetailProcessing ( Details, Item );
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Procedure beforeDetailing ( val ReportName, ReportDetails, UseMainAction, DetailActions, val DetailsAddress, val SchemaAddress, val Details )
+&atservernocontext
+procedure beforeDetailing ( val ReportName, ReportDetails, UseMainAction, DetailActions, val DetailsAddress, val SchemaAddress, val Details )
 	
 	systemMenu = undefined;
 	Reports [ ReportName ].OnDetail ( ReportDetails, systemMenu, UseMainAction, getFilters ( SchemaAddress, Details, DetailsAddress ) );
@@ -1337,10 +1337,10 @@ Procedure beforeDetailing ( val ReportName, ReportDetails, UseMainAction, Detail
 		DetailActions = systemMenu;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure doDetailProcessing ( Details, Item )
+&atclient
+procedure doDetailProcessing ( Details, Item )
 	
 	if ( DetailActions = undefined ) then
 		actions = undefined;
@@ -1354,10 +1354,10 @@ Procedure doDetailProcessing ( Details, Item )
 	// "false or UseMainAction" - Bug workaround for webclient. It doesn't get UseMainAction as a boolean value if actions = undefined
 	false or UseMainAction );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ApplySelectedAction ( SelectedAction, SelectedActionParameters, Details ) export
+&atclient
+procedure ApplySelectedAction ( SelectedAction, SelectedActionParameters, Details ) export
 	
 	if ( SelectedAction = undefined
 		or SelectedAction = DataCompositionDetailsProcessingAction.None ) then
@@ -1379,10 +1379,10 @@ Procedure ApplySelectedAction ( SelectedAction, SelectedActionParameters, Detail
 		AttachIdleHandler ( "detailReport", 0.01, true );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Function getFilters ( val Schema, val Details, val Address )
+&atservernocontext
+function getFilters ( val Schema, val Details, val Address )
 	
 	settings = GetFromTempStorage ( Address );
 	composer = new DataCompositionSettingsComposer ();
@@ -1390,10 +1390,10 @@ Function getFilters ( val Schema, val Details, val Address )
 	composer.Initialize ( new DataCompositionAvailableSettingsSource ( Schema ) );
 	return retrieveFilters ( composer, Details, settings );
 	
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function retrieveFilters ( Composer, Details, Settings )
+&atservernocontext
+function retrieveFilters ( Composer, Details, Settings )
 	
 	filters = new Array ();
 	addDetails ( Settings.Items [ Details ], Composer, filters );
@@ -1401,10 +1401,10 @@ Function retrieveFilters ( Composer, Details, Settings )
 	addFilters ( filters, Composer );
 	return PutToTempStorage ( filters );
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Procedure addDetails ( Item, Composer, Filters )
+&atservernocontext
+procedure addDetails ( Item, Composer, Filters )
 	
 	if ( TypeOf ( Item ) = Type ( "DataCompositionFieldDetailsItem" ) ) then
 		for each field in Item.GetFields () do
@@ -1420,10 +1420,10 @@ Procedure addDetails ( Item, Composer, Filters )
 		addDetails ( parent, Composer, Filters );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function formalize ( Name, Field, Filter, Parameter, Item )
+&atservernocontext
+function formalize ( Name, Field, Filter, Parameter, Item )
 	
 	data = new Structure ( "Name, Field, Filter, Parameter, Item, StandardProcessing, Comparison", Name, Field, Filter, Parameter, Item, true );
 	if ( Field and Item.Hierarchy ) then
@@ -1431,10 +1431,10 @@ Function formalize ( Name, Field, Filter, Parameter, Item )
 	endif; 
 	return data;
 	
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function getAllowedField ( Field, Composer )
+&atservernocontext
+function getAllowedField ( Field, Composer )
 	
 	if ( TypeOf ( Field ) = Type ( "String" ) ) then
 		search = new DataCompositionField ( Field );
@@ -1450,10 +1450,10 @@ Function getAllowedField ( Field, Composer )
 		return Composer.FindField ( search );
 	endif;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Procedure clean ( Filters )
+&atservernocontext
+procedure clean ( Filters )
 	
 	i = Filters.Count () - 1;
 	while ( i >= 0 ) do
@@ -1487,10 +1487,10 @@ Procedure clean ( Filters )
 		i = i - 1;
 	enddo;
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Procedure addFilters ( Filters, Composer )
+&atservernocontext
+procedure addFilters ( Filters, Composer )
 
 	for each item in Composer.Settings.Filter.Items do
 		if ( item.Use ) then
@@ -1503,10 +1503,10 @@ Procedure addFilters ( Filters, Composer )
 		endif;
 	enddo;
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure detailReport () export
+&atclient
+procedure detailReport () export
 	
 	p = ReportsSystem.GetParams ( ReportName );
 	p.Command = "DrillDown";
@@ -1517,17 +1517,17 @@ Procedure detailReport () export
 	p.Insert ( "DetailsDescription", new DataCompositionDetailsProcessDescription ( DetailsAddress, WorkAroundDetails, WorkAroundSelectedActionParameters ) );
 	ReportsSystem.Open ( p, , true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ShowLevel ( Command )
+&atclient
+procedure ShowLevel ( Command )
 	
 	selectLevel ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure selectLevel ()
+&atclient
+procedure selectLevel ()
 	
 	#if ( WebClient ) then
 		top = 5;
@@ -1543,59 +1543,59 @@ Procedure selectLevel ()
 	enddo; 
 	ShowChooseFromMenu ( new CallbackDescription ( "LevelSelected", ThisObject ), menu );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure LevelSelected ( Value, Params ) export
+&atclient
+procedure LevelSelected ( Value, Params ) export
 	
 	if ( Value = undefined ) then
 		return;
 	endif; 
 	Result.ShowRowGroupLevel ( Value.Value - 1 );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ShowHeaders ( Command )
+&atclient
+procedure ShowHeaders ( Command )
 	
 	toggleHeaders ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure toggleHeaders ()
+&atclient
+procedure toggleHeaders ()
 	
 	ShowHeaders = not ShowHeaders;
 	Items.Result.ShowHeaders = ShowHeaders;
 	Appearance.Apply ( ThisObject, "ShowHeaders" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ShowGrid ( Command )
+&atclient
+procedure ShowGrid ( Command )
 	
 	toggleGrid ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure toggleGrid ()
+&atclient
+procedure toggleGrid ()
 	
 	ShowGrid = not ShowGrid;
 	Items.Result.ShowGrid = ShowGrid;
 	Appearance.Apply ( ThisObject, "ShowGrid" );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CalcTotals ( Command )
+&atclient
+procedure CalcTotals ( Command )
 	
 	updateTotals ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure updateTotals ( CheckSquare )
+&atclient
+procedure updateTotals ( CheckSquare )
 	
 	if ( TotalsEnv = undefined ) then
 		SpreadsheetTotals.Init ( TotalsEnv );	
@@ -1606,10 +1606,10 @@ Procedure updateTotals ( CheckSquare )
 	Items.CalcTotals.Visible = CheckSquare and TotalsEnv.HugeSquare;
 	TotalInfo = TotalsEnv.Result; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ResultOnActivateArea ( Item )
+&atclient
+procedure ResultOnActivateArea ( Item )
 
 	if ( drawing ()
 		or sameArea () ) then
@@ -1617,17 +1617,17 @@ Procedure ResultOnActivateArea ( Item )
 	endif;
 	startCalculation ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function drawing ()
+&atclient
+function drawing ()
 	
 	return TypeOf ( Result.CurrentArea ) <> Type ( "SpreadsheetDocumentRange" );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function sameArea ()
+&atclient
+function sameArea ()
 	
 	currentName = Result.CurrentArea.Name;
 	if ( PreviousArea = currentName ) then
@@ -1637,19 +1637,19 @@ Function sameArea ()
 		return false;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure startCalculation ()
+&atclient
+procedure startCalculation ()
 	
 	DetachIdleHandler ( "startUpdating" );
 	AttachIdleHandler ( "startUpdating", 0.2, true );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure startUpdating ()
+&atclient
+procedure startUpdating ()
 	
 	updateTotals ( true );
 	
-EndProcedure 
+endprocedure 

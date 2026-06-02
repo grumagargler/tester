@@ -1,18 +1,18 @@
-&AtServer
+&atserver
 var IsEmpty;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	Appearance.Apply ( ThisObject );
 		
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	IsNew = Record.SourceRecordKey.IsEmpty ();
 	setSender ();
@@ -31,10 +31,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -44,24 +44,24 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setSender ()
+&atserver
+procedure setSender ()
 	
 	Sender = Cloud.Info ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setTomorrow ()
+&atserver
+procedure setTomorrow ()
 	
 	Tomorrow = CurrentSessionDate () + 86400;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function directly ()
+&atserver
+function directly ()
 	
 	interactive = IsNew and Record.Report.IsEmpty () or not Parameters.CopyingValue.IsEmpty ();
 	if ( interactive ) then
@@ -69,10 +69,10 @@ Function directly ()
 	endif; 
 	return interactive;
 	
-EndFunction 
+endfunction 
 
-&AtClientAtServerNoContext
-Procedure setDate ( Form )
+&atclientatservernocontext
+procedure setDate ( Form )
 	
 	record = Form.Record;
 	tomorrow = Form.Tomorrow;
@@ -80,31 +80,31 @@ Procedure setDate ( Form )
 		record.Date = tomorrow;
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setUser ()
+&atserver
+procedure setUser ()
 	
 	Record.User = SessionParameters.User;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setReceiver ()
+&atserver
+procedure setReceiver ()
 	
 	Record.Receiver = DF.Pick ( Record.User, "Email" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setSettingsAddress ()
+&atserver
+procedure setSettingsAddress ()
 	
 	SettingsAddress = Parameters.FillingValues.SettingsAddress;
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure loadRecord ()
+&atserver
+procedure loadRecord ()
 	
 	r = InformationRegisters.ScheduledReports.CreateRecordManager ();
 	r.User = Record.User;
@@ -114,10 +114,10 @@ Procedure loadRecord ()
 		ValueToFormAttribute ( r, "Record" );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 	
 	if ( not checkDate () ) then
 		Cancel = true;
@@ -126,10 +126,10 @@ Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 		Cancel = true;
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkDate ()
+&atserver
+function checkDate ()
 	
 	if ( Record.Date <= CurrentSessionDate () ) then
 		Output.ScheduleDateError ( , "Date", , "Record" );
@@ -137,10 +137,10 @@ Function checkDate ()
 	endif; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function checkWeekDays ()
+&atserver
+function checkWeekDays ()
 	
 	if ( Record.Periodicity = Enums.Periodicity.EveryDay ) then
 		if ( not ( Record.Monday or Record.Tuesday or Record.Wednesday or Record.Thursday or Record.Friday or Record.Saturday or Record.Sunday ) ) then
@@ -150,29 +150,29 @@ Function checkWeekDays ()
 	endif; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure NotificationProcessing ( EventName, Parameter, Source )
+&atclient
+procedure NotificationProcessing ( EventName, Parameter, Source )
 	
 	if ( EventName = Enum.MessageApplicationSettingsSaved () ) then
 		setSender ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure DeleteSchedule ( Command )
+&atclient
+procedure DeleteSchedule ( Command )
 	
 	Output.ReportScheduleRemovingConfirmation ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReportScheduleRemovingConfirmation ( Answer, Params ) export
+&atclient
+procedure ReportScheduleRemovingConfirmation ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.Yes ) then
 		clean ();
@@ -180,18 +180,18 @@ Procedure ReportScheduleRemovingConfirmation ( Answer, Params ) export
 		Close ();
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure clean ()
+&atserver
+procedure clean ()
 	
 	deleteScheduledJob ();
 	deleteRecord ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure deleteScheduledJob ()
+&atserver
+procedure deleteScheduledJob ()
 	
 	SetPrivilegedMode ( true );
 	job = Jobs.GetScheduled ( Record.RecordKey );
@@ -200,57 +200,57 @@ Procedure deleteScheduledJob ()
 	endif; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure deleteRecord ()
+&atserver
+procedure deleteRecord ()
 	
 	r = FormAttributeToValue ( "Record" );
 	r.Delete ();
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group SendingPeridicity
 
-&AtClient
-Procedure SendingPeriodicityOnChange ( Item )
+&atclient
+procedure SendingPeriodicityOnChange ( Item )
 	
 	resetPeriodicity ();
 	setDate ( ThisObject );
 	Appearance.Apply ( ThisObject, "Record.Periodicity" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure resetPeriodicity ()
+&atclient
+procedure resetPeriodicity ()
 	
 	if ( Record.Periodicity <> PredefinedValue ( "Enum.Periodicity.OtherPeriod" ) ) then
 		Record.DaysCount = 15;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
+&atserver
+procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 	
 	saveSettings ( CurrentObject );
 	initJob ( CurrentObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure saveSettings ( CurrentObject )
+&atserver
+procedure saveSettings ( CurrentObject )
 	
 	if ( CurrentObject.Selected () ) then
 		return;
 	endif; 
 	CurrentObject.Settings = new ValueStorage ( GetFromTempStorage ( SettingsAddress ), new Deflation () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure initJob ( CurrentObject )
+&atserver
+procedure initJob ( CurrentObject )
 	
 	SetPrivilegedMode ( true );
 	job = undefined;
@@ -272,10 +272,10 @@ Procedure initJob ( CurrentObject )
 	job.Write ();
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getSchedule ()
+&atserver
+function getSchedule ()
 	
 	schedule = new JobSchedule ();
 	sessionDate = CurrentSessionDate ();
@@ -303,10 +303,10 @@ Function getSchedule ()
 	endif; 
 	return schedule;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function getMonths ()
+&atserver
+function getMonths ()
 	
 	months = new Array ();
 	months.Add ( 1 );
@@ -323,10 +323,10 @@ Function getMonths ()
 	months.Add ( 12 );
 	return months;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function getWeekDays ()
+&atserver
+function getWeekDays ()
 	
 	weekDays = new Array ();
 	if ( Record.Periodicity = Enums.Periodicity.EveryTwoWeeks
@@ -357,4 +357,4 @@ Function getWeekDays ()
 	endif; 
 	return weekDays;
 	
-EndFunction 
+endfunction 

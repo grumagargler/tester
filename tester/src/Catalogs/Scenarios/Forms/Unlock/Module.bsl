@@ -1,23 +1,23 @@
-&AtServer
+&atserver
 var ActualScenarios;
-&AtServer
+&atserver
 var LastVersions;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	LockingForm.LoadScenarios ( ThisObject );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	if ( nothing () ) then
 		Close ();
@@ -25,10 +25,10 @@ Procedure OK ( Command )
 		Output.UnlockConfirmation ( ThisObject );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function nothing ()
+&atclient
+function nothing ()
 	
 	for each row in List do
 		if ( row.Use ) then
@@ -37,10 +37,10 @@ Function nothing ()
 	enddo; 
 	return false;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure UnlockConfirmation ( Answer, Params ) export
+&atclient
+procedure UnlockConfirmation ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
@@ -49,10 +49,10 @@ Procedure UnlockConfirmation ( Answer, Params ) export
 	broadcast ( restored );
 	Close ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function unlock ()
+&atserver
+function unlock ()
 	
 	table = LockingForm.FetchScenarios ( ThisObject );
 	BeginTransaction ();
@@ -63,10 +63,10 @@ Function unlock ()
 	CommitTransaction ();
 	return restored;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure userScenarios ( Table )
+&atserver
+procedure userScenarios ( Table )
 	
 	s = "
 	|select Editing.Scenario as Scenario
@@ -91,10 +91,10 @@ Procedure userScenarios ( Table )
 	ActualScenarios  = data [ 1 ].Unload ().UnloadColumn ( "Scenario" );
 	LastVersions  = data [ 2 ].Unload ();
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function rollbackScenarios ()
+&atserver
+function rollbackScenarios ()
 	
 	restored = new Array ();
 	for each row in LastVersions do
@@ -104,10 +104,10 @@ Function rollbackScenarios ()
 	enddo; 
 	return restored;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure unlockScenarios ()
+&atserver
+procedure unlockScenarios ()
 	
 	for each scenario in ActualScenarios do
 		r = InformationRegisters.Editing.CreateRecordManager ();
@@ -115,29 +115,29 @@ Procedure unlockScenarios ()
 		r.Delete ();
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure broadcast ( Scenarios )
+&atclient
+procedure broadcast ( Scenarios )
 	
 	Notify ( Enum.MessageReload (), Scenarios );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Table List
 
-&AtClient
-Procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure ListBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure

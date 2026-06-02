@@ -1,5 +1,5 @@
-Procedure Calculate ( Env ) export
+procedure Calculate ( Env ) export
 	
 	SpreadsheetTotals.Calculate ( Env );
 	
-EndProcedure
+endprocedure

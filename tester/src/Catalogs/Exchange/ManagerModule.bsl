@@ -1,7 +1,7 @@
 
-#if ( Server or ThickClientOrdinaryApplication or ExternalConnection ) then
+#if ( server or thickclientordinaryapplication or externalconnection ) then
 	
-Function GetNodeData ( Node ) export
+function GetNodeData ( Node ) export
 
 	p = new Structure ();
 	p.Insert ( "MasterNode", ( ExchangePlans.MasterNode () = undefined ) );
@@ -23,9 +23,9 @@ Function GetNodeData ( Node ) export
 	p.Insert ( "ThisNode", selection.ThisNode );
 	return p; 
 	
-EndFunction
+endfunction
 
-Procedure WriteAttributes ( Ref, Attributes ) export
+procedure WriteAttributes ( Ref, Attributes ) export
 	
 	object = Ref.GetObject ();
 	for each item in Attributes do
@@ -33,6 +33,6 @@ Procedure WriteAttributes ( Ref, Attributes ) export
 	enddo; 
 	object.Write ();
 	
-EndProcedure 
+endprocedure 
 
 #endif

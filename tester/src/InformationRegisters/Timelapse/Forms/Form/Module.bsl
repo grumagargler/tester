@@ -1,23 +1,23 @@
-&AtClient
+&atclient
 var ScriptRow;
-&AtClient
+&atclient
 var CurrentScriptRow;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	setTitle ();
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -25,10 +25,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	if ( not Parameters.Error.IsEmpty () ) then
 		data = errorData ();
@@ -48,10 +48,10 @@ Procedure loadParams ()
 	endif;
 	fill ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function errorData ()
+&atserver
+function errorData ()
 	
 	s = "
 	|select top 1 Log.Session as Session, Log.Start as Start, Log.End as End, Log.Scenario as Scenario
@@ -89,10 +89,10 @@ Function errorData ()
 	FillPropertyValues ( data, result [ 0 ] );
 	return data;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function sessionData ()
+&atserver
+function sessionData ()
 	
 	s = "
 	|select Start.Started as Start,
@@ -116,10 +116,10 @@ Function sessionData ()
 	q.SetParameter ( "Scenario", Scenario );
 	return q.Execute ().Unload () [ 0 ];
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure fill ()
+&atserver
+procedure fill ()
 	
 	data = scriptData ();
 	module = data.Module;
@@ -156,10 +156,10 @@ Procedure fill ()
 	enddo;
 	Appearance.Apply ( ThisObject, "ScenarioOutdated" );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function scriptData ()
+&atserver
+function scriptData ()
 	
 	s = "
 	|select Timelapse.Scenario as Scenario, Timelapse.Module as Module,
@@ -231,24 +231,24 @@ Function scriptData ()
 	result.Insert ( "Errors", data [ 4 ].Unload () );
 	return result;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure setTitle ()
+&atserver
+procedure setTitle ()
 	
 	Title = "@" + Scenario;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	activateLine ( InitialLine, false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateLine ( Line, Debugging )
+&atclient
+procedure activateLine ( Line, Debugging )
 	
 	row = Script [ Line - 1 ];
 	if ( Debugging ) then
@@ -256,10 +256,10 @@ Procedure activateLine ( Line, Debugging )
 	endif;
 	Items.Script.CurrentRow = row.GetID ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure changeCurrentRow ( Row )
+&atclient
+procedure changeCurrentRow ( Row )
 	
 	if ( CurrentScriptRow <> undefined ) then
 		CurrentScriptRow.Current = 0;
@@ -267,20 +267,20 @@ Procedure changeCurrentRow ( Row )
 	CurrentScriptRow = row;
 	CurrentScriptRow.Current = 1;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Script
 
-&AtClient
-Procedure GoForward ( Command )
+&atclient
+procedure GoForward ( Command )
 	
 	nextStep ( 1, not ScriptRow.Next );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure nextStep ( Direction, ThisScenario )
+&atclient
+procedure nextStep ( Direction, ThisScenario )
 	
 	if ( moving ( Direction, ThisScenario ) ) then
 		displayInfo ();
@@ -288,10 +288,10 @@ Procedure nextStep ( Direction, ThisScenario )
 		Output.NoStepsInChronograph ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function moving ( Direction, ThisScenario )
+&atclient
+function moving ( Direction, ThisScenario )
 	
 	pointer = CurrentPointer + Direction;
 	if ( pointer < 0 ) then
@@ -310,10 +310,10 @@ Function moving ( Direction, ThisScenario )
 	activateLine ( data.Row, true );
 	return true;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function stepData ( val Params, val Pointer, val ThisScenario, Screenshot, val UUID )
+&atservernocontext
+function stepData ( val Params, val Pointer, val ThisScenario, Screenshot, val UUID )
 	
 	info = getStepData ( Params, Pointer, ThisScenario );
 	if ( info = undefined ) then
@@ -330,10 +330,10 @@ Function stepData ( val Params, val Pointer, val ThisScenario, Screenshot, val U
 	result.Insert ( "Row", info.Row );
 	return result;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getStepData ( Params, Pointer, ThisScenario )
+&atservernocontext
+function getStepData ( Params, Pointer, ThisScenario )
 	
 	s = "
 	|select Timelapse.Scenario as Scenario, Timelapse.Row as Row, Timelapse.Screenshot as Screenshot
@@ -353,25 +353,25 @@ Function getStepData ( Params, Pointer, ThisScenario )
 	q.SetParameter ( "Scenario", Params.Scenario );
 	return Conversion.RowToStructure ( q.Execute ().Unload () );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure GoBack ( Command )
+&atclient
+procedure GoBack ( Command )
 	
 	nextStep ( -1, not ScriptRow.Previous );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScriptOnActivateRow ( Item )
+&atclient
+procedure ScriptOnActivateRow ( Item )
 	
 	ScriptRow = Item.CurrentData;
 	AttachIdleHandler ( "update", 0.1, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure update () export
+&atclient
+procedure update () export
 	
 	if ( ScriptRow = undefined ) then
 		setPointer ( 0 );
@@ -388,18 +388,18 @@ Procedure update () export
 	endif; 
 	displayInfo ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setPointer ( Pointer )
+&atclient
+procedure setPointer ( Pointer )
 	
 	CurrentPointer = Pointer;
 	RowPointer = Pointer;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function context ()
+&atclient
+function context ()
 	
 	p = new Structure ();
 	p.Insert ( "Session", Session );
@@ -409,10 +409,10 @@ Function context ()
 	p.Insert ( "Row", ScriptRow.Number );
 	return p;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function displayLastScreen ( val Params, Screenshot, val UUID )
+&atservernocontext
+function displayLastScreen ( val Params, Screenshot, val UUID )
 	
 	Screenshot = "";
 	info = getLastScreen ( Params );
@@ -425,10 +425,10 @@ Function displayLastScreen ( val Params, Screenshot, val UUID )
 	endif;
 	return info.Pointer;
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getLastScreen ( Params )
+&atservernocontext
+function getLastScreen ( Params )
 	
 	s = "
 	|select Timelapse.Screenshot as Screenshot, Timelapse.Pointer as Pointer
@@ -457,10 +457,10 @@ Function getLastScreen ( Params )
 	q.SetParameter ( "Row", Params.Row );
 	return Conversion.RowToStructure ( q.Execute ().Unload () );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure displayInfo ()
+&atclient
+procedure displayInfo ()
 	
 	if ( Screenshot = "" ) then
 		if ( ScriptRow = undefined ) then
@@ -475,18 +475,18 @@ Procedure displayInfo ()
 	endif; 
 	Items.ScriptError.Visible = not ScriptRow.Error.IsEmpty ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ScriptSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ScriptSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	editScenario ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure editScenario ()
+&atclient
+procedure editScenario ()
 	
 	if ( TypeOf ( Scenario ) = Type ( "CatalogRef.Versions" ) ) then
 		target = DF.Pick ( Scenario, "Scenario" );
@@ -495,21 +495,21 @@ Procedure editScenario ()
 	endif;
 	ScenarioForm.GotoLine ( target, ScriptRow.Number, ScriptRow.Error );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Screenshot Field
 
-&AtClient
-Procedure ScreenshotClick ( Item, StandardProcessing )
+&atclient
+procedure ScreenshotClick ( Item, StandardProcessing )
 	
 	StandardProcessing = false;
 	showPicture ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showPicture ()
+&atclient
+procedure showPicture ()
 	
 	if ( Screenshot = "" ) then
 		return;
@@ -519,4 +519,4 @@ Procedure showPicture ()
 	p.Insert ( "URL", Screenshot );
 	OpenForm ( "CommonForm.Screenshot", p );
 	
-EndProcedure 
+endprocedure 

@@ -1,15 +1,15 @@
 var ObjectRef;
 
-Procedure BeforeWrite ( Cancel )
+procedure BeforeWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
 	endif; 
 	makeUsersAndGroups ();
 	
-EndProcedure
+endprocedure
 
-Procedure makeUsersAndGroups ()
+procedure makeUsersAndGroups ()
 	
 	selectedUsers = undefined;
 	if ( not AdditionalProperties.Property ( "SelectedUsers", selectedUsers ) ) then
@@ -30,9 +30,9 @@ Procedure makeUsersAndGroups ()
 	enddo; 
 	recordset.Write ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure OnWrite ( Cancel )
+procedure OnWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -45,9 +45,9 @@ Procedure OnWrite ( Cancel )
 	setRights ();
 	SetPrivilegedMode ( false );
 
-EndProcedure
+endprocedure
 
-Procedure setRights ()
+procedure setRights ()
 	
 	userNames = getUserNames ();
 	for each userName in userNames do
@@ -59,9 +59,9 @@ Procedure setRights ()
 		user.Write ();
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function getUserNames ()
+function getUserNames ()
 	
 	s = "
 	|select UsersAndGroups.User.Description as UserName
@@ -72,4 +72,4 @@ Function getUserNames ()
 	q.SetParameter ( "Ref", Ref );
 	return q.Execute ().Unload ().UnloadColumn ( "UserName" );
 	
-EndFunction 
+endfunction 

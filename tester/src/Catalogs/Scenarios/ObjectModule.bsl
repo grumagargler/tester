@@ -5,21 +5,21 @@ var OldDeletionMark;
 var OldTree;
 var OldPath;
 
-Procedure FillCheckProcessing ( Cancel, CheckedAttributes )
+procedure FillCheckProcessing ( Cancel, CheckedAttributes )
 	
 	checkAccess ( CheckedAttributes );
 	
-EndProcedure
+endprocedure
 
-Procedure checkAccess ( CheckedAttributes )
+procedure checkAccess ( CheckedAttributes )
 	
 	if ( Access ) then
 		CheckedAttributes.Add ( "Users" );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure BeforeWrite ( Cancel )
+procedure BeforeWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -61,9 +61,9 @@ Procedure BeforeWrite ( Cancel )
 	endif; 
 	Catalogs.Scenarios.UpdateFiles ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-Procedure removeFiles ()
+procedure removeFiles ()
 	
 	Catalogs.Scenarios.RemoveFile ( Ref, OldApplication, OldPath, OldTree, false );
 	renamedCommonFolder = Tree and Application.IsEmpty (); 
@@ -74,23 +74,23 @@ Procedure removeFiles ()
 		enddo;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function option ( Name )
+function option ( Name )
 	
 	return AdditionalProperties.Property ( Name )
 	and AdditionalProperties [ Name ];
 	
-EndFunction 
+endfunction 
 
-Procedure stamp ()
+procedure stamp ()
 	
 	Changed = CurrentUniversalDate ();
 	LastCreator = SessionParameters.User;
 	
-EndProcedure
+endprocedure
 
-Procedure fixApplication ()
+procedure fixApplication ()
 	
 	if ( Parent.IsEmpty () ) then
 		return;
@@ -102,15 +102,15 @@ Procedure fixApplication ()
 	endif; 
 	Application = parentApp;
 	
-EndProcedure 
+endprocedure 
 
-Procedure setTree ()
+procedure setTree ()
 	
 	Tree = ( Type = Enums.Scenarios.Folder ) or ( not IsNew and hasChildren ( Ref ) );
 	
-EndProcedure 
+endprocedure 
 
-Function hasChildren ( Scenario )
+function hasChildren ( Scenario )
 	
 	s = "
 	|select top 1 1
@@ -125,18 +125,18 @@ Function hasChildren ( Scenario )
 	SetPrivilegedMode ( true );
 	return not q.Execute ().IsEmpty ();
 	
-EndFunction 
+endfunction 
 
-Procedure fixType ()
+procedure fixType ()
 	
 	if ( Tree
 		and Type = Enums.Scenarios.Scenario ) then
 		Type = Enums.Scenarios.Folder;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure getLastProps ()
+procedure getLastProps ()
 	
 	OldParent = Ref.Parent;
 	OldApplication = Ref.Application;
@@ -144,9 +144,9 @@ Procedure getLastProps ()
 	OldTree = Ref.Tree;
 	OldPath = Ref.Path;
 	
-EndProcedure
+endprocedure
 
-Function changeParents ()
+function changeParents ()
 	
 	if ( Parent = OldParent ) then
 		return true;
@@ -165,17 +165,17 @@ Function changeParents ()
 	endif; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-Function isFolder ( Scenario )
+function isFolder ( Scenario )
 	
 	scenarioType = DF.Pick ( Scenario, "Type" );
 	return scenarioType = Enums.Scenarios.Folder
 	or scenarioType = Enums.Scenarios.Library;
 	
-EndFunction
+endfunction
 
-Function makeScenario ( Scenario, AsParent )
+function makeScenario ( Scenario, AsParent )
 	
 	if ( Catalogs.Scenarios.Locked ( Scenario ) ) then
 		return false;
@@ -196,9 +196,9 @@ Function makeScenario ( Scenario, AsParent )
 	ExchangePlans.Repositories.Sync ( Scenario, parentApp, false );
 	return true;
 	
-EndFunction 
+endfunction 
 
-Procedure OnWrite ( Cancel )
+procedure OnWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -216,17 +216,17 @@ Procedure OnWrite ( Cancel )
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure FullExchange () export
+procedure FullExchange () export
 
 	if ( not Local ) then
 		Exchange.RecordChanges ( Ref );	
 	endif; 
 
-EndProcedure
+endprocedure
 
-Procedure markVersions ( Delete )
+procedure markVersions ( Delete )
 	
 	selection = Catalogs.Versions.Select ( , , new Structure ( "Scenario", Ref ) );
 	while ( selection.Next () ) do
@@ -234,10 +234,10 @@ Procedure markVersions ( Delete )
 		obj.SetDeletionMark ( Delete );
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure BeforeDelete ( Cancel )
+procedure BeforeDelete ( Cancel )
 	
 	Catalogs.Scenarios.RemoveFile ( Ref, Application, Path, Tree, true );
 	
-EndProcedure
+endprocedure

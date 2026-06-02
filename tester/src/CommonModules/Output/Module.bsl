@@ -1,5 +1,5 @@
 
-Function Sformat ( Str, Params ) export
+function Sformat ( Str, Params ) export
 	
 	if ( Params = undefined
 		or StrFind ( Str, "%" ) = 0 ) then
@@ -31,9 +31,9 @@ Function Sformat ( Str, Params ) export
 	enddo; 
 	return result;
 	
-EndFunction
+endfunction
 
-Procedure PutMessage ( Text, Params, Field, DataKey, DataPath, Form = undefined ) export
+procedure PutMessage ( Text, Params, Field, DataKey, DataPath, Form = undefined ) export
 	
 	msg = new UserMessage ();
 	s = Output.Sformat ( Text, Params );
@@ -62,10 +62,10 @@ Procedure PutMessage ( Text, Params, Field, DataKey, DataPath, Form = undefined 
 	msg.Text = s;
 	msg.Message ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openMessageBox ( Text, Params, ProcName, Module, CallbackParams, Timeout, Title )
+&atclient
+procedure openMessageBox ( Text, Params, ProcName, Module, CallbackParams, Timeout, Title )
 	
 	if ( Module = undefined ) then
 		handler = undefined;
@@ -78,51 +78,51 @@ Procedure openMessageBox ( Text, Params, ProcName, Module, CallbackParams, Timeo
 		ShowMessageBox ( handler, Output.Sformat ( Text, Params ), Timeout, ? ( Title = "", MetadataPresentation (), Title ) );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openQueryBox ( Text, Params, ProcName, Module, CallbackParams, Buttons, Timeout, DefaultButton, Title )
+&atclient
+procedure openQueryBox ( Text, Params, ProcName, Module, CallbackParams, Buttons, Timeout, DefaultButton, Title )
 	
 	ShowQueryBox ( new NotifyDescription ( ProcName, Module, CallbackParams ), Output.Sformat ( Text, Params ), Buttons, Timeout, DefaultButton, ? ( Title = "", MetadataPresentation (), Title ) );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure putUserNotification ( Text, Params, NavigationLink, Explanation, Picture )
+&atclient
+procedure putUserNotification ( Text, Params, NavigationLink, Explanation, Picture )
 	
 	ShowUserNotification ( Output.SFormat ( Text, Params ), NavigationLink, Output.SFormat ( Explanation, Params ), Picture );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function AskUser ( Text, Params, Buttons, Timeout, DefaultButton, Title ) export
+&atclient
+function AskUser ( Text, Params, Buttons, Timeout, DefaultButton, Title ) export
 
 	return DoQueryBoxAsync ( Output.Sformat ( Text, Params ), Buttons, Timeout, DefaultButton, ? ( Title = "", MetadataPresentation (), Title ) );
 
-EndFunction
+endfunction
 
-Function Row ( Table, LineNumber, Field ) export
+function Row ( Table, LineNumber, Field ) export
 	
 	return Table + "[" + Format ( LineNumber - 1, "NG=;NZ=" ) + "]." + Field;
 	
-EndFunction 
+endfunction 
 
-Function TableAndRow ( Params ) export
+function TableAndRow ( Params ) export
 
 	text = NStr ( "en='table %Table [%Row]';ru='таблица %Table [%Row]'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function MetadataPresentation () export
+&atclient
+function MetadataPresentation () export
 
 	text = NStr ( "en='Tester';ru='Тестер'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function getTable ( Field )
+function getTable ( Field )
 	
 	i = StrFind ( Field, "[" );
 	j = StrFind ( Field, "]", , i );
@@ -133,398 +133,398 @@ Function getTable ( Field )
 	row = 1 + Number ( Mid ( Field, i + 1, j - i - 1 ) );
 	return new Structure ( "Name, Row", name, row );
 	
-EndFunction 
+endfunction 
 
 #region ExchangeData
 
-&AtClient
-Procedure MasterNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure MasterNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Main node selected. Data exchange must be made from subordinate nodes!';ru='Выбран главный узел. Обмен данными должен производиться из подчиненных узлов!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ExchangeDataItemAlreadyExist ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ExchangeDataItemAlreadyExist ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Element with node code: %Code already exists! To modify or add node data, you must open an existing directory item.';ru='Элемент с кодом узла: %Code уже существует! Для изменения или добавления данных узла необходимо открыть уже существующий элемент справочника.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ChangePrefixFileName ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure ChangePrefixFileName ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='The prefix of the data exchange file name has been changed! This operation must be performed carefully! For further correct work of data exchange, it is necessary to make similar changes in the corresponding nodes of the distributed information base.';ru='Был изменён префикс имени файла обмена данными! Данную операцию необходимо выполнять осмотрительно! Для дальнейшей корректной работы обмена данными, необходимо произвести подобные изменения в соответствующих узлах распределённой информационной базы.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure AlreadyRunExchangeFull ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure AlreadyRunExchangeFull ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Background job ""Exchange"" is currently running. Please try again later.';ru='Фоновое задание ""Exchange"" в данный момент запущено. Повторите попытку позже.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure LoadingCompleteNotification ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
+&atclient
+procedure LoadingCompleteNotification ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
 	
 	text = NStr ( "en='Load data';ru='Загрузка данных'" );
 	explanation = NStr ( "en = 'Loading is complete!'; ru = 'Загрузка завершена!'" );
 	putUserNotification ( text, Params, NavigationLink, explanation, PictureLib.Exchange );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnloadingCompleteNotification ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
+&atclient
+procedure UnloadingCompleteNotification ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
 	
 	text = NStr ( "en='Unload data';ru='Выгрузка данных'" );
 	explanation = NStr ( "en = 'Unloading is complete!'; ru = 'Выгрузка завершена!'" );
 	putUserNotification ( text, Params, NavigationLink, explanation, PictureLib.Exchange );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function NotDefineThisNode () export
+&atserver
+function NotDefineThisNode () export
 	
 	p = new Structure ();
 	p.Insert ( "Node", ExchangePlans.Full.ThisNode () );
 	s = NStr ( "en = 'No setting created for exchange data for node - ""%Node"".'; ru = 'Не создана настройка обмена данными для узла - ""%Node"".'" );
 	return Sformat ( s, p );
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure WritingChanges ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WritingChanges ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	text = NStr ( "en='... write data to file.';ru='... запись данных в файл.'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure WritingChangesComplete ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WritingChangesComplete ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... data successfully written to file.';ru='... данные успешно записаны в файл.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ConnectToWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ConnectToWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	s = NStr ( "en='... connecting to a web service';ru='... подключение к веб-сервису'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReadWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReadWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... receiving data through a web service';ru='... получение данных через веб-сервис'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure WriteWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WriteWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... data recording via web service';ru='... запись данных через веб-сервис'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure CheckPreviousFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure CheckPreviousFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Search for an existing exchange file.';ru='Поиск существующего файла обмена.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ItWasFoundFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ItWasFoundFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='An unread exchange file was found for the %Node node (the file name is %File). Node will not be unloaded for %Node.';ru='Для узла %Node был обнаружен непрочитанный файл обмена (имя файла - %File). Для узла %Node не будет произведена выгрузка.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FTPConnectionError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure FTPConnectionError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='There were errors connecting to the FTP server! Error description - ""%Error"".';ru='Возникли ошибки при соединении с FTP сервером! Описание ошибки - ""%Error"".'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure WillBeRunRereadFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WillBeRunRereadFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='The exchange file will be read again after updating the configuration.';ru='Файл обмена будет прочитан повторно, после обновления конфигурации.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ExchangeReceivedFromNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ExchangeReceivedFromNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Exchange data from host ""%Node "" accepted!';ru='Данные обмена от узла ""%Node"" приняты!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ErrorReceivingData ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ErrorReceivingData ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Error getting exchange data! %Error. Exchange file %FileXml..';ru='Ошибка при получении данных обмена! %Error. Файл обмена %FileXml.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LockBase ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LockBase ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Infobase locked for configuration update.';ru='Информационная база заблокирована для обновления конфигурации.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnlockBase ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnlockBase ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='The base lock is removed. Time - %Date.';ru='Снята блокировка базы. Время - %Date.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FinishedRereadFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure FinishedRereadFileExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Finishing reading the exchange file after updating the configuration.';ru='Завершение дочитывания файла обмена после обновления конфигурации.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LoadDataFromNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LoadDataFromNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Retrieving data from node ""%Node"" ...';ru='Получение данных от узла ""%Node"" ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnloadBegin ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnloadBegin ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Unload data for node ""%Node"" ...';ru='Выгрузка данных для узла ""%Node"" ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnloadFinish ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnloadFinish ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... unload data for node ""%Node"" completed.';ru='... выгрузка данных для узла ""%Node"" завершена.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LoadDataFromNodeOver ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LoadDataFromNodeOver ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... receiving data from node ""%Node"" completed.';ru='... получение данных от узла ""%Node"" завершено.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LoadFromEmail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LoadFromEmail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Load from email ...';ru='Загрузка данных из электронной почты ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LoadFromFTP ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LoadFromFTP ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Load from ftp ...';ru='Загрузка данных с ftp ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LoadFromWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LoadFromWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Load data from web service ...';ru='Загрузка данных через веб-сервис ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnLoadToEmail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnLoadToEmail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Unload data to email ...';ru='Выгрузка данных на электронную почту ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnLoadToFTP ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnLoadToFTP ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Unload data to ftp ...';ru='Выгрузка данных на ftp ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnloadToDisk ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnloadToDisk ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Unload data to disk ...';ru='Выгрузка данных на диск ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnloadToWebService ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnloadToWebService ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='Unload data through web service ...';ru='Выгрузка данных через веб-сервис ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LogonToServerMail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LogonToServerMail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Connection to the mail server ...';ru='Соединение с почтовым сервером ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-Procedure LogonSuccess ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+procedure LogonSuccess ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... connection to the server is established.';ru='... соединение с сервером установлено.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-Procedure ErrorConnectEmailProfile ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+procedure ErrorConnectEmailProfile ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Error connecting to mail profile! Exchange failed! Error Description:%Error';ru='Ошибка при подключении к почтовому профилю! Обмен не выполнен! Описание ошибки: %Error'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure MailReceived ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure MailReceived ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Message is received.';ru='Сообщение получено.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure SendingMail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SendingMail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Sending email ...';ru='Отправка эл. почты ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure MessageSent ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure MessageSent ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Exchange message for node ""%Node"" sent successfully';ru='Сообщение обмена для узла ""%Node"" успешно отправлено.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure NoNewExchangeFiles ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure NoNewExchangeFiles ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='No new messages!';ru='Отсутствуют новые сообщения!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ErrorLogonInternetMail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ErrorLogonInternetMail ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='Error connecting to internet mail. Error description - %ErrorDescription.';ru='Ошибка при подключении к интернет-почте. Описание ошибки - %ErrorDescription.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FileDeletionError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure FileDeletionError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='Error deleting file (%File)! %Error';ru='Ошибка при удалении файла (%File)! %Error'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UnLoadFromWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UnLoadFromWS ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='... started uploading data through a web service';ru='... стартовала выгрузка данных через веб-сервис'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure LoadFromNetworkDisk ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure LoadFromNetworkDisk ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='... started loading data from a network drive';ru='... стартовала загрузка данных с сетевого диска'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReadingChanges ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReadingChanges ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='... reading data from file.';ru='... чтение данных из файла.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReadingChangesComplete ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReadingChangesComplete ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='... data from node ""%Node"" was successfully read from the file.';ru='... данные от узла ""%Node"" успешно прочитаны из файла.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReceivedFromNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReceivedFromNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='Exchange data from host ""%Node"" accepted!';ru='Данные обмена от узла ""%Node"" приняты!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReadChangesConfiguration ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReadChangesConfiguration ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ("en='Changes that contain configuration changes were read. The configuration will be updated.';ru='Были прочитаны изменения, которые содержат изменения в конфигурации. Конфигурация будет обновлена.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function SubjectErrorReport ( Params ) export
+&atserver
+function SubjectErrorReport ( Params ) export
 
 	s = NStr ("en='Errors while loading data from exchange node ""%Node"". The data load date is %CurrentDate.';ru='Ошибки при загрузке данных от узла-обмена ""%Node"". Дата загрузки данных - %CurrentDate.'" );
 	return Sformat ( s, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function TextMessageEmailErrorReport ( Params ) export 
+&atserver
+function TextMessageEmailErrorReport ( Params ) export 
 
 	s = NStr ( "en='Exchange data with node ""%Node""."
 	"Exceeded the maximum number of errors while loading data from the file-sharing."
@@ -539,10 +539,10 @@ Function TextMessageEmailErrorReport ( Params ) export
 	"Необходимо устранить причину ошибку для дальнейшего успешного обмена данными.'" );
 	return Sformat ( s, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function TextMessageEmailErrorReportNoNewExchangeFiles ( Params ) export
+&atserver
+function TextMessageEmailErrorReportNoNewExchangeFiles ( Params ) export
 
 	s = NStr ( "en='Exchange data with node ""%Node""."
 	"Exceeded the maximum number of errors while loading data from the file-sharing."
@@ -557,321 +557,321 @@ Function TextMessageEmailErrorReportNoNewExchangeFiles ( Params ) export
 	"Необходимо устранить причину ошибку для дальнейшего успешного обмена данными.'" );
 	return Sformat ( s, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure ThisNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure ThisNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	s = NStr ( "en='The data exchange node corresponding to this information base has been selected. You must select a node to exchange data.';ru='Выбран узел обмена данными, соответствующей данной информационной базе. Необходимо выбрать узел для обмена данными.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure IncorrectRecipients ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure IncorrectRecipients ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Exchange with the node - ""%Node"". Failed to send email mail ""%EMailUnLoad""! Error - ""%Error""!';ru='Обмен с узлом - ""%Node"". Не удалось отправить письмо на эл. почту ""%EMailUnLoad""! Описание ошибки - ""%Error""!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure IncorrectReportRecipients ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure IncorrectReportRecipients ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Send error report. Failed to send email mail ""%EMailUnLoad""! Error - ""%Error""!';ru='Отправка уведомления об ошибках обмена. Не удалось отправить письмо на эл. почту ""%EMailUnLoad""! Описание ошибки - ""%Error""!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SelectThisNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure SelectThisNode ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	s = NStr ( "en='This node is selected. Settings for this node are not specified.';ru='Выбран этот узел. Настройки для этого узла не указываются.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function ExchangeReadDataError ( Params ) export
+&atserver
+function ExchangeReadDataError ( Params ) export
 
 	s = NStr ( "en='User %User does not have permissions to exchange data.';ru='У пользователя %User нет прав на обмен данными.'" );
 	return Sformat ( s, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function UnknownNode ( Params ) export
+&atserver
+function UnknownNode ( Params ) export
 
 	s = NStr ( "en='No node found. Node Code - %Code.';ru='Не найден узел. Код узла - %Code.'" );
 	return Sformat ( s, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure StartUpdateScriptProcedure ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure StartUpdateScriptProcedure ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Start procedure for updating the configuration';ru='Старт процедуры по обновлению конфигурации.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure NotFoundExecuteFile1C ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure NotFoundExecuteFile1C ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='The executable file 1cv8.exe was not found!';ru='Не найден исполняемый файл 1cv8.exe!'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function InfobaseUpdateMessage ( Params ) export
+&atserver
+function InfobaseUpdateMessage ( Params ) export
 
 	s = NStr ( "en='The infobase was blocked for %Period min starting with %Date.';ru='Информационная база была заблокирована на %Period мин начиная с %Date.'" );
 	return Sformat ( s, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure StartReReadData ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure StartReReadData ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Processing reading file.';ru='Стартовала процедура дочитывания файла обмена.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ExchangeLoadingAgain ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ExchangeLoadingAgain ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='The exchange data will be read again from the %Node node (ID = %ID).';ru='Будет произведено повторное чтение данных обмена из узла %Node (ID = %ID).'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReReadLoad ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReReadLoad ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Data loading started after update.';ru='Началась загрузка данных после обновления.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReReadUnLoad ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReReadUnLoad ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Unloading of data after updating has begun.';ru='Началась выгрузка данных после обновления.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure CloseCurrentSession ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure CloseCurrentSession ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Ending the current session (processing reading data after update) ...';ru='Завершение текущего сеанса (дочитывание данных после обновления конфигурации) ...'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure SaveRereadExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SaveRereadExchange ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='Saved file processing read file exchange. The file is %File.';ru='Сохранили файл обработки дочитывания файла обмена. Файл - %File.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure NotDefineLanguageForUser ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure NotDefineLanguageForUser ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	s = NStr ( "en='For user %User is not set to the default language.';ru='Для пользователя %User не установлен язык по умолчанию.'" );
 	putMessage ( s, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
 #endregion
 
-&AtServer
-Function RuntimeMessage ( Params = undefined ) export
+&atserver
+function RuntimeMessage ( Params = undefined ) export
 
 	text = NStr ( "en='%Message {%Stack}';ru='%Message {%Stack}'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function RuntimeMessagePrefix ( Params = undefined ) export
+&atserver
+function RuntimeMessagePrefix ( Params = undefined ) export
 
 	text = "%Line: ";
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function RuntimeMessageCutPrefix () export
+&atserver
+function RuntimeMessageCutPrefix () export
 
 	text = "...";
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function CheckError ( Params ) export
+&atclient
+function CheckError ( Params ) export
 
 	text = NStr ( "en='%Form: %Title. Field ""%Field"" <> ""%Value"". The actual value is ""%Result""';ru='%Form: %Title. Поле ""%Field"" <> ""%Value"". Текущее значение ""%Result""'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function ScenarioError () export
+function ScenarioError () export
 
 	text = NStr ( "en='Scenario error';ru='Ошибка сценария'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function CallError ( Params ) export
+function CallError ( Params ) export
 
 	text = NStr ( "en='Scenario ""%Scenario"" not found';ru='Сценарий ""%Scenario"" не найден'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure TestComlete ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure TestComlete ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = Output.TestComleteMessage ();
 	PutMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function TestComleteMessage () export
+&atclient
+function TestComleteMessage () export
 	
 	text = NStr ( "en='Test complete!';ru='Тест завершен!'" );
 	return text;
 	
-EndFunction
+endfunction
 
-Function CompilationError () export
+function CompilationError () export
 
 	text = NStr ( "en='Compilation error';ru='Ошибка компиляции'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function CheckAppearanceIncorrect ( Params ) export
+&atclient
+function CheckAppearanceIncorrect ( Params ) export
 
 	text = NStr ( "en='CheckAppearance error: Status ""%Value"" is unknown';ru='CheckAppearance ошибка: Статус ""%Value"" не определен'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function CheckAppearanceError ( Params ) export
+&atclient
+function CheckAppearanceError ( Params ) export
 
 	text = NStr ( "en='Field ""%Field"" state ""%Value"" should be ""%Flag"". Actual state is ""%State""';ru='У поля ""%Field"" состояние ""%Value"" должно быть ""%Flag"", а реальное состояние ""%State""'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function FieldNotFound ( Params ) export
+&atclient
+function FieldNotFound ( Params ) export
 
 	text = NStr ( "en='Field ""%Field"" is not found';ru='Поле ""%Field"" не найдено'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function ManyPlaces ( Params ) export
+&atclient
+function ManyPlaces ( Params ) export
 
 	text = NStr ( "en='Field ""%Field"" found many times: %Places';ru='Поле ""%Field"" найдено в нескольких местах: %Places'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function StopMessage () export
+&atclient
+function StopMessage () export
 
 	text = NStr ( "en='Scenario stopped';ru='Сценарий остановлен'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function NewScenario () export
+&atclient
+function NewScenario () export
 
 	text = NStr ( "en='New Scenario';ru='Новый сценарий'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function TemplateEmpty () export
+&atclient
+function TemplateEmpty () export
 
 	text = NStr ( "en='Template is empty';ru='Шаблон пустой'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function AreaComparisonError ( Params ) export
+&atclient
+function AreaComparisonError ( Params ) export
 
 	text = NStr ( "en='Cell [%Area] correct value [%Original] is not equal actual value [%Actual]';ru='Ячейка [%Area] правильное значение [%Original] не соответствует текущему значению [%Actual]'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TemplateCaption () export
+function TemplateCaption () export
 
 	text = NStr ( "en='Template';ru='Шаблон'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure MainScenarioUndefined ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "MainScenarioUndefined" ) export
+&atclient
+procedure MainScenarioUndefined ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "MainScenarioUndefined" ) export
 	
 	text = NStr ( "en='Main Scenario is not yet defined';ru='Основной сценарий еще не определен'" );
 	title = NStr ( "en=''; ru=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure UserNameAlreadyExists ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure UserNameAlreadyExists ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Duplicate user name detected';ru='Такое имя пользователя уже существует'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure SelectAccessRights ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SelectAccessRights ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Check the boxes to set access rights';ru='Отметьте флажками права доступа'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ConfirmAccessRights ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ConfirmAccessRights ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Confirm or revert changes in access rights';ru='Принять или отменить изменения в правах доступа'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure SelectUsersGroup ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SelectUsersGroup ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Assign user to the group or assign individual rights';ru='Назначить пользователю группу или индивидуальные права'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsConfirmation ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "BPNotFound" ) export
+&atclient
+procedure RightsConfirmation ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "BPNotFound" ) export
 	
 	text = NStr ( "en='Selected right has dependencies on other system rights."
 "They should be added or removed as well."
@@ -881,98 +881,98 @@ Procedure RightsConfirmation ( Module = undefined, CallbackParams = undefined, P
 	title = NStr ( "en=''; ru=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ClearLogConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ClearLogConfirmation" ) export
+&atclient
+procedure ClearLogConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ClearLogConfirmation" ) export
 	
 	text = NStr ( "en='Do you want to remove all records?';ru='Удалить все записи?'" );
 	title = NStr ( "en=''; ru=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure AdministratorNotFound ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure AdministratorNotFound ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='No users with administrative rights left in the system. You need to have at least one user with administrative rights in the database for service efficiency';ru='В системе не осталось пользователей с административными правами. Для работы сервиса требуется как минимум один администратор приложения'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AccessDenied ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "AccessDenied" ) export
+&atclient
+procedure AccessDenied ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "AccessDenied" ) export
 	
 	text = NStr ( "en='Access denied';ru='Доступ запрещен'" );
 	title = NStr ( "en=''; ru=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function ApplicationNotFound ( Params ) export
+&atserver
+function ApplicationNotFound ( Params ) export
 
 	text = NStr ( "en='""%Name"" application is not found';ru='""%Name"" приложение не найдено'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function ScenarioNotFound ( Params ) export
+function ScenarioNotFound ( Params ) export
 
 	text = NStr ( "en='""%Name"" scenario is not found';ru='""%Name"" сценарий не найден'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure DownloadCompleted ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "DownloadCompleted" ) export
+&atclient
+procedure DownloadCompleted ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "DownloadCompleted" ) export
 	
 	text = NStr ( "en='Download completed!';ru='Загрузка завершена!'" );
 	title = NStr ( "en=''; ru=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function ParametersCountError ( Params ) export
+&atserver
+function ParametersCountError ( Params ) export
 
 	text = NStr ( "en='%Name (): Count of parameters cannot be more than %Limit';ru='%Name (): Количество параметров не может быть больше %Limit'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure ScenarioAlreadyExists ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ScenarioAlreadyExists ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = '""%Name"" scenario is already exists'; ru = '""%Name"" сценарий уже существует'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-Procedure LockError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+procedure LockError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = Output.LockingError ();
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-Function LockingError ( Params = undefined ) export
+function LockingError ( Params = undefined ) export
 
 	text = NStr ( "en='Scenario ""%Scenario"" has already been locked by %User';ru='Сценарий ""%Scenario"" уже захватил %User'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure ScenarioNotLocked ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ScenarioNotLocked ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Scenario ""%Scenario"" has not been locked'; ru = 'Сценарий ""%Scenario"" не захвачен для редактирования'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnlockConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "UnlockConfirmation" ) export
+&atclient
+procedure UnlockConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "UnlockConfirmation" ) export
 	
 	text = NStr ( "en = 'Selected scenarios will be replaced on the previous versions!
                   |Do you want to continue?'; ru = 'Выбранные сценарии будут заменены на предыдущие версии!
@@ -980,19 +980,19 @@ Procedure UnlockConfirmation ( Module, CallbackParams = undefined, Params = unde
 	title = NStr ( "en=''; ru=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure EnrollmentError ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "EnrollmentError" ) export
+&atclient
+procedure EnrollmentError ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "EnrollmentError" ) export
 	
 	text = NStr ( "ru='Центральный узел не может быть использован';en='The main node cannot be used'" );
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure EnrollNode ( Module, CallbackParams = undefined, Params = undefined, ProcName = "EnrollNode" ) export
+&atclient
+procedure EnrollNode ( Module, CallbackParams = undefined, Params = undefined, ProcName = "EnrollNode" ) export
 	
 	text = NStr ( "en = 'For this User, all scenarios will be marked as changed!
                    |Would you like to continue?'; ru = 'Для данного пользователя все сценарии будут помечены как измененные!
@@ -1000,35 +1000,35 @@ Procedure EnrollNode ( Module, CallbackParams = undefined, Params = undefined, P
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure EnrollmentCompleted ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "EnrollmentCompleted" ) export
+&atclient
+procedure EnrollmentCompleted ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "EnrollmentCompleted" ) export
 	
 	text = NStr ( "ru='Регистрация завершена!';en='Enrollment is completed!'" );
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ColumnIsEmpty ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ColumnIsEmpty ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "ru='Не заполнена колонка ""%Column"" в строке %LineNumber списка ""%Table""';en='Row ""%Column"" in line %LineNumber of list ""%Table"" is empty'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FieldIsEmpty ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure FieldIsEmpty ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "ru='Поле ""%Field"" не заполнено';en='Field ""%Field"" is empty'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScenariosProcessed ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "ScenariosProcessed" ) export
+&atclient
+procedure ScenariosProcessed ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "ScenariosProcessed" ) export
 	
 	text = NStr ( "en = 'Operation completed!
                    |Scenarios Processed: %Counter'; ru = 'Операция завершена!
@@ -1036,10 +1036,10 @@ Procedure ScenariosProcessed ( Module = undefined, CallbackParams = undefined, P
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScenariosProcessedNotification ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
+&atclient
+procedure ScenariosProcessedNotification ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
 	
 	text = NStr ( "en='Unloading scenarios';ru='Выгрузка сценариев'" );
 	explanation = NStr ( "en = 'Operation completed!
@@ -1047,49 +1047,49 @@ Procedure ScenariosProcessedNotification ( Params = undefined, NavigationLink = 
                    |Обработано сценариев: %Counter'" );
 	putUserNotification ( text, Params, NavigationLink, explanation, Picture );
 	
-EndProcedure
+endprocedure
 
-Function CommonApplicationName () export
+function CommonApplicationName () export
 
 	text = NStr ( "en='<Common>';ru='<Общее>'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function CommonApplicationCode () export
+&atserver
+function CommonApplicationCode () export
 
 	text = NStr ( "en='COMM';ru='ОБЩЕ'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure RepositoryNotSelected ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure RepositoryNotSelected ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Select at least one repository for processing'; ru = 'Выберите хотя бы один репозиторий для обработки'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ScenarioIDError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ScenarioIDError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Scenario ID should not contain special characters'; ru = 'ID сценария не должен содержать специальные символы'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function UserAdmin () export
+&atserver
+function UserAdmin () export
 
 	text = NStr ( "en='Administrator';ru='Администратор'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure SetupMainScenario ( Module, CallbackParams = undefined, Params = undefined, ProcName = "SetupMainScenario" ) export
+&atclient
+procedure SetupMainScenario ( Module, CallbackParams = undefined, Params = undefined, ProcName = "SetupMainScenario" ) export
 	
 	text = NStr ( "en = 'Main Scenario is not yet defined.
                   |Would you like to install current scenario as main?'; ru = 'Основной сценарий еще не определен.
@@ -1097,83 +1097,83 @@ Procedure SetupMainScenario ( Module, CallbackParams = undefined, Params = undef
 	title = NStr ( "en=''; ru=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UndefinedMainScenario ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "UndefinedMainScenario" ) export
+&atclient
+procedure UndefinedMainScenario ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "UndefinedMainScenario" ) export
 	
 	title = NStr ( "en=''; ru=''" );
 	text = NStr ( "en = 'Main scenario is undefined'; ru = 'Основной сценарий не определен'" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function LoadingProcessVersionMemo () export
+&atserver
+function LoadingProcessVersionMemo () export
 
 	text = NStr ( "en = 'Automatically created scenario version during files loading process'; ru = 'Автоматически созданная версия перед загрузкой сценария из файла'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure AssistantBuiltin ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "AssistantBuiltin" ) export
+&atclient
+procedure AssistantBuiltin ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "AssistantBuiltin" ) export
 	
 	text = NStr ( "en = 'Built-in functions cannot be changed'; ru = 'Встроенные функции не могут быть изменены'" );
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function RecordingSenario () export
+&atclient
+function RecordingSenario () export
 
 	text = NStr ( "en = 'Recording...'; ru = 'Идет запись...'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function PauseScenario () export
+&atclient
+function PauseScenario () export
 
 	text = NStr ( "en = 'Pause'; ru = 'Пауза'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function RecordSenario () export
+function RecordSenario () export
 
 	text = NStr ( "en = 'Record: no connection'; ru = 'Запись: нет подключения'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function WrongFieldValue ( Params ) export
+&atclient
+function WrongFieldValue ( Params ) export
 
 	text = NStr ( "en = 'Entered value was not found. The closest match found in the system is ""%NewValue"". Please provide an unambiguous value or select it from the list. If the value does not exist, consider creating it';ru = 'Введённое значение не найдено. Ближайшее совпадение, найденное в системе: ""%NewValue"". Пожалуйста, введите однозначное значение или выберите его из списка. Если значение не существует, рассмотрите возможность его создания'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure CommonReportOpenError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure CommonReportOpenError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'This report is an official report and it cannot be opened interactively';ru = 'Данный отчет является служебным и не предназначен для интерактивного открытия'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function ClickGenerateReport () export
+&atserver
+function ClickGenerateReport () export
 	
 	text = NStr ( "en='Press the button ""Generate"" to create a report';ru='Нажмите кнопку Сформировать для формирования отчета'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure ReportVariantModified2 ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReportVariantModified2" ) export
+&atclient
+procedure ReportVariantModified2 ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReportVariantModified2" ) export
 	
 	text = NStr ( "en='Current report version was modified."
 "Would you like to save changes?';ru='Текущий вариант отчета модифицирован."
@@ -1181,18 +1181,18 @@ Procedure ReportVariantModified2 ( Module, CallbackParams = undefined, Params = 
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNoCancel, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ReportSchedulingIncorrectPeriod ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ReportSchedulingIncorrectPeriod ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Selection by period is set to specific date. You cannot use the schedule because you set strict selection mode and the report will be delivered with the same data all the time. Try to set predefined value as a selection, not a specific date.';ru='Отбор по периоду установлен на конкретную дату. Использовать расписание нельзя, так как вы установили строгий отбор и будете каждый раз получать этот отчет с одними и теме же данными. Попробуйте указать в качестве отбора, не конкретную дату(ы), а предопределенное значение'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReportVariantModified1 ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReportVariantModified1" ) export
+&atclient
+procedure ReportVariantModified1 ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReportVariantModified1" ) export
 	
 	text = NStr ( "en='Current report version has been modified."
 "Would you like to save current changes before loading the new version?';ru='Текущий вариант отчета модифицирован."
@@ -1200,68 +1200,68 @@ Procedure ReportVariantModified1 ( Module, CallbackParams = undefined, Params = 
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNoCancel, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function LoadReportSettings () export
+&atserver
+function LoadReportSettings () export
 	
 	text = NStr ( "en='Report settings';ru='Настройки отчета'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function LoadReportVariant () export
+&atserver
+function LoadReportVariant () export
 	
 	text = NStr ( "en='Report variants';ru='Варианты отчета'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure ReplaceReportVariant ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReplaceReportVariant" ) export
+&atclient
+procedure ReplaceReportVariant ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReplaceReportVariant" ) export
 	
 	text = NStr ( "en='Overwrite the existing report settings?';ru='Перезаписать существующие настройки отчета?'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure SendingReportsByScheduleAddingError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SendingReportsByScheduleAddingError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Scheduled reports can be created and sent from specific form. Interactive access denied';ru='Создание графиков отправки осуществляется из форм конкретных отчетов. Интерактивное добавление недоступно'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure ScheduleDateError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ScheduleDateError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Start the schedule from the date greater than current date';ru='Начните расписание с даты большей, чем текущая дата'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure WeekDaySelectionError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WeekDaySelectionError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en='Please select at least one week day';ru='Выберите хотя бы один день недели'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReportScheduleRemovingConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReportScheduleRemovingConfirmation" ) export
+&atclient
+procedure ReportScheduleRemovingConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ReportScheduleRemovingConfirmation" ) export
 	
 	text = NStr ( "en='Are you sure you want to delete the schedule?';ru='Удалить расписание?'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function ReportByEmailBody ( Params ) export
+&atserver
+function ReportByEmailBody ( Params ) export
 	
 	text = NStr ( "en='Hello,"
 "You received scheduled report %ReportPresentation. Report is attached to this e-mail."
@@ -1279,18 +1279,18 @@ Function ReportByEmailBody ( Params ) export
 "С уважением, команда специалистов %Website'" );
 	return Output.Sformat ( text, Params );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function PageFooter () export
+&atserver
+function PageFooter () export
 	
 	text = NStr ( "en='[&PageNumber] from [&PagesTotal]';ru='[&PageNumber] from [&PagesTotal]'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure SetCurrentVersion ( Module, CallbackParams = undefined, Params = undefined, ProcName = "SetCurrentVersion" ) export
+&atclient
+procedure SetCurrentVersion ( Module, CallbackParams = undefined, Params = undefined, ProcName = "SetCurrentVersion" ) export
 	
 	text = NStr ( "en = 'Selected version %Version will be used as current application version for your profile.
                   |Would you like to continue?'; ru = 'Для вашего профиля, версия %Version будет установлена как текущая.
@@ -1298,574 +1298,573 @@ Procedure SetCurrentVersion ( Module, CallbackParams = undefined, Params = undef
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function ExpressionError () export
+&atserver
+function ExpressionError () export
 	
 	text = NStr ( "en = 'Expression error'; ru = 'Ошибка в выражении'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function CurrentVersionUndefined () export
+&atserver
+function CurrentVersionUndefined () export
 	
 	text = NStr ( "en = 'Current version is not defined'; ru = 'Текущая версия не определена'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function VersionNotFound ( Params ) export
+&atserver
+function VersionNotFound ( Params ) export
 	
 	text = NStr ( "en = 'Version <%Version> is not found'; ru = 'Версия <%Version> не найдена'" );
 	return Output.Sformat ( text, Params );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function StopDebugging () export
+function StopDebugging () export
 
 	text = NStr ( "en = 'Debugging stopped'; ru = 'Отладка остановлена'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure ApplicationChangingError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure ApplicationChangingError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Application changing error. Scenario: %Scenario, Error: %Error'; ru = 'Не удалось изменить приложение для сценария %Scenario. Ошибка: %Error'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-Function OptionsLabelShow () export
+function OptionsLabelShow () export
 
 	text = NStr ( "en = 'Options'; ru = 'Опции'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function OptionsLabelHide () export
+function OptionsLabelHide () export
 
 	text = NStr ( "en = 'Hide'; ru = 'Скрыть'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function FilterLabelShow () export
+function FilterLabelShow () export
 
 	text = NStr ( "en = 'Filter: '; ru = 'Отбор: '" );
 	return text;
 
-EndFunction
+endfunction
 
-Function LockedLabel () export
+function LockedLabel () export
 
 	text = NStr ( "en = 'Filtered by Locked'; ru = 'Отобраны захваченные'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function UnlockedLabel () export
+function UnlockedLabel () export
 
 	text = NStr ( "en = 'Filtered by Unlocked'; ru = 'Отобраны незахваченные'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function TagsFilter () export
+function TagsFilter () export
 
 	text = NStr ( "en = 'Tags'; ru = 'Теги'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function SourceNotFound () export
+&atclient
+function SourceNotFound () export
 
 	text = NStr ( "en = 'Source not found '; ru = 'Источник не найден'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function NewTag () export
+&atserver
+function NewTag () export
 
 	text = NStr ( "en = 'New Tag'; ru = 'Новый тег'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure ObjectNotOriginal ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ObjectNotOriginal ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = '%Value already exists!'; ru = '%Value уже существует!'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagRemovingConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "TagRemovingConfirmation" ) export
+&atclient
+procedure TagRemovingConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "TagRemovingConfirmation" ) export
 	
 	text = NStr ( "en='Do you want to remove the tag?';ru='Удалить тег?'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagsListEmpty ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "TagsListEmpty" ) export
+&atclient
+procedure TagsListEmpty ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "TagsListEmpty" ) export
 	
 	text = NStr ( "en = 'Tags list is empty. For creating new tags please contact your administrator'; ru = 'Список тегов не задан. Для создания новых тегов, обратитесь к администратору за получением соответствующих прав доступа'" );
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function UndefinedExternalRequest () export
+&atclient
+function UndefinedExternalRequest () export
 
 	text = NStr ( "en = 'Undefined request'; ru = 'Неопознанный запрос'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function FileReadingError ( Params ) export
+&atclient
+function FileReadingError ( Params ) export
 
 	text = NStr ( "en = 'File reading timeout error: %File'; ru = 'Превышен таймаут ожидания для чтения файла: %File'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function ErrorsNotFound () export
+&atclient
+function ErrorsNotFound () export
 
 	text = NStr ( "en = 'No syntax errors found!'; ru = 'Синтаксических ошибок не обнаружено!'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function UndefinedScenario ( Params ) export
+function UndefinedScenario ( Params ) export
 
 	text = NStr ( "en = 'Cannot find scenario by file: %File'; ru = 'Не удалось найти сценарий согласно файла: %File'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function ScenarioApplicationUnmapped ( Params ) export
+function ScenarioApplicationUnmapped ( Params ) export
 
 	text = NStr ( "en = 'Scenario <%Path> is not mapped to the folder of the file system'; ru = 'Сценарий <%Path> не синхронизирован с папкой файловой системы'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure WrongRepoFolder1 ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WrongRepoFolder1 ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'One folder cannot be specified twice'; ru = 'Одна папка не может использоваться дважды'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure WrongRepoFolder2 ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure WrongRepoFolder2 ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Repository folders cannot be inside of each other: %Folder1 <-> %Folder2. Use another folder path'; ru = 'Папки репозиториев не могут включать друг друга: %Folder1 <-> %Folder2. Укажите другой путь к папке'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure AgentAccessDenied ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure AgentAccessDenied ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = '%Creator cannot delegate tasks for the Agent: Access Denied'; ru = '%Creator не может делегировать задачи для этого агента: Отказано в доступе'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function OpenErrorsLog () export
+&atclient
+function OpenErrorsLog () export
 
 	text = NStr ( "en = 'Open Errors Log'; ru = 'Открыть журнал ошибок'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function OpenError () export
+&atclient
+function OpenError () export
 
 	text = NStr ( "en = 'Error: '; ru = 'Ошибка: '" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function OpenLog () export
+&atclient
+function OpenLog () export
 
 	text = NStr ( "en = 'Open Execution Log'; ru = 'Открыть журнал запуска'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function OpenScenario () export
+&atclient
+function OpenScenario () export
 
 	text = NStr ( "en = 'Open Scenario'; ru = 'Открыть сценарий'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure DeleteJob ( Module, CallbackParams = undefined, Params = undefined, ProcName = "DeleteJob" ) export
+&atclient
+procedure DeleteJob ( Module, CallbackParams = undefined, Params = undefined, ProcName = "DeleteJob" ) export
 	
 	text = NStr ( "en = 'Would you like to remove this job?'; ru = 'Удалить задание?'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-Function JobCanceled () export
+function JobCanceled () export
 
 	text = NStr ( "en = 'Job canceled'; ru = 'Задание отменено'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function TestedApplicationOffline () export
+&atclient
+function TestedApplicationOffline () export
 
 	text = NStr ( "en = 'Tested application is offline'; ru = 'Нет подключения к тестируемому приложению'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function AgentNotFound ( Params ) export
+&atserver
+function AgentNotFound ( Params ) export
 
 	text = NStr ( "en = 'Agent ""%Agent"" not found'; ru = 'Агент ""%Agent"" не найден'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function ComputerNotFound ( Params ) export
+&atserver
+function ComputerNotFound ( Params ) export
 
 	text = NStr ( "en = 'Computer ""%Computer"" not found'; ru = 'Компьютер ""%Computer"" не найден'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function OSNotSupported () export
+&atclient
+function OSNotSupported () export
 	
 	text = NStr ( "en = 'The extended functions library supports Windows OS only. Other operating systems are not currently supported'; ru = 'Библиотека расширенных функций поддерживает работу в операционной системе Windows. Другие операционные системы в настоящий момент не поддерживаются'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure SourcesFolderError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SourcesFolderError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'At least one folder should be defined'; ru = 'Как минимум одна папка должна быть определена'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function UnableToClick ( Params ) export
+&atclient
+function UnableToClick ( Params ) export
 
 	text = NStr ( "en = 'Unable to click %Field'; ru = 'Не удалось нажать на %Field'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function CheckAppearanceError ( Params ) export
+&atserver
+function CheckAppearanceError ( Params ) export
 
 	text = NStr ( "en='Field ""%Field"" state ""%Value"" should be ""%Flag"". Actual state is ""%State""';ru='У поля ""%Field"" состояние ""%Value"" должно быть ""%Flag"", а реальное состояние ""%State""'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function ShouldBe () export
+&atserver
+function ShouldBe () export
 	
 	text = NStr ( "en = 'should be'; ru = 'должно быть'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ShouldNotBe () export
+&atserver
+function ShouldNotBe () export
 	
 	text = NStr ( "en = 'should not be'; ru = 'не должно быть'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function Filled () export
+&atserver
+function Filled () export
 	
 	text = NStr ( "en = 'filled'; ru = 'заполненным'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function Empty () export
+&atserver
+function Empty () export
 	
 	text = NStr ( "en = 'empty'; ru = 'пустым'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function Existed () export
+&atserver
+function Existed () export
 	
 	text = NStr ( "en = 'existed'; ru = 'существующим'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function Between ( Params ) export
+&atserver
+function Between ( Params ) export
 	
 	text = NStr ( "en = 'between %Start and %Finish'; ru = 'между %Start и %Finish'");
 	return Output.Sformat ( text, Params );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ShouldContain () export
+&atserver
+function ShouldContain () export
 	
 	text = NStr ( "en = 'should contain'; ru = 'должно содержать'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ShouldNotContain () export
+&atserver
+function ShouldNotContain () export
 	
 	text = NStr ( "en = 'should not contain'; ru = 'не должно содержать'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ShouldHave () export
+&atserver
+function ShouldHave () export
 	
 	text = NStr ( "en = 'should have size'; ru = 'должно иметь размер'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ShouldNotHave () export
+&atserver
+function ShouldNotHave () export
 	
 	text = NStr ( "en = 'should not have size'; ru = 'не должно иметь размер'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function Value () export
+&atserver
+function Value () export
 	
 	text = NStr ( "en = 'Value'; ru = 'Значение'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function YesNo () export
+&atserver
+function YesNo () export
 	
 	text = NStr ( "en = 'BF=False; BT=True'; ru = 'BF=Ложь; BT=Истина'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure NoStepsInChronograph ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
+&atclient
+procedure NoStepsInChronograph ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
 	
 	text = NStr ( "en='Chronograph';ru='Хронограф'" );
 	explanation = NStr ( "en = 'There are no steps for the selected direction'; ru = 'Нет шагов для перехода в указанном направлении'" );
 	putUserNotification ( text, Params, NavigationLink, explanation, Picture );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function SessionAccessError () export
+&atserver
+function SessionAccessError () export
 	
 	text = NStr ( "en = 'You don’t have access to the tested session'; ru = 'Нет доступа к тестируемой сессии'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioNotFilmed () export
+&atserver
+function ScenarioNotFilmed () export
 	
 	text = NStr ( "en = 'Scenario wasn’t filmed'; ru = 'Сценарий не записывался в хронограф'");
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure WrongFolder ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure WrongFolder ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'The folder is referencing to itself'; ru = 'Папка ссылается на саму себя'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function CopyingError () export
+&atserver
+function CopyingError () export
 	
 	text = NStr ( "en = 'Selected item causes levels looping!'; ru = 'Выбранный элемент приводит к зацикливанию уровней!'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure CopyMoveConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "CopyMoveConfirmation" ) export
+&atclient
+procedure CopyMoveConfirmation ( Module, CallbackParams = undefined, Params = undefined, ProcName = "CopyMoveConfirmation" ) export
 	
 	text = NStr ( "en = 'During the process system will change applications of transferred scenarios to %Application'; ru = 'При помещении сценариев в выбранную папку будет произведена замена приложения помещаемых сценариев на %Application'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ErrorNotLocated ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "ErrorNotLocated" ) export
+&atclient
+procedure ErrorNotLocated ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "ErrorNotLocated" ) export
 	
 	text = NStr ( "en = 'Selected error has not been found in the list. Check filters in the list which can prevent locating the error'; ru = 'Не удалось перейти к строке с ошибкой. Проверьте установленные отборы, возможно они не позволяют найти выбранную в списке ошибку'" );
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function WebClientDoesNotSupport () export
+&atclient
+function WebClientDoesNotSupport () export
 	
 	text = NStr ( "en = 'Web client does not support this functionality'; ru = 'Веб-клиент не поддерживает данную функциональность'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ClientDoesNotSupport () export
+&atclient
+function ClientDoesNotSupport () export
 	
 	text = NStr ( "en = 'This application does not support this functionality'; ru = 'Это приложение не поддерживает данную функциональность'" );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherRenamingError ( Params ) export
+&atserver
+function WatcherRenamingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario renaming error: %Scenario (%File). %Error'; ru = 'Ошибка переименования сценария: %Scenario (%File). %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherRenamingChildrenError ( Params ) export
+&atserver
+function WatcherRenamingChildrenError ( Params ) export
 
 	text = NStr ( "en = 'Error on changing the path of subordinate scenarios for the %Scenario';ru = 'Ошибка при изменении пути подчиненных сценариев для %Scenario'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherDeletingChildrenError ( Params ) export
+&atserver
+function WatcherDeletingChildrenError ( Params ) export
 
 	text = NStr ( "en = 'Error on deleting subordinate scripts in %Scenario group';ru = 'Ошибка при изменении пути подчиненных сценариев для %Scenario'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherUpdatingError ( Params ) export
+&atserver
+function WatcherUpdatingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario updating error: %Scenario. %Error'; ru = 'Ошибка обновления сценария: %Scenario. %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherParentNotFound ( Params ) export
+&atserver
+function WatcherParentNotFound ( Params ) export
 
 	text = NStr ( "en = 'Parent scenario for the %File is not found'; ru = 'Родительский сценарий для %File не найден'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherCreatingError ( Params ) export
+&atserver
+function WatcherCreatingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario creating error. Folder: %Parent (%File). %Error'; ru = 'Ошибка создания сценария. Папка: %Parent (%File). %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherRestorationError ( Params ) export
+&atserver
+function WatcherRestorationError ( Params ) export
 
 	text = NStr ( "en = 'Restoration of %Scenario (%File) caused an error: %Error'; ru = 'Ошибка восстановления сценария %Scenario (%File). %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherRemovingError ( Params ) export
+&atserver
+function WatcherRemovingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario removing error: %Scenario. %Error'; ru = 'Ошибка удаления сценария: %Scenario. %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherTemplateRemovingError ( Params ) export
+&atserver
+function WatcherTemplateRemovingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario template removing error: %Scenario. %Error'; ru = 'Ошибка удаления шаблона сценария: %Scenario. %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function WatcherScriptRemovingError ( Params ) export
+&atserver
+function WatcherScriptRemovingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario script removing error: %Scenario. %Error'; ru = 'Ошибка удаления программного кода сценария: %Scenario. %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function WatcherRenamingFolderError ( Params ) export
+&atclient
+function WatcherRenamingFolderError ( Params ) export
 
 	text = NStr ( "en = 'You renamed the file (%File) responsible for the current folder which can cause synchronization issues. Please, use Tester for renaming folders and test-libraries';ru = 'Вы переименовали файл (%File) ответственный за именование текущей папки. Это может привести к ошибкам синхронизации. Пожалуйста, используйте Тестер для переименования папок и библиотек с тестами'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function WatcherFileNameError ( Params = undefined ) export
+function WatcherFileNameError ( Params = undefined ) export
 	
 	text = NStr ( "en = 'File (%File) should not contain special characters'; ru = 'Файл (%File) не должен содержать специальные символы'" );
 	return Sformat ( text, Params );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure SyntaxError ( Form, Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure SyntaxError ( Form, Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = '%Error'; ru = '%Error'" );
 	putMessage ( text, Params, Field, DataKey, DataPath, Form );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ContinueStoring ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ContinueStoring" ) export
+&atclient
+procedure ContinueStoring ( Module, CallbackParams = undefined, Params = undefined, ProcName = "ContinueStoring" ) export
 	
 	text = NStr ( "en = 'Syntax errors have been found!
 				  |Would you like to continue?';ru = 'Обнаружены синтаксические ошибки!
@@ -1873,26 +1872,26 @@ Procedure ContinueStoring ( Module, CallbackParams = undefined, Params = undefin
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function VSCodeWorkspace ( Params ) export
+&atclient
+function VSCodeWorkspace ( Params ) export
 
 	text = NStr ( "en = 'Visual Studio Code Workspace (*%Extension)|*%Extension';ru = 'Рабочая область Visual Studio Code (*%Extension)|*%Extension'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function SelectWorkspace () export
+&atclient
+function SelectWorkspace () export
 
 	text = NStr ( "en = 'Select Workspace';ru = 'Выберите рабочую область'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure VSCodeWorkspaceUndefined ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "VSCodeWorkspaceUndefined" ) export
+&atclient
+procedure VSCodeWorkspaceUndefined ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "VSCodeWorkspaceUndefined" ) export
 	
 	text = NStr ( "en = 'Workspace is not defined!
 				  |Please, open Repositories and specify Visual Studio Code workspace
@@ -1903,348 +1902,348 @@ Procedure VSCodeWorkspaceUndefined ( Module = undefined, CallbackParams = undefi
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function WatcherListeningEvents () export
+&atclient
+function WatcherListeningEvents () export
 
 	text = NStr ( "en = 'Listening repository changes...';ru = 'Получение событий от репозитория...'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function WatcherSyncingMessage () export
+&atclient
+function WatcherSyncingMessage () export
 
 	text = NStr ( "en = 'Syncing with repository';ru = 'Синхронизация с репозиторием'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure WorkspaceCreated ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
+&atclient
+procedure WorkspaceCreated ( Params = undefined, NavigationLink = undefined, Picture = undefined ) export
 	
 	text = NStr ( "en='Tester';ru='Тестер'" );
 	explanation = NStr ( "en = 'Workspace has been created: %Path'; ru = 'Создана рабочая область: %Path'" );
 	putUserNotification ( text, Params, NavigationLink, explanation, Picture );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure MarkForDeletion ( Module, CallbackParams = undefined, Params = undefined, ProcName = "MarkForDeletion" ) export
+&atclient
+procedure MarkForDeletion ( Module, CallbackParams = undefined, Params = undefined, ProcName = "MarkForDeletion" ) export
 	
 	text = NStr ( "en = 'Mark for deletion?';ru = 'Пометить на удаление?'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnmarkForDeletion ( Module, CallbackParams = undefined, Params = undefined, ProcName = "UnmarkForDeletion" ) export
+&atclient
+procedure UnmarkForDeletion ( Module, CallbackParams = undefined, Params = undefined, ProcName = "UnmarkForDeletion" ) export
 	
 	text = NStr ( "en = 'Do you want to remove the deletion mark for selected elements?';ru = 'Снять пометку на удаление?'" );
 	title = NStr ( "ru='';en=''" );
 	openQueryBox ( text, Params, ProcName, Module, CallbackParams, QuestionDialogMode.YesNo, 0, DialogReturnCode.Yes, title );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ShowError ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "ShowError" ) export
+&atclient
+procedure ShowError ( Module = undefined, CallbackParams = undefined, Params = undefined, ProcName = "ShowError" ) export
 	
 	text = "%Error";
 	title = NStr ( "ru='';en=''" );
 	openMessageBox ( text, Params, ProcName, Module, CallbackParams, 0, title );
 	
-EndProcedure
+endprocedure
 
-Function SpreadsheedTotalCount ( Params ) export
+function SpreadsheedTotalCount ( Params ) export
 
 	text = NStr ( "en='Count: %Count'; ru='Кол-во: %Count'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function SpreadsheedTotal ( Params ) export
+function SpreadsheedTotal ( Params ) export
 
 	text = NStr ( "en='Avg: %Average   Count: %Count   Sum: %Sum'; ru='Среднее: %Average   Кол-во: %Count   Сумма: %Sum'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function CalculationAreaTooBig () export
+&atclient
+function CalculationAreaTooBig () export
 
 	text = NStr ( "en='The selected area is too large. Click on the button on the right for manual calculation'; ru='Выделена большая область. Нажмите кнопку справа для расчета'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function SpreadsheedAreaNotSelected () export
+function SpreadsheedAreaNotSelected () export
 
 	text = NStr ( "en='Area not defined'; ru='Область не задана'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function DataSetColumnNotFound ( Params ) export
+&atserver
+function DataSetColumnNotFound ( Params ) export
 
 	text = "Field not found, DataPath: %Path. Might be the field no longer exists in the source report or Mobile application (or mobile reports) is not up to date";
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure SyncingBackRequred ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure SyncingBackRequred ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Common scenario <%Folder> has been changed. Syncing back is required for the following applications: %Apps';ru = 'Был изменен общий сценарий <%Folder>, требуется обратная синхронизация изменений для приложений: %Apps'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function LoadingError () export
+&atserver
+function LoadingError () export
 
 	text = NStr ( "en = 'Data loading error occurred';ru = 'Произошла ошибка во время загрузки данных'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioPropertiesNotJSON () export
+&atserver
+function ScenarioPropertiesNotJSON () export
 
 	text = NStr ( "en = 'Scenario properties must be a valid JSON object'; ru = 'Свойства сценария должны быть заданы в виде корректного JSON-объекта'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioPropertiesMissingRequiredFields ( Params ) export
+&atserver
+function ScenarioPropertiesMissingRequiredFields ( Params ) export
 
 	text = NStr ( "en = 'Scenario properties JSON is missing required fields: %Fields'; ru = 'В JSON свойств сценария отсутствуют обязательные поля: %Fields'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioPropertiesTreeMustBeBoolean () export
+&atserver
+function ScenarioPropertiesTreeMustBeBoolean () export
 
 	text = NStr ( "en = 'Scenario properties field ""Tree"" must be boolean (true/false)'; ru = 'Поле ""Tree"" в свойствах сценария должно быть булевым (true/false)'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioPropertiesWrongType ( Params ) export
+&atserver
+function ScenarioPropertiesWrongType ( Params ) export
 
 	text = NStr ( "en = 'Scenario properties field ""Type"" must match Enums.Scenarios. Received: %Value'; ru = 'Поле ""Type"" в свойствах сценария должно соответствовать Enums.Scenarios. Получено: %Value'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioPropertiesWrongSeverity ( Params ) export
+&atserver
+function ScenarioPropertiesWrongSeverity ( Params ) export
 
 	text = NStr ( "en = 'Scenario properties field ""Severity"" must match Enums.Severity. Received: %Value'; ru = 'Поле ""Severity"" в свойствах сценария должно соответствовать Enums.Severity. Получено: %Value'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Function ScenarioPropertiesLoadingError ( Params ) export
+&atserver
+function ScenarioPropertiesLoadingError ( Params ) export
 
 	text = NStr ( "en = 'Scenario properties loading error in file %File. %Error'; ru = 'Ошибка загрузки свойств сценария из файла %File. %Error'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableValuesDifferent ( Params ) export
+function TableValuesDifferent ( Params ) export
 
 	text = NStr ( "en = 'In the row %Row of %Table table, in the %Column column, the value should be ""%Standard"", not ""%Tested""'; ru = 'В строке %Row таблицы %Table, в колонке %Column должно быть ""%Standard"", а не ""%Tested""'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableFormatErrorStandard () export
+function TableFormatErrorStandard () export
 
 	text = NStr ( "en = 'Standard Table'; ru = 'Эталонная таблица'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function TableFormatErrorTesting () export
+function TableFormatErrorTesting () export
 
 	text = NStr ( "en = 'Testing Table'; ru = 'Тестируемая таблица'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function TableFormatErrorFormatting () export
+function TableFormatErrorFormatting () export
 
 	text = NStr ( "en = 'Formatting Table'; ru = 'Форматируемая таблица'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function TableFormatErrorColumns ( Params ) export
+function TableFormatErrorColumns ( Params ) export
 
 	text = NStr ( "en = '%Table Format Error: incorrect number of colums in the row #%Row'; ru = 'Ошибка формата, %Table: неверное количество колонок в строке #%Row'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableFormatErrorName ( Params ) export
+function TableFormatErrorName ( Params ) export
 
 	text = NStr ( "en = '%Table Format Error: table name is not defined'; ru = 'Ошибка формата, %Table: не определено имя таблицы'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableFormatErrorHeader ( Params ) export
+function TableFormatErrorHeader ( Params ) export
 
 	text = NStr ( "en = '%Table Format Error: table columns are not defined'; ru = 'Ошибка формата, %Table: не заданы колонки'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableColumnNotFound ( Params ) export
+function TableColumnNotFound ( Params ) export
 
 	text = NStr ( "en = 'There''s no <%Column> column in the %Table table, but the standard has'; ru = 'В таблице %Table нет колонки <%Column>, а в эталоне есть'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableHasManyColumns ( Params ) export
+function TableHasManyColumns ( Params ) export
 
 	text = NStr ( "en = '%Table table has more columns than standard'; ru = 'В таблице %Table больше колонок чем в эталоне'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableHasFewerColumns ( Params ) export
+function TableHasFewerColumns ( Params ) export
 
 	text = NStr ( "en = '%Table table has fewer columns than standard'; ru = 'В таблице %Table меньше колонок чем в эталоне'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableHasManyRows ( Params ) export
+function TableHasManyRows ( Params ) export
 
 	text = NStr ( "en = '%Table table has more rows than standard (%TestedRows > %StandardRows)'; ru = 'В таблице %Table больше строк чем в эталоне (%TestedRows > %StandardRows)'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-Function TableHasFewerRows ( Params ) export
+function TableHasFewerRows ( Params ) export
 
 	text = NStr ( "en = '%Table table has fewer rows than standard (%TestedRows < %StandardRows)'; ru = 'В таблице %Table меньше строк чем в эталоне (%TestedRows < %StandardRows)'" );
 	return Output.Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure ColumnsNotSelected ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ColumnsNotSelected ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Select testing columns please'; ru = 'Выберите пожалуйста тестируемые колонки'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function ErrorObtainingTableParameters () export
+&atclient
+function ErrorObtainingTableParameters () export
 
 	text = NStr ( "en = 'An error occurred in obtaining the table parameters';ru = 'Произошла ошибка получения параметров таблицы'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function Standard () export
+&atclient
+function Standard () export
 
 	text = NStr ( "en = 'standard';ru = 'эталон'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function TableDefinitionNotFound () export
+&atclient
+function TableDefinitionNotFound () export
 
 	text = NStr ( "en = 'Table Definition Not Found';ru = 'Не удалось найти определение таблицы'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure ScenarioTemplateLoadingError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atserver
+procedure ScenarioTemplateLoadingError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	text = NStr ( "en = 'Scenario template loading error: %Error. Scenario: %Scenario';ru = 'Произошла системная ошибка при загрузке шаблона сценария %Scenario: %Error'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function LinuxVSCode () export
+&atclient
+function LinuxVSCode () export
 
 	return "code";
 
-EndFunction
+endfunction
 
-Procedure WrongExternalLibrary ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+procedure WrongExternalLibrary ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	text = NStr ( "en = 'Wrong or missing library in the %File.
                    |Internal library will be used instead'; ru = 'Не удалось загрузить библиотеку из файла %File. Будет использована внутренняя компонента'" );
 	Output.PutMessage ( text, Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-Function LibraryFailed () export
+function LibraryFailed () export
 
 	text = NStr ( "en = 'Failed to connect an external library. Operation of the system is not possible';ru = 'Не удалось подключить внешнюю компоненту. Корректная работа системы невозможна'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure AgentRunnerError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure AgentRunnerError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
 	text = NStr ( "en = 'Failed to proceed %Job: %Error';ru = 'Возникла ошибка при обработке задания %Job: %Error'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function DebuggerLabel () export
+&atclient
+function DebuggerLabel () export
 
 	text = NStr ( "en = 'DebugStart ();';ru = 'ОтладкаСтарт ();'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function WrongPeriod () export
+function WrongPeriod () export
 
 	text = NStr ( "en='Period is incorrect'; ru='Некорректно задан период'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function ShowingReportSettings () export
+&atserver
+function ShowingReportSettings () export
 
 	text = NStr ( "en='Report settings'; ro='Setări raport'; ru='Настройки отчета'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtServer
-Function ShowingReportVariants () export
+&atserver
+function ShowingReportVariants () export
 
 	text = NStr ( "en='Report variants'; ro='Opţiuni raport'; ru='Варианты отчета'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function NewReportAccessDefinition ( Params = undefined ) export
+&atclient
+function NewReportAccessDefinition ( Params = undefined ) export
 
 	text = NStr ( "en = 'Would you like to define an access for storing item?
 				  |(you can do this later)';ro = 'Doriți să definiți accesul pentru elementul salvat?
@@ -2253,234 +2252,242 @@ Function NewReportAccessDefinition ( Params = undefined ) export
 	title = NStr ( "en=''; ro=''; ru=''" );
 	return Output.AskUser ( text, Params, QuestionDialogMode.YesNo, 0, DialogReturnCode.No, title );
 
-EndFunction
+endfunction
 
-Function Processing () export
+function Processing () export
 
 	text = NStr ( "en='Processing...'; ru='Обработка...'" );
 	return text;
 
-EndFunction
+endfunction
 
-Function JobFailed () export
+function JobFailed () export
 
 	text = NStr ( "en='An exception has occurred during the execution of a background job'; ru='Произошло исключение во время выполнения фонового задания'" );
 	return SFormat ( text, undefined );
 
-EndFunction
+endfunction
 
-&AtClient
-Function ErrorTitle () export
+&atclient
+function ErrorTitle () export
 
 	text = NStr ( "en='Error'; ru='Ошибка'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Function InfoDetected () export
+&atclient
+function InfoDetected () export
 
 	text = NStr ( "en='Information messages were detected'; ru='Найдены информационные сообщения'" );
 	return text;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure MCPServerError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure MCPServerError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 	
-	text = NStr ( "en = 'Failed to start MCP-server %Server: %Error';ru = 'Не удалось запустить MCP-сервер %Server: %Error'" );
+	text = NStr ( "en = 'Failed to start MCP server %Server: %Error';ru = 'Не удалось запустить MCP сервер %Server: %Error'" );
 	putMessage ( text, Params, Field, DataKey, DataPath );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure HTTPDError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+&atclient
+procedure MCPServerWrongAccess ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
+	
+	text = NStr ( "en = 'Failed to start MCP server: the user doesn''t have access to edit scenarios'; ru = 'Не удалось запустить MCP сервер: у пользователя нет доступа к редактированию сценариев.'" );
+	putMessage ( text, Params, Field, DataKey, DataPath );
+	
+endprocedure
+
+&atclient
+procedure HTTPDError ( Params = undefined, Field = "", DataKey = undefined, DataPath = "Object" ) export
 
 	MCPServerError ( Params, Field, DataKey, DataPath );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function WrongRequest () export
+&atclient
+function WrongRequest () export
 
 	return "MCP request body is not correct. It should have JSON format and include the 'id' and 'name' fields.";
 
-EndFunction
+endfunction
 
-&AtClient
-Function WrongCommand ( Params = undefined ) export
+&atclient
+function WrongCommand ( Params = undefined ) export
 
 	text = "MCP tool '%Tool' is not found. The following tools are available: %List";
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function SrenarioNotProvided () export
+&atclient
+function SrenarioNotProvided () export
 
 	return "The tool arguments were not found. You should provide the full path to the bsl-file in the 'args.script_path' value. The file should be inside a Tester repository folder configured for the current session. Path examples: /home/user/project/path/to/file.bsl for Linux, or C:\Users\user\project\path\to\file.bsl for Windows.";
 
-EndFunction
+endfunction
 
-&AtClient
-Function RequestedScenarioNotMapped ( Params ) export
+&atclient
+function RequestedScenarioNotMapped ( Params ) export
 
 	text = "Cannot determine which application the file %File belongs to. It looks like the folder from which you are trying to execute scripts is not mapped in the Tester";
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function WrongScenarioExtension ( Params ) export
+&atclient
+function WrongScenarioExtension ( Params ) export
 
 	text = "The scenario '%Path' extension should be 'bsl'";
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function RequestedScriptNotFound ( Params ) export
+&atclient
+function RequestedScriptNotFound ( Params ) export
 
 	text = "Cannot determine the associated scenario for the file %File. A synchronization error has probably occurred";
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function RequestedTestComleted () export
+&atclient
+function RequestedTestComleted () export
 	
 	text = "Scenario successfully completed!";
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function TableNotFound () export
+&atclient
+function TableNotFound () export
 	
 	return NStr ( "en = 'Table not found';ru = 'Таблица не найдена'" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function SpreadsheetNotFound () export
+&atclient
+function SpreadsheetNotFound () export
 	
 	return NStr ( "en = 'Spreadsheet not found';ru = 'Табличный документ не найден'" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function TableIsTooBig () export
+&atclient
+function TableIsTooBig () export
 	
 	return NStr ( "en = 'The table is too big. Please try to filter it first using the search field or the table filters. If applicable, try to export the table to a spreadsheet document and then use GetSpreadsheetContent() to get the data in a Microsoft Excel file';ru = 'Таблица слишком большая. Пожалуйста, попробуйте сначала отфильтровать её с помощью поля поиска или фильтров таблицы. Если возможно, попробуйте экспортировать таблицу в документ электронной таблицы, а затем используйте ПолучитьСодержимоеТабличногоДокумента() для получения данных в файле Microsoft Excel'" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function SectionsPanelNotFound () export
+&atclient
+function SectionsPanelNotFound () export
 	
 	return NStr ( "en = 'Please enable the display of the Sections panel in the command interface. Otherwise, the application menu cannot be accessed';ru = 'Включите отображение панели разделов в командном интерфейсе. Иначе доступ к главному меню приложения невозможен'" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function SpreadsheetControlHint ( Params ) export
+&atclient
+function SpreadsheetControlHint ( Params ) export
 
 	text = NStr ( "en = 'Use GetSpreadsheetContent( ""%Name"" ) to get the xlsx file of this spreadsheet';ru = 'Используйте GetSpreadsheetContent ( ""%Name"" ) для получения xlsx-файла этого табличного документа'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function SetValueFailed () export
+&atclient
+function SetValueFailed () export
 
 	return NStr ( "en = 'Probably the input field contains a complex type. Try to choose a value instead of setting it directly';ru = 'Вероятно, поле ввода содержит сложный тип. Попробуйте выбрать значение вместо того, чтобы устанавливать его напрямую'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function FieldIsReadOnly() export
+&atclient
+function FieldIsReadOnly() export
 
 	return NStr ( "en = 'The field is read-only';ru = 'Поле доступно только для чтения'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function WrongNextUse() export
+&atclient
+function WrongNextUse() export
 
 	return NStr ( "en = 'Did you use With ( [<""Caption"">] ) ? Because the current source does not support the Next () method';ru = 'Вы использовали Здесь ( [<""Заголовок"">]  ) ? Потому что текущий источник не поддерживает метод Далее ()'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function WrongParameterType ( Params ) export
+&atclient
+function WrongParameterType ( Params ) export
 
 	text = NStr ( "en = 'Wrong parameter type #%Parameter in the function `%Function`';ru = 'Неверный тип параметра №%Parameter в функции `%Function`'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function CannotGotoRow ( Params ) export
+&atclient
+function CannotGotoRow ( Params ) export
 
 	text = NStr ( "en = 'Failed to navigate to the row, the specified value ""%Value"" is probably absent in the ""%Column"" column of the table/list ""%Table""';ru = 'Не удалось перейти к строке, вероятно указанное значение ""%Value"" отсутствует в колонке ""%Column"" таблицы/списка ""%Table""'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function NameAndType ( Params ) export
+&atclient
+function NameAndType ( Params ) export
 
 	text = NStr ( "en = 'Name: %Name; Type: %Type';ru = 'Имя: %Name; Тип: %Type'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function AvoidAmbiguity () export
+&atclient
+function AvoidAmbiguity () export
 
 	return NStr ( "en = 'Use a name with the prefix ''#'' instead of a title to avoid ambiguity';ru = 'Используйте имя с префиксом ''!'' вместо заголовка, чтобы избежать неоднозначности'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function NoActiveWindowFound () export
+&atclient
+function NoActiveWindowFound () export
 
 	return NStr ( "en = 'No active window found';ru = 'Нет активных окон'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function NoWindows () export
+&atclient
+function NoWindows () export
 
 	return NStr ( "en = 'There are no more windows to close'; ru = 'Больше нет окон, которые можно закрыть'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function CollapsibleGroup () export
+&atclient
+function CollapsibleGroup () export
 
 	return NStr ( "en = 'Collapsible'; ru = 'Свертываемая'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function CollapsibleGroupSystemHint ( Params ) export
+&atclient
+function CollapsibleGroupSystemHint ( Params ) export
 
 	text = NStr ( "en = 'This group is collapsed. To work with the items in this group, you need to expand it. To expand this group, use `Click ( ""%Name"" )`';ru = 'Эта группа свернута. Чтобы работать с элементами в этой группе, её необходимо развернуть. Чтобы развернуть эту группу, используйте `Click ( ""%Name"" )`'" );
 	return Sformat ( text, Params );
 
-EndFunction
+endfunction
 
-&AtClient
-Function LoadingFilesCheckFillingError () export
+&atclient
+function LoadingFilesCheckFillingError () export
 
 	return NStr ( "en = 'CheckFilling() of data processor Load returned an error. Please try to sync files manually'; ru = 'ПроверкаЗаполнения() обработчика данных Загрузка вернул ошибку. Пожалуйста, попробуйте синхронизировать файлы вручную'" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function UnloadingFilesCheckFillingError () export
+&atclient
+function UnloadingFilesCheckFillingError () export
 
 	return NStr ( "en = 'CheckFilling() of data processor Unload returned an error. Please try to sync files manually'; ru = 'ПроверкаЗаполнения() обработчика данных Выгрузка вернул ошибку. Пожалуйста, попробуйте синхронизировать файлы вручную'" );
 
-EndFunction
+endfunction

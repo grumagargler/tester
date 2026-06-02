@@ -1,12 +1,12 @@
 
-Procedure Init ( Object ) export
+procedure Init ( Object ) export
 	
 	setCreator ( Object );
 	
-EndProcedure 
+endprocedure 
 
-Procedure setCreator ( Object )
+procedure setCreator ( Object )
 	
 	Object.Creator = SessionParameters.User;
 	
-EndProcedure 
+endprocedure 

@@ -1,13 +1,13 @@
 
-&AtClient
-Procedure CommandProcessing ( References, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( References, ExecuteParameters )
 	
 	openReport ( References, ExecuteParameters );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openReport ( References, ExecuteParameters )
+&atclient
+procedure openReport ( References, ExecuteParameters )
 	
 	parameter = References [ 0 ];
 	p = ReportsSystem.GetParams ( "Summary" );
@@ -34,10 +34,10 @@ Procedure openReport ( References, ExecuteParameters )
 	p.GenerateOnOpen = true;
 	ReportsSystem.Open ( p, ExecuteParameters.Source, true, ExecuteParameters.Window );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function jobsData ( val References )
+&atserver
+function jobsData ( val References )
 	
 	s = "
 	|// Sessions
@@ -64,4 +64,4 @@ Function jobsData ( val References )
 	result.Users = data [ 2 ].Unload ().UnloadColumn ( "Agent" );
 	return result;
 	
-EndFunction
+endfunction

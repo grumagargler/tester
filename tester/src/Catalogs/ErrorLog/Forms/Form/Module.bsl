@@ -1,8 +1,8 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 
 	readApplication ();
 	setScreenshot ();
@@ -11,10 +11,10 @@ Procedure OnReadAtServer ( CurrentObject )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -23,17 +23,17 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readApplication ()
+&atserver
+procedure readApplication ()
 	
 	ScenarioApplication = DF.Pick ( Object.Scenario, "Application" );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setScreenshot ()
+&atserver
+procedure setScreenshot ()
 	
 	if ( Object.ScreenshotExists ) then
 		Screenshot = GetURL ( Object.Ref, "Screenshot" );
@@ -41,28 +41,28 @@ Procedure setScreenshot ()
 		Screenshot = "";
 	endif; 
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setTitle ()
+&atserver
+procedure setTitle ()
 	
 	Title = Title + ": " + Object.Date;
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure ShowInList ( Command )
+&atclient
+procedure ShowInList ( Command )
 	
 	openList ();
 	Close ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openList ()
+&atclient
+procedure openList ()
 	
 	ref = Object.Ref;
 	form = GetForm ( "Catalog.ErrorLog.ListForm", new Structure ( "CurrentRow", ref ) );
@@ -73,34 +73,34 @@ Procedure openList ()
 		Output.ErrorNotLocated ();
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Table Stack
 
-&AtClient
-Procedure StackSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure StackSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	data = Item.CurrentData;
 	ScenarioForm.GotoLine ( data.Ref, data.Row, Object.Ref );
 	Close ();
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Screenshot Field
 
-&AtClient
-Procedure ScreenshotClick ( Item, StandardProcessing )
+&atclient
+procedure ScreenshotClick ( Item, StandardProcessing )
 	
 	StandardProcessing = false;
 	showPicture ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showPicture ()
+&atclient
+procedure showPicture ()
 	
 	if ( Screenshot = "" ) then
 		return;
@@ -110,4 +110,4 @@ Procedure showPicture ()
 	p.Insert ( "URL", Screenshot );
 	OpenForm ( "CommonForm.Screenshot", p );
 	
-EndProcedure 
+endprocedure 

@@ -1,5 +1,5 @@
 
-Function GetWork () export
+function GetWork () export
 	
 	if ( Jobs.GetBackground ( "Exchange" ) <> undefined ) then
 		return undefined;
@@ -11,9 +11,9 @@ Function GetWork () export
 		return new Structure ( "Job, Parameters, Scenarios", job.Job, job.Parameters, getScenarios ( job ) );
 	endif;
 	
-EndFunction
+endfunction
 
-Function takeJob ()
+function takeJob ()
 	
 	timeout = true;
 	attempts = 15;
@@ -40,18 +40,18 @@ Function takeJob ()
 	CommitTransaction ();
 	return job;
 	
-EndFunction
+endfunction
 
-Procedure lockJobs ()
+procedure lockJobs ()
 	
 	lock = new DataLock ();
 	item = lock.Add ( "InformationRegister.Jobs" );
 	item.Mode = DataLockMode.Exclusive;
 	lock.Lock ();
 	
-EndProcedure
+endprocedure
 
-Function getJob ()
+function getJob ()
 	
 	s = "
 	|select top 1 Jobs.Job as Job, Jobs.Job.Parameters as Parameters
@@ -66,9 +66,9 @@ Function getJob ()
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ] );
 	
-EndFunction
+endfunction
 
-Function getScenarios ( Job )
+function getScenarios ( Job )
 	
 	s = "
 	|select Scenarios.Scenario as Scenario, Scenarios.Application as Application,
@@ -81,9 +81,9 @@ Function getScenarios ( Job )
 	q.SetParameter ( "Job", Job.Job );
 	return Collections.Serialize ( q.Execute ().Unload () );
 	
-EndFunction
+endfunction
 
-Procedure start ( Job )
+procedure start ( Job )
 	
 	TesterAgent.AgentStatus ( Enums.AgentStatuses.Busy );
 	SetPrivilegedMode ( true );
@@ -98,9 +98,9 @@ Procedure start ( Job )
 	r.Status = Enums.JobStatuses.Running;
 	r.Write ();
 	
-EndProcedure
+endprocedure
 
-Procedure AgentStatus ( val Status ) export
+procedure AgentStatus ( val Status ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.AgentStatuses.CreateRecordManager ();
@@ -114,9 +114,9 @@ Procedure AgentStatus ( val Status ) export
 	r.Status = Status;
 	ExchangeKillers.Write ( r );
 	
-EndProcedure
+endprocedure
 
-Procedure Finish ( val Job ) export
+procedure Finish ( val Job ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.AgentJobs.CreateRecordManager ();
@@ -130,9 +130,9 @@ Procedure Finish ( val Job ) export
 	r.Write ();
 	TesterAgent.AgentStatus ( Enums.AgentStatuses.Available );
 	
-EndProcedure
+endprocedure
 
-Function hasErrors ( Job )
+function hasErrors ( Job )
 	
 	s = "
 	|select top 1 1
@@ -143,9 +143,9 @@ Function hasErrors ( Job )
 	q.SetParameter ( "Ref", Job );
 	return not q.Execute ().IsEmpty ();
 	
-EndFunction
+endfunction
 
-Procedure StartScenario ( val Job, val Row ) export
+procedure StartScenario ( val Job, val Row ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.AgentScenarios.CreateRecordManager ();
@@ -154,9 +154,9 @@ Procedure StartScenario ( val Job, val Row ) export
 	r.Started = CurrentSessionDate ();
 	r.Write ();
 	
-EndProcedure
+endprocedure
 
-Procedure FinishScenario ( val Job, val Row ) export
+procedure FinishScenario ( val Job, val Row ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.AgentScenarios.CreateRecordManager ();
@@ -166,9 +166,9 @@ Procedure FinishScenario ( val Job, val Row ) export
 	r.Finished = CurrentSessionDate ();
 	r.Write ();
 	
-EndProcedure
+endprocedure
 
-Procedure Create ( Job, Agent, Date, Computer ) export
+procedure Create ( Job, Agent, Date, Computer ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.AgentJobs.CreateRecordManager ();
@@ -182,9 +182,9 @@ Procedure Create ( Job, Agent, Date, Computer ) export
 	r.Computer = Computer;
 	r.Write ();
 	
-EndProcedure
+endprocedure
 
-Procedure Testing ( Job ) export
+procedure Testing ( Job ) export
 	
 	BeginTransaction ();
 	lockJob ( Job );
@@ -203,9 +203,9 @@ Procedure Testing ( Job ) export
 	TesterAgent.Create ( obj.Ref, obj.Agent, obj.Date, obj.Computer );
 	CommitTransaction ();
 	
-EndProcedure
+endprocedure
 
-Procedure lockJob ( Job )
+procedure lockJob ( Job )
 	
 	lock = new DataLock ();
 	item = lock.Add ( "Document.Job" );
@@ -213,9 +213,9 @@ Procedure lockJob ( Job )
 	item.SetValue ( "Ref", Job );
 	lock.Lock ();
 	
-EndProcedure
+endprocedure
 
-Function jobActive ( Job )
+function jobActive ( Job )
 	
 	s = "
 	|select top 1 1
@@ -234,9 +234,9 @@ Function jobActive ( Job )
 	q.SetParameter ( "Job", Job );
 	return not q.Execute ().IsEmpty ();
 	
-EndFunction
+endfunction
 
-Function Canceled ( val Job ) export
+function Canceled ( val Job ) export
 	
 	s = "
 	|select top 1 1
@@ -248,9 +248,9 @@ Function Canceled ( val Job ) export
 	q.SetParameter ( "Job", Job );
 	return not q.Execute ().IsEmpty ();
 	
-EndFunction
+endfunction
 
-Procedure CreateJob ( val Agent, val Scenarios, val Application, val Parameters, val Computer, val Memo,
+procedure CreateJob ( val Agent, val Scenarios, val Application, val Parameters, val Computer, val Memo,
 	val Schedule, val Parent ) export
 	
 	obj = Documents.Job.CreateDocument ();
@@ -293,9 +293,9 @@ Procedure CreateJob ( val Agent, val Scenarios, val Application, val Parameters,
 	endif;
 	obj.Write ();
 	
-EndProcedure
+endprocedure
 
-Function findAgent ( Agent )
+function findAgent ( Agent )
 	
 	ref = Catalogs.Users.FindByDescription ( Agent, true );
 	if ( ref.IsEmpty () ) then
@@ -303,9 +303,9 @@ Function findAgent ( Agent )
 	endif;
 	return ref;
 	
-EndFunction
+endfunction
 
-Function findComputer ( Computer )
+function findComputer ( Computer )
 	
 	ref = Catalogs.Computers.FindByDescription ( Computer, true );
 	if ( ref.IsEmpty () ) then
@@ -313,9 +313,9 @@ Function findComputer ( Computer )
 	endif;
 	return ref;
 	
-EndFunction
+endfunction
 
-Function findScenario ( Scenario, Application )
+function findScenario ( Scenario, Application )
 	
 	ref = RuntimeSrv.FindScenario ( Scenario, undefined, Application, undefined, true );
 	if ( ref = undefined ) then
@@ -323,9 +323,9 @@ Function findScenario ( Scenario, Application )
 	endif;
 	return ref;
 	
-EndFunction
+endfunction
 
-Function jobSchedule ( Schedule )
+function jobSchedule ( Schedule )
 	
 	type = TypeOf ( Schedule );
 	if ( type = Type ( "Date" ) ) then
@@ -342,4 +342,4 @@ Function jobSchedule ( Schedule )
 		return Schedule;
 	endif;
 	
-EndFunction
+endfunction

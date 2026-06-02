@@ -1,10 +1,10 @@
-Function ValueToString ( Value ) export
+function ValueToString ( Value ) export
 	
 	return ? ( ValueIsFilled ( Value ), String ( Value ), "<...>" );
 
-EndFunction
+endfunction
 
-Function ValuesToString ( Value1 = undefined, Value2 = undefined, Value3 = undefined ) export
+function ValuesToString ( Value1 = undefined, Value2 = undefined, Value3 = undefined ) export
 	
 	s = "";
 	if ( ValueIsFilled ( Value1 ) ) then
@@ -18,15 +18,15 @@ Function ValuesToString ( Value1 = undefined, Value2 = undefined, Value3 = undef
 	endif;
 	return Mid ( s, 3 );
 
-EndFunction
+endfunction
  
-Function DateToString ( D, StringFormat = "DLF=D; DE=..." ) export
+function DateToString ( D, StringFormat = "DLF=D; DE=..." ) export
 
 	return Format ( D, StringFormat );
 
-EndFunction
+endfunction
 
-Function StringToArray ( String, Separator = "," ) export
+function StringToArray ( String, Separator = "," ) export
 	
 	a = StrSplit ( String, Separator, false );
 	j = a.UBound ();
@@ -35,9 +35,9 @@ Function StringToArray ( String, Separator = "," ) export
 	enddo; 
 	return a;
 	
-EndFunction
+endfunction
 
-Function findMinPos ( Str, CharsFind )
+function findMinPos ( Str, CharsFind )
 	
 	minPosResult = 0;
 	findCharsLen = StrLen ( CharsFind );
@@ -54,9 +54,9 @@ Function findMinPos ( Str, CharsFind )
 	endif;	
 	return minPosResult;
 	
-EndFunction
+endfunction
 
-Function StringToStructure ( StringValue, EqualChars = "=:", SplitteChars = ",;" ) export
+function StringToStructure ( StringValue, EqualChars = "=:", SplitteChars = ",;" ) export
 	
 	resultSructure = new Structure;
 	templateStr = StringValue;	
@@ -84,10 +84,10 @@ Function StringToStructure ( StringValue, EqualChars = "=:", SplitteChars = ",;"
 	enddo;
 	return resultSructure;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function NameToCode ( Name, Len ) export
+&atclient
+function NameToCode ( Name, Len ) export
 	
 	s = Upper ( TrimAll ( StrReplace ( Name, " ", "" ) ) );
 	nameLen = StrLen ( s );
@@ -103,10 +103,10 @@ Function NameToCode ( Name, Len ) export
 	codeLen = StrLen ( code );
 	return ? ( codeLen < Len, Left ( s, Len ), code );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function flushString ( String, Count, Symbol = "0" )
+&atclient
+function flushString ( String, Count, Symbol = "0" )
 	
 	a = new Array ();
 	for i = 1 to Count do
@@ -114,19 +114,19 @@ Function flushString ( String, Count, Symbol = "0" )
 	enddo; 
 	return String + StrConcat ( a );
 	
-EndFunction 
+endfunction 
 
-#if ( Server or ThinClient or ThickClientManagedApplication ) then
+#if ( server or thinclient or thickclientmanagedapplication ) then
 	
-Function FromJSON ( JSON ) export
+function FromJSON ( JSON ) export
 	
 	reader = new JSONReader ();
 	reader.SetString ( JSON );
 	return ReadJSON ( reader );
 		
-EndFunction 
+endfunction 
 
-Function ToJSON ( Object, Formatted = true ) export
+function ToJSON ( Object, Formatted = true ) export
 	
 	js = new JSONWriter ();
 	if ( Formatted ) then
@@ -138,35 +138,35 @@ Function ToJSON ( Object, Formatted = true ) export
 	WriteJSON ( js, Object, , "JSONValueToString", Conversion );
 	return js.Close ();
 	
-EndFunction 
+endfunction 
 
-Function JSONValueToString ( Name, Value, Params, Cancel ) export 
+function JSONValueToString ( Name, Value, Params, Cancel ) export 
 	
 	return String ( Value );
 	
-EndFunction
+endfunction
 	
-Function JSONToObject ( JSON, Type = undefined ) export
+function JSONToObject ( JSON, Type = undefined ) export
 	
 	reader = new JSONReader ();
 	reader.SetString ( JSON );
 	return XDTOSerializer.ReadJSON ( reader, Type );
 		
-EndFunction 
+endfunction 
 
-Function ObjectToJSON ( Value, Explicit = false ) export
+function ObjectToJSON ( Value, Explicit = false ) export
 	
 	writer = new JSONWriter ();
 	writer.SetString ( new JSONWriterSettings ( JSONLineBreak.None ) );
 	XDTOSerializer.WriteJSON ( writer, Value, ? ( Explicit, XMLTypeAssignment.Explicit, XMLTypeAssignment.Implicit ) );
 	return writer.Close ();
 	
-EndFunction 
+endfunction 
 
 #endif
 
-&AtServer
-Function RowToStructure ( Table ) export
+&atserver
+function RowToStructure ( Table ) export
 	
 	row = ? ( Table.Count () = 0, undefined, Table [ 0 ] );
 	result = new Structure ();
@@ -182,19 +182,19 @@ Function RowToStructure ( Table ) export
 	endif; 
 	return result;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function StringToHash ( Str ) export
+&atserver
+function StringToHash ( Str ) export
 	
 	hash = new DataHashing ( HashFunction.SHA256 );
 	hash.Append ( Str );
 	return StrReplace ( String ( hash.HashSum ), " ", "" );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function XMLToStandard ( val Text ) export
+&atserver
+function XMLToStandard ( val Text ) export
 	
 	position = FindDisallowedXMLCharacters ( Text );
 	while ( position > 0 ) do
@@ -203,10 +203,10 @@ Function XMLToStandard ( val Text ) export
 	enddo;
 	return Text;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ToXML ( Object ) export
+&atserver
+function ToXML ( Object ) export
 	
 	xml = new XMLWriter ();
 	xml.SetString ( "UTF-8" );
@@ -214,19 +214,19 @@ Function ToXML ( Object ) export
 	XDTOSerializer.WriteXML ( xml, Object );
 	return xml.Close ();
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function FromXML ( XML ) export
+&atserver
+function FromXML ( XML ) export
 	
 	reader = new XMLReader ();
 	reader.SetString ( XML );
 	return XDTOSerializer.ReadXML ( reader );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function EnumToName ( Item ) export
+&atserver
+function EnumToName ( Item ) export
 	
 	if ( Item.IsEmpty () ) then
 		return undefined;
@@ -235,16 +235,16 @@ Function EnumToName ( Item ) export
 	i = Enums [ meta.Name ].IndexOf ( Item );
 	return meta.EnumValues [ i ].Name;
 	
-EndFunction
+endfunction
 
-Function Wrap ( Value ) export
+function Wrap ( Value ) export
 	
 	return """" + StrReplace ( Value, """", """""" ) + """";
 
-EndFunction 
+endfunction 
 
-&AtClient
-Function DecToHex ( Number ) export
+&atclient
+function DecToHex ( Number ) export
 	
 	set = "0123456789ABCDEF"; 
 	value = Number; 
@@ -255,18 +255,18 @@ Function DecToHex ( Number ) export
 	enddo;
 	return s; 
 	
-EndFunction
+endfunction
 
-&AtServer
-Function ObjectToURL ( Ref ) export
+&atserver
+function ObjectToURL ( Ref ) export
 	
 	url = Cloud.ApplicationURL ();
 	return url + "/#" + GetURL ( Ref );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function MillisecondsToTime ( Milliseconds ) export
+&atserver
+function MillisecondsToTime ( Milliseconds ) export
 	
 	if ( Milliseconds = 0
 		or Milliseconds = null ) then
@@ -288,10 +288,10 @@ Function MillisecondsToTime ( Milliseconds ) export
 		return Format ( Milliseconds, "NS=3" );
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function PeriodToDuration ( Start, Finish ) export
+&atserver
+function PeriodToDuration ( Start, Finish ) export
 	
 	if ( Start = 0
 		or Finish = 0 ) then
@@ -300,10 +300,10 @@ Function PeriodToDuration ( Start, Finish ) export
 		return Conversion.MillisecondsToTime ( Finish - Start );
 	endif;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ParametersToMap ( Parameters ) export
+&atclient
+function ParametersToMap ( Parameters ) export
 	
 	keys = new Array ();
 	values = new Array ();
@@ -350,10 +350,10 @@ Function ParametersToMap ( Parameters ) export
 	enddo; 
 	return result;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function CodeToNumber ( Number ) export
+&atserver
+function CodeToNumber ( Number ) export
 	
 	try
 		value = Number ( Number );
@@ -362,4 +362,4 @@ Function CodeToNumber ( Number ) export
 	endtry;
 	return Format ( value, "NG=" );
 	
-EndFunction
+endfunction

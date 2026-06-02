@@ -1,4 +1,4 @@
-Function JobRecord () export
+function JobRecord () export
 	
 	p = new Structure ();
 	p.Insert ( "Scenario" );
@@ -8,4 +8,4 @@ Function JobRecord () export
 	p.Insert ( "Disconnect", true );
 	return p;
 	
-EndFunction
+endfunction

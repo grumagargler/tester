@@ -1,14 +1,14 @@
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	Appearance.Apply ( ThisObject );
 	fillNodeData ( ThisObject, CurrentObject.Node );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		fillNew ();
@@ -17,10 +17,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -33,10 +33,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillNew ()	
+&atserver
+procedure fillNew ()	
 	
 	Object.ExchangeTransport = Enums.ExchangeTransport.NetworkDisk; 
 	Object.UseAutomatic = true;
@@ -52,27 +52,27 @@ Procedure fillNew ()
 	Object.UseSSLOutgoing = false;
 	setPortOutgoing ( Object );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillAttributes ()
+&atserver
+procedure fillAttributes ()
 	
 	TypeExchange = ? ( Object.UseAutomatic, 2, 1 );
 	ThisNode = getThisNode ( Object.Node );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
+&atserver
+procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 	
 	if ( ValueIsFilled ( CurrentObject.Node ) and CurrentObject.Ref.IsEmpty () ) then
 		Cancel = checkNode ( CurrentObject.Node );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkNode ( Node )
+&atserver
+function checkNode ( Node )
 	
 	s = "
 	|select Ref as Ref
@@ -90,32 +90,32 @@ Function checkNode ( Node )
 	endif;
 	return error; 
 		
-EndFunction
+endfunction
 
-&AtServer
-Procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
+&atserver
+procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
 	
 	Appearance.Apply ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ExchangeTransportOnChange ( Item )
+&atclient
+procedure ExchangeTransportOnChange ( Item )
 	
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TypeExchangeOnChange ( Item )
+&atclient
+procedure TypeExchangeOnChange ( Item )
 	
 	Object.UseAutomatic = ? ( TypeExchange = 2, true, false );
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure NodeOnChange ( Item )
+&atclient
+procedure NodeOnChange ( Item )
 	
 	Object.Code = getCodeNode ( Object.Node );
 	ThisNode = getThisNode ( Object.Node );
@@ -125,10 +125,10 @@ Procedure NodeOnChange ( Item )
 	Appearance.Apply ( ThisObject );
 	fillNodeData ( ThisObject, Object.Node ); 
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function getCodeNode ( Node )
+&atservernocontext
+function getCodeNode ( Node )
 	
 	if ( ValueIsFilled ( Node ) ) then
 		code = Node.Code;
@@ -137,34 +137,34 @@ Function getCodeNode ( Node )
 	endif; 
 	return code; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure PathStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure PathStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	selectDirectory ( Item.Name );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure selectDirectory ( Name )
+&atclient
+procedure selectDirectory ( Name )
 	
 	p = new Structure ( "Attribute", Name );
 	LocalFiles.Prepare ( new NotifyDescription ( "OpenDialog", ThisObject, p ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OpenDialog ( Result, Params ) export
+&atclient
+procedure OpenDialog ( Result, Params ) export
 	
 	dialog = new FileDialog ( FileDialogMode.ChooseDirectory );
 	dialog.Directory = getDirectory ( Params.Attribute );
 	dialog.Show ( new NotifyDescription ( "SetAttribute", ThisObject, Params ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function getDirectory ( Attribute )
+&atclient
+function getDirectory ( Attribute )
 	
 	path = Object [ Attribute ];
 	directory = "";
@@ -181,10 +181,10 @@ Function getDirectory ( Attribute )
 	enddo;
 	return directory; 
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure SetAttribute ( Result, Params ) export
+&atclient
+procedure SetAttribute ( Result, Params ) export
 	
 	if ( Result = undefined ) then
 		return;
@@ -192,24 +192,24 @@ Procedure SetAttribute ( Result, Params ) export
 	Object [ Params.Attribute ] = Result [ 0 ];
 	Modified = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure PrefixFileNameOnChange ( Item )
+&atclient
+procedure PrefixFileNameOnChange ( Item )
 	
 	Output.ChangePrefixFileName ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UseSSLOutgoingOnChange ( Item )
+&atclient
+procedure UseSSLOutgoingOnChange ( Item )
 	
 	setPortOutgoing ( Object );	
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure setPortOutgoing ( Object )
+&atclientatservernocontext
+procedure setPortOutgoing ( Object )
 	
 	if ( Object.UseSSLOutgoing ) then
 		Object.PortOutgoing = 465;
@@ -217,24 +217,24 @@ Procedure setPortOutgoing ( Object )
 		Object.PortOutgoing = 25;
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ProtocolOnChange ( Item )
+&atclient
+procedure ProtocolOnChange ( Item )
 	
 	setPortIncoming ( Object );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UseSSLIncomingOnChange ( Item )
+&atclient
+procedure UseSSLIncomingOnChange ( Item )
 	
 	setPortIncoming ( Object );
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure setPortIncoming ( Object )
+&atclientatservernocontext
+procedure setPortIncoming ( Object )
 	
 	if ( Object.Protocol = PredefinedValue ( "Enum.Protocols.IMAP" ) ) then
 		if ( Object.UseSSLIncoming ) then
@@ -250,24 +250,24 @@ Procedure setPortIncoming ( Object )
 		endif; 
 	endif;	
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TestConnectionCommand ( Command )
+&atclient
+procedure TestConnectionCommand ( Command )
 	
 	testConnection ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure testConnection ()
+&atclient
+procedure testConnection ()
 	
 	testConnectionSrv ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure testConnectionSrv ()
+&atserver
+procedure testConnectionSrv ()
 	
 	profile = getProfile ();
 	email = new InternetMail ();
@@ -279,10 +279,10 @@ Procedure testConnectionSrv ()
 		Output.ErrorConnectEmailProfile ( new Structure ( "Error", ErrorDescription () ) );
 	endtry;	
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getProfile ()
+&atserver
+function getProfile ()
 	
 	p = new InternetMailProfile ();
 	p.User = TrimAll ( Object.UserEmail );
@@ -305,10 +305,10 @@ Function getProfile ()
 	endif; 
 	return p;
 	
-EndFunction
+endfunction
 
-&AtServer  
-Function getMailProtocol ( Protocol )
+&atserver  
+function getMailProtocol ( Protocol )
 	
 	if ( Protocol = PredefinedValue ( "Enum.Protocols.POP3" ) ) then
 		p = InternetMailProtocol.POP3;
@@ -319,10 +319,10 @@ Function getMailProtocol ( Protocol )
 	endif;
 	return p;
 	
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function getThisNode ( Node )
+&atservernocontext
+function getThisNode ( Node )
 	
 	if ( ValueIsFilled ( Node ) ) then
 		ThisNode = Node.ThisNode; 
@@ -331,28 +331,28 @@ Function getThisNode ( Node )
 	endif;
 	return ThisNode; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	if ( ThisNode ) then
 		Output.SelectThisNode ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure fillNodeData ( Form, Node )
+&atclientatservernocontext
+procedure fillNodeData ( Form, Node )
 	
 	data = getNodeData ( Node );
 	Form.ReceivedNo = data.ReceivedNo;
 	Form.SentNo = data.SentNo;
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function getNodeData ( Node )
+&atservernocontext
+function getNodeData ( Node )
 	
 	p = new Structure ();
 	p.Insert ( "ReceivedNo", 0 );
@@ -377,4 +377,4 @@ Function getNodeData ( Node )
 	endif; 
 	return p; 
 	
-EndFunction 
+endfunction 

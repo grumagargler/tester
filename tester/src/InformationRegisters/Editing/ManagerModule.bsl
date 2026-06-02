@@ -1,4 +1,4 @@
-Procedure Lock ( User, Scenario ) export
+procedure Lock ( User, Scenario ) export
 	
 	r = InformationRegisters.Editing.CreateRecordManager ();
 	r.Scenario = Scenario;
@@ -6,4 +6,4 @@ Procedure Lock ( User, Scenario ) export
 	r.Date = CurrentSessionDate ();
 	r.Write ();
 	
-EndProcedure 
+endprocedure 

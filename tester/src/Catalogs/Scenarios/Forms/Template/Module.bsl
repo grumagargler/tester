@@ -1,18 +1,18 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	init ();
 	setTemplates ();
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -23,18 +23,18 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	Everywhere = true;
 	Variant1 = 1;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setTemplates ()
+&atserver
+procedure setTemplates ()
 	
 	text = Parameters.Text;
 	Template1 = "{*}";
@@ -47,21 +47,21 @@ Procedure setTemplates ()
 	endif; 
 	Template4 = "{" + text + "}";
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Replace ( Command )
+&atclient
+procedure Replace ( Command )
 	
 	p = new Structure ( "Template, Everywhere", getTemplate (), Everywhere );
 	Close ( p );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function getTemplate ()
+&atclient
+function getTemplate ()
 	
 	if ( Variant1 = 1 ) then
 		return Template1;
@@ -73,45 +73,45 @@ Function getTemplate ()
 		return Template4;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Variant1OnChange ( Item )
+&atclient
+procedure Variant1OnChange ( Item )
 	
 	Variant2 = 0;
 	Variant3 = 0;
 	Variant4 = 0;
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
 
-&AtClient
-Procedure Variant2OnChange ( Item )
+&atclient
+procedure Variant2OnChange ( Item )
 	
 	Variant1 = 0;
 	Variant3 = 0;
 	Variant4 = 0;
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Variant3OnChange ( Item )
+&atclient
+procedure Variant3OnChange ( Item )
 	
 	Variant1 = 0;
 	Variant2 = 0;
 	Variant4 = 0;
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Variant4OnChange ( Item )
+&atclient
+procedure Variant4OnChange ( Item )
 	
 	Variant1 = 0;
 	Variant2 = 0;
 	Variant3 = 0;
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure

@@ -1,5 +1,5 @@
 
-Procedure ChangePassword ( NewPassword ) export
+procedure ChangePassword ( NewPassword ) export
 	
 	SetPrivilegedMode ( true );
 	name = UserName ();
@@ -8,16 +8,16 @@ Procedure ChangePassword ( NewPassword ) export
 	user.Write ();
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Procedure SetRights ( User ) export
+procedure SetRights ( User ) export
 	
 	roles = getUserRoles ( User.Name );
 	assingRoles ( User, roles );
 	
-EndProcedure 
+endprocedure 
 
-Function getUserRoles ( UserName )
+function getUserRoles ( UserName )
 	
 	s = "
 	|select Rights.RoleName as RoleName
@@ -39,9 +39,9 @@ Function getUserRoles ( UserName )
 	q.SetParameter ( "User", user );
 	return q.Execute ().Unload ().UnloadColumn ( "RoleName" );
 	
-EndFunction 
+endfunction 
 
-Procedure assingRoles ( User, Roles )
+procedure assingRoles ( User, Roles )
 	
 	userRoles = User.Roles;
 	userRoles.Clear ();
@@ -53,9 +53,9 @@ Procedure assingRoles ( User, Roles )
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure Remove ( UserName ) export
+procedure Remove ( UserName ) export
 	
 	user = InfoBaseUsers.FindByName ( UserName );
 	if ( user = undefined ) then
@@ -63,9 +63,9 @@ Procedure Remove ( UserName ) export
 	endif; 
 	user.Delete ();
 	
-EndProcedure 
+endprocedure 
 
-Function LastAdministrator () export
+function LastAdministrator () export
 	
 	if ( findAdmin () ) then
 		return false;
@@ -73,9 +73,9 @@ Function LastAdministrator () export
 	Output.AdministratorNotFound ();
 	return true;
 	
-EndFunction 
+endfunction 
 
-Function findAdmin ()
+function findAdmin ()
 	
 	s = "
 	|select top 1 1
@@ -100,4 +100,4 @@ Function findAdmin ()
 	found = not q.Execute ().IsEmpty ();
 	return found;
 	
-EndFunction
+endfunction

@@ -1,5 +1,5 @@
 
-Function List ( Search, Scope, PortionSize = 10 ) export
+function List ( Search, Scope, PortionSize = 10 ) export
 	
 	request = prepareRequest ( Search );
 	list = getList ( request.Template, Scope, PortionSize );
@@ -16,9 +16,9 @@ Function List ( Search, Scope, PortionSize = 10 ) export
 	enddo; 
 	return result;
 	
-EndFunction 
+endfunction 
 
-Function prepareRequest ( Search )
+function prepareRequest ( Search )
 	
 	template = "";
 	highlights = new Array ();
@@ -40,9 +40,9 @@ Function prepareRequest ( Search )
 	result.Highlights = highlights;
 	return result;
 	
-EndFunction 
+endfunction 
 
-Function isWord ( Word )
+function isWord ( Word )
 	
 	if ( StrLen ( Word ) < 3 ) then
 		return false;
@@ -56,9 +56,9 @@ Function isWord ( Word )
 	return not ( Find ( symbols, leftChar ) > 0
 			or Find ( symbols, rightChar ) > 0 );
 	
-EndFunction 
+endfunction 
 
-Function isReserved ( Word )
+function isReserved ( Word )
 	
 	s = Upper ( Word );
 	return s = "AND"
@@ -70,9 +70,9 @@ Function isReserved ( Word )
 	or s = "НЕ"
 	or s = "РЯДОМ";
 	
-EndFunction 
+endfunction 
 
-Function getList ( Search, Scope, PortionSize )
+function getList ( Search, Scope, PortionSize )
 	
 	list = FullTextSearch.CreateList ( Search );
 	list.PortionSize = PortionSize;
@@ -94,9 +94,9 @@ Function getList ( Search, Scope, PortionSize )
 	endif; 
 	return list;
 	
-EndFunction 
+endfunction 
 
-Function extractResult ( Response )
+function extractResult ( Response )
 	
 	if ( IsBlankString ( Response.Description ) ) then
 		s = Response.Presentation;
@@ -113,9 +113,9 @@ Function extractResult ( Response )
 	enddo; 
 	return StrConcat ( a, " " );
 	
-EndFunction
+endfunction
 
-Function highlight ( Text, Highlights )
+function highlight ( Text, Highlights )
 	
 	parts = Conversion.StringToArray ( Text, " " );
 	result = new Array ();
@@ -149,9 +149,9 @@ Function highlight ( Text, Highlights )
 	enddo; 
 	return new FormattedString ( result );
 	
-EndFunction 
+endfunction 
 
-Function Refs ( Search, Scope, PortionSize = 100 ) export
+function Refs ( Search, Scope, PortionSize = 100 ) export
 	
 	request = prepareRequest ( Search );
 	list = getList ( request.Template, Scope, PortionSize );
@@ -164,4 +164,4 @@ Function Refs ( Search, Scope, PortionSize = 100 ) export
 	enddo; 
 	return result;
 	
-EndFunction 
+endfunction 

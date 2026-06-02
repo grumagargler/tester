@@ -1,18 +1,18 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Record.SourceRecordKey.IsEmpty () ) then
 		initNew ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initNew ()
+&atserver
+procedure initNew ()
 	
 	Record.Session = SessionParameters.Session;
 	
-EndProcedure
+endprocedure

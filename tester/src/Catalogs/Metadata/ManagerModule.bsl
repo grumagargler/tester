@@ -1,5 +1,5 @@
 
-Function Ref ( Path ) export
+function Ref ( Path ) export
 
 	item = FindByDescription ( Path, true );
 	if ( item.IsEmpty () ) then
@@ -11,4 +11,4 @@ Function Ref ( Path ) export
 		return item;
 	endif; 
 	
-EndFunction
+endfunction

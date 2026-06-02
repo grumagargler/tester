@@ -1,21 +1,21 @@
-&AtServer
+&atserver
 var AllScenarios export;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	LockingForm.LoadScenarios ( ThisObject );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	var locked, errors;
 	
@@ -23,37 +23,37 @@ Procedure OK ( Command )
 	broadcast ( locked );
 	Close ( errors );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure lock ( LockedScenarios, ErrorsList )
+&atserver
+procedure lock ( LockedScenarios, ErrorsList )
 	
 	AllScenarios = LockingForm.FetchScenarios ( ThisObject );
 	LockingForm.Lock ( AllScenarios, LockedScenarios, ErrorsList );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure broadcast ( Scenarios )
+&atclient
+procedure broadcast ( Scenarios )
 	
 	Notify ( Enum.MessageLocked (), Scenarios );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Table List
 
-&AtClient
-Procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure ListBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure ListBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure

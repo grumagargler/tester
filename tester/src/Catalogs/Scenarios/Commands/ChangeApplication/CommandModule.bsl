@@ -1,15 +1,15 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
 	
 	callback = new NotifyDescription ( "Changed", ThisObject );
 	p = new Structure ( "Scenarios", Scenarios );
 	OpenForm ( "Catalog.Scenarios.Form.ChangeApplication", p, CommandExecuteParameters.Source, CommandExecuteParameters.Uniqueness, CommandExecuteParameters.Window, CommandExecuteParameters.URL, callback );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Changed ( Result, Params ) export
+&atclient
+procedure Changed ( Result, Params ) export
 	
 	if ( Result = undefined ) then
 		return;
@@ -27,4 +27,4 @@ Procedure Changed ( Result, Params ) export
 		enddo; 
 	endif; 
 	
-EndProcedure 
+endprocedure 

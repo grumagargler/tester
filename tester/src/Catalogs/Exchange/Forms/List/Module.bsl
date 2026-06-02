@@ -1,15 +1,15 @@
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	setViewSettings ();
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -17,10 +17,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer                                                                                                        
-Procedure setViewSettings ()
+&atserver                                                                                                        
+procedure setViewSettings ()
 	
 	ViewSettings = ( AccessRight ( "Edit", Metadata.Constants.Agent )
 					and AccessRight ( "Edit", Metadata.Constants.CloudPassword )
@@ -31,11 +31,11 @@ Procedure setViewSettings ()
 					and AccessRight ( "Edit", Metadata.Constants.ServerCode )
 					and AccessRight ( "Edit", Metadata.Constants.ServerPassword ) );
 					
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OpenConstants ( Command )
+&atclient
+procedure OpenConstants ( Command )
 	
 	OpenForm ( "Catalog.Exchange.Form.Settings" );	
 	
-EndProcedure
+endprocedure

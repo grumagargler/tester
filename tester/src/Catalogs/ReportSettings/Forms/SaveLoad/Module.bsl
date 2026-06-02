@@ -2,8 +2,8 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParameters ();
 	setReplacing ();
@@ -15,17 +15,17 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParameters ()
+&atserver
+procedure loadParameters ()
 	
 	Report = Catalogs.Metadata.Ref ( "Report." + Parameters.Report );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setTitle ()
+&atserver
+procedure setTitle ()
 	
 	if ( Parameters.Settings ) then
 		Title = Output.ShowingReportSettings ();
@@ -33,10 +33,10 @@ Procedure setTitle ()
 		Title = Output.ShowingReportVariants ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Procedure setDefaultButton ( Form )
+&atclientatservernocontext
+procedure setDefaultButton ( Form )
 	
 	if ( Form.Parameters.Saving ) then
 		if ( Form.Replacing = 0 ) then
@@ -53,10 +53,10 @@ Procedure setDefaultButton ( Form )
 		endif;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadVariants ()
+&atserver
+procedure loadVariants ()
 	
 	if ( Parameters.Saving
 		or Parameters.Settings ) then
@@ -71,17 +71,17 @@ Procedure loadVariants ()
 		endif; 
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StandardVariantsValueChoice ( Item, Value, StandardProcessing )
+&atclient
+procedure StandardVariantsValueChoice ( Item, Value, StandardProcessing )
 	
 	chooseStandard ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure chooseStandard ()
+&atclient
+procedure chooseStandard ()
 	
 	item = Items.StandardVariants.CurrentData;
 	if ( item = undefined ) then
@@ -89,25 +89,25 @@ Procedure chooseStandard ()
 	endif;
 	NotifyChoice ( "#" + item.Value );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function isSystemVariant ( Variant )
+&atserver
+function isSystemVariant ( Variant )
 	
 	return StrStartsWith ( Variant.Name, "#" );
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure initList ()
+&atserver
+procedure initList ()
 	
 	DC.ChangeFilter ( List, "Report", Report, true );
 	DC.ChangeFilter ( List, "IsSettings", Parameters.Settings, true );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure activateRecord ()
+&atserver
+procedure activateRecord ()
 	
 	if ( Parameters.Saving ) then
 		record = Parameters.ReportSettings;
@@ -118,10 +118,10 @@ Procedure activateRecord ()
 		Items.List.CurrentRow = record;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setReplacing ()
+&atserver
+procedure setReplacing ()
 	
 	if ( not Parameters.Saving ) then
 		return;
@@ -136,10 +136,10 @@ Procedure setReplacing ()
 		Replacing = 1;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -155,26 +155,26 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 
 	if ( Parameters.Saving and Replacing = 0 ) then
 		CheckedAttributes.Add ( "RecordDescripion" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	setCurrentItem ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setCurrentItem ()
+&atclient
+procedure setCurrentItem ()
 	
 	if ( Parameters.Saving ) then
 		if ( Replacing = 0 ) then
@@ -190,12 +190,12 @@ Procedure setCurrentItem ()
 		endif;
 	endif;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
+&atclient
 async Procedure Save ( Command )
 	
 	if ( CheckFilling () ) then
@@ -211,17 +211,17 @@ async Procedure Save ( Command )
 		NotifyChoice ( item );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AccessChanged ( Result, Ref ) export
+&atclient
+procedure AccessChanged ( Result, Ref ) export
 	
 	NotifyChoice ( Ref );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function saveData ( val Ref = undefined )
+&atserver
+function saveData ( val Ref = undefined )
 	
 	if ( Replacing = 0 ) then
 		obj = Catalogs.ReportSettings.CreateItem ();
@@ -237,45 +237,45 @@ Function saveData ( val Ref = undefined )
 	obj.Write ();
 	return obj.Ref;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure SavingVariantOnChange ( Item )
+&atclient
+procedure SavingVariantOnChange ( Item )
 	
 	applySavingVariant (); 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applySavingVariant ()
+&atclient
+procedure applySavingVariant ()
 	
 	setDefaultButton ( ThisObject );
 	Appearance.Apply ( ThisObject, "Replacing" );
 	setCurrentItem ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListValueChoice ( Item, Value, StandardProcessing )
+&atclient
+procedure ListValueChoice ( Item, Value, StandardProcessing )
 	
 	if ( Parameters.Saving ) then
 		saveData ( Value );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure LoadingStandardOnChange ( Item )
+&atclient
+procedure LoadingStandardOnChange ( Item )
 	
 	applyLoadingVariant ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyLoadingVariant ()
+&atclient
+procedure applyLoadingVariant ()
 	
 	setDefaultButton ( ThisObject );
 	Appearance.Apply ( ThisObject, "Loading" );
 	setCurrentItem ();
 
-EndProcedure
+endprocedure

@@ -1,17 +1,17 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	Title = Parameters.Title;
 	Screenshot = Parameters.URL;
 	
-EndProcedure 
+endprocedure 

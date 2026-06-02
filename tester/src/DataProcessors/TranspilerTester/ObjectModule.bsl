@@ -19,16 +19,16 @@ var CheckFinishEditingCurrentArea;
 var CurrentForm;
 var FormTables;
 
-Function Perform () export
+function Perform () export
 	
 	init ();
 	build ();
 	complete ();
 	return Script;
 	
-EndFunction
+endfunction
 
-Procedure init ()
+procedure init ()
 
 	Program = new Array ();
 	Reader = new XMLReader ();
@@ -42,9 +42,9 @@ Procedure init ()
 	CurrentForm = undefined;
 	FormTables = new Map ();
 
-EndProcedure 
+endprocedure 
 
-Procedure fillDictionary ()
+procedure fillDictionary ()
 	
 	Dictionary = new Map ();
 	Dictionary [ "search" ] = ? ( Lang = "en", "search", "поиск" );
@@ -122,9 +122,9 @@ Procedure fillDictionary ()
 	Dictionary [ "table" ] = ? ( Lang = "en", "Table", "Таблица" );
 	Dictionary [ "TableType" ] = ? ( Lang = "en", "Table", "Таблица" );
 
-EndProcedure 
+endprocedure 
 
-Procedure build ()
+procedure build ()
 	
 	while ( read () ) do
 		if ( NodeComplete ) then
@@ -142,9 +142,9 @@ Procedure build ()
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function read ()
+function read ()
 	
 	taken = Reader.Read ();
 	if ( taken ) then
@@ -155,16 +155,16 @@ Function read ()
 	endif; 
 	return taken;
 	
-EndFunction 
+endfunction 
 
-Function isMethod ()
+function isMethod ()
 	
 	k = Left ( Node, 1 );
 	return k = Lower ( k );
 	
-EndFunction 
+endfunction 
 
-Procedure callMethod ()
+procedure callMethod ()
 	
 	if ( Node = "uilog" ) then
 		if ( not NodeComplete
@@ -246,9 +246,9 @@ Procedure callMethod ()
 		endif; 
 	endif;
 
-EndProcedure 
+endprocedure 
 
-Procedure rollback ( HowMany = 1 )
+procedure rollback ( HowMany = 1 )
 	
 	i = HowMany;
 	j = Program.UBound ();
@@ -258,9 +258,9 @@ Procedure rollback ( HowMany = 1 )
 		i = i - 1;
 	enddo;
 
-EndProcedure
+endprocedure
 
-Procedure addCall ( Method, P1 = undefined, P2 = undefined, P3 = undefined, Comment = "" )
+procedure addCall ( Method, P1 = undefined, P2 = undefined, P3 = undefined, Comment = "" )
 	
 	params = new Array ();
 	skipped = 0;
@@ -297,17 +297,17 @@ Procedure addCall ( Method, P1 = undefined, P2 = undefined, P3 = undefined, Comm
 		TopDescriptor.Nodes.Add ( Descriptor );
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure addSkipped ( Code, Skipped )
+procedure addSkipped ( Code, Skipped )
 
 	for i = 1 to Skipped do
 		Code.Add ( "," );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function buildMethod ()
+function buildMethod ()
 	
 	method = translate ( Node );
 	if ( TopDescriptor.Name = "ClientApplicationWindow"
@@ -321,16 +321,16 @@ Function buildMethod ()
 		endif;
 	endif;
 
-EndFunction 
+endfunction 
 
-Function getTableName ( Table )
+function getTableName ( Table )
 
 	name = Table.Attributes [ "name" ];
 	return ? ( name = undefined, translate ( "table" ), name );
 	
-EndFunction
+endfunction
 
-Procedure addDefinition ( Left, Right )
+procedure addDefinition ( Left, Right )
 	
 	code = new Array ();
 	code.Add ( Left );
@@ -339,22 +339,22 @@ Procedure addDefinition ( Left, Right )
 	Program.Add ( StrConcat ( code ) );
 	TopDescriptor.Nodes.Add ( Descriptor );
 
-EndProcedure 
+endprocedure 
 
-Function wrapAttribute ( Name )
+function wrapAttribute ( Name )
 	
 	return Conversion.Wrap ( Attributes [ Name ] );
 	
-EndFunction 
+endfunction 
 
-Function translate ( Text )
+function translate ( Text )
 	
 	result = Dictionary [ Text ];
 	return ? ( result = undefined, Text, result );
 	
-EndFunction
+endfunction
 
-Function fieldID ( Quote = true, Parent = undefined )
+function fieldID ( Quote = true, Parent = undefined )
 	
 	if ( Parent = undefined ) then
 		nodeAbove = TopDescriptor;
@@ -375,9 +375,9 @@ Function fieldID ( Quote = true, Parent = undefined )
 		return ? ( Quote, """"  + name + """", name );
 	endif;
 	
-EndFunction
+endfunction
 
-Function parentNode ( Name, Attribute = undefined, AttributeValue = undefined )
+function parentNode ( Name, Attribute = undefined, AttributeValue = undefined )
 	
 	set = ? ( AttributeValue = undefined, undefined, Conversion.StringToArray ( AttributeValue ) );
 	justNode = Attribute = undefined;
@@ -399,9 +399,9 @@ Function parentNode ( Name, Attribute = undefined, AttributeValue = undefined )
 	enddo; 
 	return undefined;
 
-EndFunction
+endfunction
 
-Procedure applyGotoRow ()
+procedure applyGotoRow ()
 
 	if ( NodeComplete ) then
 		if ( Node = LastNode ) then
@@ -420,15 +420,15 @@ Procedure applyGotoRow ()
 		fetchSearch ();
 	endif; 
 
-EndProcedure
+endprocedure
 
-Procedure fetchSearch ()
+procedure fetchSearch ()
 	
 	addDefinition ( translate ( "search" ), translate ( "new" ) + " " + translate ( "Map" ) + " ()" );
 	
-EndProcedure 
+endprocedure 
 
-Procedure applyEndEditRow ()
+procedure applyEndEditRow ()
 	
 	cancel = Attributes [ "cancel" ];
 	if ( cancel = "true" ) then
@@ -445,9 +445,9 @@ Procedure applyEndEditRow ()
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure applyWith ( Title, Activate = undefined )
+procedure applyWith ( Title, Activate = undefined )
 	
 	if ( CurrentForm <> undefined
 		and ( CurrentForm = Title
@@ -459,15 +459,15 @@ Procedure applyWith ( Title, Activate = undefined )
 	addLineBreak ();
 	addCall ( translate ( "With" ), """" + CurrentForm + """", Activate );
 	
-EndProcedure
+endprocedure
 
-Procedure addLineBreak ()
+procedure addLineBreak ()
 
 	Program.Add ( Chars.CR );
 	
-EndProcedure
+endprocedure
 
-Procedure applyActivate ()
+procedure applyActivate ()
 	
 	name = TopDescriptor.Name; 
 	if ( name = "Form" ) then
@@ -478,9 +478,9 @@ Procedure applyActivate ()
 		addCall ( translate ( "Activate" ), fieldID (), , , TopDescriptor.Attributes [ "title" ] );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure applyClick ()
+procedure applyClick ()
 
 	if ( TopDescriptor.Name = "CommandInterfaceButton" ) then
 		parent = parentNode ( "ClientApplicationWindow", "isMain", "true" );
@@ -509,9 +509,9 @@ Procedure applyClick ()
 		addCall ( translate ( "Click" ), fieldID () );
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure applyExpand ( Expand )
+procedure applyExpand ( Expand )
 	
 	if ( TopDescriptor.Name = "FormGroup" ) then
 		if ( NodeComplete ) then
@@ -531,9 +531,9 @@ Procedure applyExpand ( Expand )
 		endif; 
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure applyValue ()
+procedure applyValue ()
 	
 	if ( Node = "executeChoiceFromChoiceList"
 		or Node = "executeChoiceFromDropList" ) then
@@ -578,9 +578,9 @@ Procedure applyValue ()
 	endif;
 	addCall ( translate ( action ), fieldID ( , "FormField" ), value, tableName );
 	
-EndProcedure
+endprocedure
 
-Function getTable ()
+function getTable ()
 
 	table = parentNode ( "FormTable", "name" );
 	if ( table = undefined ) then
@@ -588,9 +588,9 @@ Function getTable ()
 	endif;
 	return table;
 
-EndFunction
+endfunction
 
-Procedure applyGotoNextItem ()
+procedure applyGotoNextItem ()
 
 	if ( TopDescriptor.Name = "FormTable" ) then
 		if ( not nodeHas ( TopDescriptor.Nodes, "gotoNextItem" ) ) then
@@ -601,9 +601,9 @@ Procedure applyGotoNextItem ()
 		addCall ( translate ( "Next" ) );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Function nodeHas ( Nodes, Method, StackBack = undefined )
+function nodeHas ( Nodes, Method, StackBack = undefined )
 	
 	if ( StackBack = undefined ) then
 		for each item in Nodes do
@@ -621,9 +621,9 @@ Function nodeHas ( Nodes, Method, StackBack = undefined )
 		endif;
 	endif;
 	
-EndFunction
+endfunction
 
-Procedure pop ()
+procedure pop ()
 	
 	Stack.Delete ( StackIndex );
 	StackIndex = StackIndex - 1;
@@ -635,9 +635,9 @@ Procedure pop ()
 		endif; 
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure defineVar ()
+procedure defineVar ()
 	
 	if ( Node = "Field" ) then
 		addDefinition ( translate ( "search" ) + " [ " + wrapAttribute ( "title" ) + " ]", wrapAttribute ( "cellText" ) );
@@ -647,9 +647,9 @@ Procedure defineVar ()
 		applyFormTable ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure applyFormTable ()
+procedure applyFormTable ()
 
 	name = Attributes [ "name" ];
 	if ( name = undefined ) then
@@ -668,9 +668,9 @@ Procedure applyFormTable ()
 		addDefinition ( name, translate ( "Get" ) + " ( """", , """ + translate ( "TableType" ) + """ )" );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure push ()
+procedure push ()
 	
 	Attributes = new Map ();
 	if ( Reader.AttributeCount () > 0 ) then
@@ -685,11 +685,11 @@ Procedure push ()
 	Stack.Add ( Descriptor );
 	StackIndex = StackIndex + 1;
 	
-EndProcedure 
+endprocedure 
 
-Procedure complete ()
+procedure complete ()
 	
 	Program.Add ( "" );
 	Script = StrConcat ( Program, Chars.LF );
 	
-EndProcedure 
+endprocedure 

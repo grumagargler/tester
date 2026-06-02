@@ -1,4 +1,4 @@
-Function VersionLess ( val Version ) export
+function VersionLess ( val Version ) export
 	
 	#if ( Server or ExternalConnection ) then
 		si = new SystemInfo ();
@@ -8,9 +8,9 @@ Function VersionLess ( val Version ) export
 	#endif
 	return firstSmaller ( platform, Version );
 	
-EndFunction
+endfunction
 
-Function firstSmaller ( Platform, Version )
+function firstSmaller ( Platform, Version )
 	
 	machine = StrSplit ( Platform, "." );
 	i = 0;
@@ -22,18 +22,18 @@ Function firstSmaller ( Platform, Version )
 	enddo;
 	return false;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function CompatibilityLess ( Version ) export
+&atserver
+function CompatibilityLess ( Version ) export
 	
 	compatibility = getCompatibility ();
 	return firstSmaller ( compatibility, Version );
 	
-EndFunction
+endfunction
 
-&AtServer
-Function getCompatibility ()
+&atserver
+function getCompatibility ()
 	
 	compatibility = Metadata.CompatibilityMode;
 	if ( compatibility = Metadata.ObjectProperties.CompatibilityMode.DontUse ) then
@@ -48,30 +48,30 @@ Function getCompatibility ()
 	endif;
 	return version;
 	
-EndFunction
+endfunction
 
-Function IsWindows () export
+function IsWindows () export
 	
 	info = new SystemInfo ();
 	type = info.PlatformType;
 	return type = PlatformType.Windows_x86
 	or type = PlatformType.Windows_x86_64;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function IsLinux () export
+&atclient
+function IsLinux () export
 	
 	info = new SystemInfo ();
 	type = info.PlatformType;
 	return type = PlatformType.Linux_x86
 	or type = PlatformType.Linux_x86_64;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function AdvancedEditor () export
+&atserver
+function AdvancedEditor () export
 	
 	return Constants.AdvancedEditor.Get ();
 	
-EndFunction
+endfunction

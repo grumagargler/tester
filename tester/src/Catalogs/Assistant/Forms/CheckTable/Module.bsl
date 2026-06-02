@@ -1,26 +1,26 @@
-&AtClient
+&atclient
 var TableField;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 
 	init ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	Splitter = "|";
 	Method = TrimR ( Left ( Parameters.Method, StrFind ( Parameters.Method, "(" ) - 1 ) );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	try
 		fill ();
@@ -28,10 +28,10 @@ Procedure OnOpen ( Cancel )
 		raise Output.ErrorObtainingTableParameters ();
 	endtry;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fill ()
+&atclient
+procedure fill ()
 	
 	With ( Parameters.Form );
 	field = Type ( "TestedFormField" );
@@ -53,19 +53,19 @@ Procedure fill ()
 		row.Check = available;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 	
 	if ( not checkColumns () ) then
 		Cancel = true;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkColumns ()
+&atserver
+function checkColumns ()
 	
 	for each row in TestingTable do
 		if ( row.Check ) then
@@ -75,23 +75,23 @@ Function checkColumns ()
 	Output.ColumnsNotSelected ();
 	return false;
 	
-EndFunction
+endfunction
 
 // *****************************************
 // *********** TestingTable
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	if ( not CheckFilling () ) then
 		return;
 	endif;
 	Close ( TableProcessor.CheckingScript ( Method, TableField, selectedColumns (), ByNames, Splitter ) );
 		
-EndProcedure
+endprocedure
 
-&AtClient
-Function selectedColumns ()
+&atclient
+function selectedColumns ()
 	
 	list = new Array ();	
 	for each row in TestingTable do
@@ -101,28 +101,28 @@ Function selectedColumns ()
 	enddo;
 	return list;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure MarkAll ( Command )
+&atclient
+procedure MarkAll ( Command )
 	
 	checkbox ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkbox ( Value )
+&atclient
+procedure checkbox ( Value )
 	
 	for each row in TestingTable do
 		row.Check = Value;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UnmarkAll ( Command )
+&atclient
+procedure UnmarkAll ( Command )
 	
 	checkbox ( false );
 	
-EndProcedure
+endprocedure
 

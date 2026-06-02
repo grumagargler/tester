@@ -1,15 +1,15 @@
-&AtClient
+&atclient
 var TableRow;
-&AtClient
+&atclient
 var ConfirmationTaken;
-&AtClient
+&atclient
 var LockedScenarios;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	setAgentStatus ( ThisObject );
 	readSchedule ();
@@ -17,19 +17,19 @@ Procedure OnReadAtServer ( CurrentObject )
 	readErrors ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure setAgentStatus ( Form )
+&atclientatservernocontext
+procedure setAgentStatus ( Form )
 	
 	object = Form.Object;
 	Form.AgentStatus = getStatus ( object.Agent, object.Computer );
 	Appearance.Apply ( Form );
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function getStatus ( val Agent, val Computer )
+&atservernocontext
+function getStatus ( val Agent, val Computer )
 	
 	s = "
 	|select top 1 AgentStatuses.Status as Status
@@ -48,19 +48,19 @@ Function getStatus ( val Agent, val Computer )
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Status );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure readSchedule ()
+&atserver
+procedure readSchedule ()
 	
 	if ( Object.Mode = Enums.Running.Schedule ) then
 		Schedule = Conversion.JSONToObject ( Object.Schedule, Type ( "JobSchedule" ) );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readInfo ()
+&atserver
+procedure readInfo ()
 	
 	r = InformationRegisters.AgentJobs.CreateRecordManager ();
 	r.Job = Object.Ref;
@@ -68,10 +68,10 @@ Procedure readInfo ()
 	ValueToFormAttribute ( r, "JobInfo" );
 	DC.SetParameter ( JobsLog, "Ref", Object.Ref );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readErrors ()
+&atserver
+procedure readErrors ()
 	
 	s = "
 	|select count ( Log.Status ) as Count
@@ -84,10 +84,10 @@ Procedure readErrors ()
 	q.SetParameter ( "Ref", Object.Ref );
 	ErrorsCount = q.Execute ().Unload ().Total ( "Count" );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		DocumentForm.Init ( Object );
@@ -99,10 +99,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -129,10 +129,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	if ( Parameters.Scenarios = undefined ) then
 		return;
@@ -140,10 +140,10 @@ Procedure loadParams ()
 	list = getScenarios ();
 	Object.Scenarios.Load ( list );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function getScenarios ()
+&atserver
+function getScenarios ()
 	
 	s = "
 	|select allowed Scenarios.Ref as Scenario,
@@ -159,10 +159,10 @@ Function getScenarios ()
 	q.SetParameter ( "Application", EnvironmentSrv.GetApplication () );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure initNew ()
+&atserver
+procedure initNew ()
 	
 	if ( Object.Schedule = "" ) then
 		initSchedule ();
@@ -173,38 +173,38 @@ Procedure initNew ()
 		setAgentStatus ( ThisObject );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initSchedule ()
+&atserver
+procedure initSchedule ()
 	
 	Schedule = new JobSchedule ();
 	Schedule.BeginDate = BegOfDay ( CurrentSessionDate () + 86400 );
 	Schedule.DaysRepeatPeriod = 1;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure BeforeLoadDataFromSettingsAtServer ( Settings )
+&atserver
+procedure BeforeLoadDataFromSettingsAtServer ( Settings )
 	
 	if ( not Object.Agent.IsEmpty ()
 		or not Object.Ref.IsEmpty () ) then
 		Settings.Clear ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnLoadDataFromSettingsAtServer ( Settings )
+&atserver
+procedure OnLoadDataFromSettingsAtServer ( Settings )
 	
 	if ( not Object.Agent.IsEmpty () ) then
 		setAgentStatus ( ThisObject );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure BeforeWrite ( Cancel, WriteParameters )
+&atclient
+procedure BeforeWrite ( Cancel, WriteParameters )
 	
 	if ( not CheckFilling () ) then
 		Cancel = true;
@@ -216,10 +216,10 @@ Procedure BeforeWrite ( Cancel, WriteParameters )
 	endif;
 	storeSchedule ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function confirmationRequired ()
+&atclient
+function confirmationRequired ()
 	
 	if ( ConfirmationTaken
 		or not Object.Ref.IsEmpty () ) then
@@ -228,10 +228,10 @@ Function confirmationRequired ()
 	LockedScenarios = editingScenarios ();
 	return LockedScenarios.Count () > 0;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function editingScenarios ()
+&atserver
+function editingScenarios ()
 	
 	s = "
 	|select allowed distinct Editing.Scenario as Scenario
@@ -254,82 +254,82 @@ Function editingScenarios ()
 	q.SetParameter ( "Me", SessionParameters.User );
 	return q.Execute ().Unload ().UnloadColumn ( "Scenario" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure askUser ()
+&atclient
+procedure askUser ()
 	
 	p = new Structure ( "Scenarios, JobPreparing", LockedScenarios, true );
 	callback = new NotifyDescription ( "StoreFormClosed", ThisObject );
 	OpenForm ( "Catalog.Scenarios.Form.Store", p, ThisObject, true, , , callback );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StoreFormClosed ( Result, Params ) export
+&atclient
+procedure StoreFormClosed ( Result, Params ) export
 	
 	ConfirmationTaken = true;
 	Write ();
 	Close ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure storeSchedule ()
+&atclient
+procedure storeSchedule ()
 	
 	if ( Object.Mode = PredefinedValue ( "Enum.Running.Schedule" ) ) then
 		Object.Schedule = Conversion.ObjectToJSON ( Schedule );
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure ModeOnChange ( Item )
+&atclient
+procedure ModeOnChange ( Item )
 	
 	Appearance.Apply ( ThisObject, "Object.Mode" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScheduleClick ( Item, StandardProcessing )
+&atclient
+procedure ScheduleClick ( Item, StandardProcessing )
 	
 	StandardProcessing = false;
 	showSchedule ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showSchedule ()
+&atclient
+procedure showSchedule ()
 	
 	#if ( not MobileClient ) then
 		dialog = new ScheduledJobDialog ( Schedule );
 		dialog.Show ( new NotifyDescription ( "ScheduleDefined", ThisObject ) );
 	#endif
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScheduleDefined ( Data, Params ) export
+&atclient
+procedure ScheduleDefined ( Data, Params ) export
 	
 	if ( Data = undefined ) then
 		return;
 	endif;
 	Schedule = Data;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Delete ( Command )
+&atclient
+procedure Delete ( Command )
 
 	Output.DeleteJob ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure DeleteJob ( Answer, Params ) export
+&atclient
+procedure DeleteJob ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
@@ -338,53 +338,53 @@ Procedure DeleteJob ( Answer, Params ) export
 	Write ();
 	Close ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AgentChoiceProcessing ( Item, SelectedValue, StandardProcessing )
+&atclient
+procedure AgentChoiceProcessing ( Item, SelectedValue, StandardProcessing )
 	
 	if ( TypeOf ( SelectedValue ) = Type ( "Structure" ) ) then
 		StandardProcessing = false;
 		applyAgent ( SelectedValue );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyAgent ( Data )
+&atclient
+procedure applyAgent ( Data )
 	
 	Object.Agent = Data.Agent;
 	Object.Computer = Data.Computer;
 	setAgentStatus ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AgentOnChange ( Item )
+&atclient
+procedure AgentOnChange ( Item )
 	
 	setAgentStatus ( ThisObject );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Scenarios
 
-&AtClient
-Procedure ScenariosOnActivateRow ( Item )
+&atclient
+procedure ScenariosOnActivateRow ( Item )
 	
 	TableRow = Item.CurrentData;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScenariosScenarioOnChange ( Item )
+&atclient
+procedure ScenariosScenarioOnChange ( Item )
 	
 	setApplication ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setApplication ()
+&atclient
+procedure setApplication ()
 	
 	value = DF.Pick ( TableRow.Scenario, "Application" );
 	if ( value.IsEmpty () ) then
@@ -392,29 +392,29 @@ Procedure setApplication ()
 	endif;
 	TableRow.Application = value;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Jobs
 
-&AtClient
-Procedure JobsLogOnActivateRow ( Item )
+&atclient
+procedure JobsLogOnActivateRow ( Item )
 	
 	TableRow = Item.CurrentData;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure JobsLogSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure JobsLogSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	if ( Field.Name = "JobsLogScenario" ) then
 		showMenu ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showMenu ()
+&atclient
+procedure showMenu ()
 	
 	menu = new ValueList ();
 	status = TableRow.Status;
@@ -426,10 +426,10 @@ Procedure showMenu ()
 	menu.Add ( 4, Output.OpenScenario (), , PictureLib.Change );
 	ShowChooseFromMenu ( new NotifyDescription ( "ActionSelected", ThisObject ), menu );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ActionSelected ( Menu, Params ) export
+&atclient
+procedure ActionSelected ( Menu, Params ) export
 	
 	if ( Menu = undefined ) then
 		return;
@@ -445,17 +445,17 @@ Procedure ActionSelected ( Menu, Params ) export
 		ShowValue ( , findScenario ( Object.Ref, jobScenario (), TableRow.LineNumber ) );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function jobScenario ()
+&atclient
+function jobScenario ()
 	
 	return Object.Scenarios [ TableRow.LineNumber - 1 ].Scenario;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure openLog ( OnlyErrors = false )
+&atclient
+procedure openLog ( OnlyErrors = false )
 	
 	job = Object.Ref;
 	scenario = findScenario ( job, jobScenario (), TableRow.LineNumber );
@@ -469,10 +469,10 @@ Procedure openLog ( OnlyErrors = false )
 		OpenForm ( "InformationRegister.Log.ListForm", params );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function findScenario ( val Job, val Scenario, val Row )
+&atservernocontext
+function findScenario ( val Job, val Scenario, val Row )
 	
 	s = "
 	|select top 1 Log.Scenario as Scenario
@@ -489,7 +489,7 @@ Function findScenario ( val Job, val Scenario, val Row )
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Scenario );
 	
-EndFunction
+endfunction
 
 // *****************************************
 // *********** Variables Initialization

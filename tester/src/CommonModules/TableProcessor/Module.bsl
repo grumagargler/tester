@@ -1,5 +1,5 @@
 
-Procedure CompareTables ( Table, Standard, Params = undefined, Options = undefined, Debug ) export
+procedure CompareTables ( Table, Standard, Params = undefined, Options = undefined, Debug ) export
 	
 	this = createContext ( Debug );
 	types = This.TableTypes.Standard;
@@ -7,9 +7,9 @@ Procedure CompareTables ( Table, Standard, Params = undefined, Options = undefin
 	table2 = readTable ( this, Standard, types.Standard, Params, false );
 	compare ( this, table1, table2, Params, Options );
 
-EndProcedure
+endprocedure
 
-Function createContext ( Debug )
+function createContext ( Debug )
 	
 	this = new Structure ();
 	this.Insert ( "Debug", Debug );
@@ -26,9 +26,9 @@ Function createContext ( Debug )
 	this.Insert ( "Separators", separators );
 	return this;
 	
-EndFunction
+endfunction
 
-Function readTable ( This, Table, TableType, Params, Designer )
+function readTable ( This, Table, TableType, Params, Designer )
 	
 	name = undefined;
 	header = undefined;
@@ -81,9 +81,9 @@ Function readTable ( This, Table, TableType, Params, Designer )
 	endif;
 	return createTable ( name, header, body );
 	
-EndFunction
+endfunction
 
-Function tablePresentation ( This, Type )
+function tablePresentation ( This, Type )
 
 	tableType = This.TableTypes;
 	if ( Type = tableType.Standard ) then
@@ -94,9 +94,9 @@ Function tablePresentation ( This, Type )
 		return Output.TableFormatErrorFormatting ();
 	endif;
 
-EndFunction
+endfunction
 
-Function expressionToValue ( This, Row )
+function expressionToValue ( This, Row )
 	
 	values = new Array ();
 	parts = new Array ();
@@ -150,9 +150,9 @@ Function expressionToValue ( This, Row )
 	values.Delete ( 0 );
 	return new Structure ( "Values, Separator", values, separator );
 	
-EndFunction
+endfunction
 
-Procedure addValues ( This, Values, Parts )
+procedure addValues ( This, Values, Parts )
 	
 	s = TrimAll ( StrConcat ( Parts ) );
 	if ( Left ( s, 1 ) = "'"
@@ -163,9 +163,9 @@ Procedure addValues ( This, Values, Parts )
 	Values.Add ( StrReplace ( s, quote, "'" ) );
 	Parts.Clear ();
 	
-EndProcedure
+endprocedure
 
-Function textToValue ( This, Row )
+function textToValue ( This, Row )
 	
 	values = new Array ();
 	parts = new Array ();
@@ -208,18 +208,18 @@ Function textToValue ( This, Row )
 	values.Delete ( 0 );
 	return new Structure ( "Values, Separator", values, separator );
 	
-EndFunction
+endfunction
 
-Procedure addRawValues ( This, Values, Parts )
+procedure addRawValues ( This, Values, Parts )
 	
 	s = TrimAll ( StrConcat ( Parts ) );
 	quote = This.Anchor1;
 	Values.Add ( StrReplace ( s, quote, "'" ) );
 	Parts.Clear ();
 	
-EndProcedure
+endprocedure
 
-Function readHeader ( This, Row, TableType, Params )
+function readHeader ( This, Row, TableType, Params )
 	
 	result = new Structure ( "Values, EvaluatedValues, Separator" );
 	tableTypes = This.TableTypes;
@@ -239,9 +239,9 @@ Function readHeader ( This, Row, TableType, Params )
 	result.Separator = ? ( data.Separator = undefined, "|", data.Separator );
 	return result;
 	
-EndFunction
+endfunction
 
-Function applyParams ( This, Value, Params )
+function applyParams ( This, Value, Params )
 	
 	prefix = Left ( Value, 1 );
 	if ( prefix = "#"
@@ -257,22 +257,22 @@ Function applyParams ( This, Value, Params )
 		return s;
 	endif;
 	
-EndFunction
+endfunction
 
-Function createTable ( Name, Header, Body )
+function createTable ( Name, Header, Body )
 	
 	return new Structure ( "Name, Header, Body", Name, Header, Body );
 	
-EndFunction
+endfunction
 
-Procedure compare ( This, Table, Standard, Params, Options )
+procedure compare ( This, Table, Standard, Params, Options )
 	
 	compareHeader ( This, Table, Standard, Params, Options );
 	compareBodies ( This, Table, Standard, Params, Options );
 	
-EndProcedure
+endprocedure
 
-Procedure compareHeader ( This, Table, Standard, Params, Options )
+procedure compareHeader ( This, Table, Standard, Params, Options )
 	
 	name = Table.Name;
 	testedHeader = Table.Header.Titles;
@@ -301,15 +301,15 @@ Procedure compareHeader ( This, Table, Standard, Params, Options )
 		Runtime.ThrowError ( Output.TableHasFewerColumns ( msg ), This.Debug );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function columnPresentation ( Column, EvaluatedColumn )
+function columnPresentation ( Column, EvaluatedColumn )
 	
 	return ? ( Column = EvaluatedColumn, Column, EvaluatedColumn + "(" + Column + ")" );
 	
-EndFunction
+endfunction
 
-Procedure compareBodies ( This, Table, Standard, Params, Options )
+procedure compareBodies ( This, Table, Standard, Params, Options )
 	
 	stardardRows = Standard.Body;
 	standardCount = stardardRows.UBound ();
@@ -394,9 +394,9 @@ Procedure compareBodies ( This, Table, Standard, Params, Options )
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function getBody ( TestingTable )
+function getBody ( TestingTable )
 	
 	body = TestingTable.Body;
 	#if ( Server ) then
@@ -417,9 +417,9 @@ Function getBody ( TestingTable )
 	#endif	
 	return body;
 	
-EndFunction
+endfunction
 
-Function compareValues ( This, Tested, Standard, Params )
+function compareValues ( This, Tested, Standard, Params )
 	
 	if ( Left ( Standard, 1 ) = "%" ) then
 		id = Mid ( Standard, 2 );
@@ -456,9 +456,9 @@ Function compareValues ( This, Tested, Standard, Params )
 		return comparisonResult ( Tested = value, evaluatedStandard );
 	endif;
 
-EndFunction
+endfunction
 
-Function ValuesEqual ( Tested, Standard ) export
+function ValuesEqual ( Tested, Standard ) export
 	
 	type = TypeOf ( Standard );
 	if ( type = Type ( "Number" ) ) then
@@ -481,16 +481,16 @@ Function ValuesEqual ( Tested, Standard ) export
 		return Tested = Standard;
 	endif;
 	
-EndFunction
+endfunction
 
-Function comparisonResult ( Equal, EvaluatedValue )
+function comparisonResult ( Equal, EvaluatedValue )
 	
 	return new Structure ( "Equal, EvaluatedValue", Equal, EvaluatedValue );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure CompareFieldAndTable ( Table, Params, Options, Source ) export
+&atclient
+procedure CompareFieldAndTable ( Table, Params, Options, Source ) export
 	
 	this = createContext ( Debug );
 	standardTable = readTable ( this, Table, This.TableTypes.Standard, Params, false );
@@ -500,9 +500,9 @@ Procedure CompareFieldAndTable ( Table, Params, Options, Source ) export
 	testingTable = createTable ( tableName, columns, tableField );
 	compare ( this, testingTable, standardTable, Params, Options );
 	
-EndProcedure
+endprocedure
 
-Function fetchColumns ( Control, Header, Options )
+function fetchColumns ( Control, Header, Options )
 	
 	names = new Array ();
 	titles = new Array ();
@@ -538,16 +538,16 @@ Function fetchColumns ( Control, Header, Options )
 	enddo;
 	return new Structure ( "Names, Titles", names, titles );
 	
-EndFunction
+endfunction
 
-Function escapedTitle ( Title )
+function escapedTitle ( Title )
 	
 	prefix = Left ( Title, 1 );
 	return ? ( prefix = "#" or prefix = "!", "\", "" ) + Title;
 	
-EndFunction
+endfunction
 
-Function startIteration ( Table )
+function startIteration ( Table )
 
 	#if ( Server ) then
 		empty = Table.Count () = 0;
@@ -560,10 +560,10 @@ Function startIteration ( Table )
 	#endif
 	return not empty;
 
-EndFunction
+endfunction
 
-&AtClient
-Function CheckingScript ( Method, Table, SelectedColumns, ByNames, Splitter ) export
+&atclient
+function CheckingScript ( Method, Table, SelectedColumns, ByNames, Splitter ) export
 
 	this = createContext ( Debug );
 	columns = fetchColumns ( Table, SelectedColumns, undefined );
@@ -572,10 +572,10 @@ Function CheckingScript ( Method, Table, SelectedColumns, ByNames, Splitter ) ex
 	text = buildScript ( Method, Table.Name, escaped, rows, this.Separators [ Splitter ], 0 );
 	return text;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function readValues ( This, Columns, ByNames )
+&atclient
+function readValues ( This, Columns, ByNames )
 	
 	prefix = ScenarioForm.NamePrefix ( CurrentLanguage () );
 	list = new Array ();
@@ -588,10 +588,10 @@ Function readValues ( This, Columns, ByNames )
 	enddo;
 	return list;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function valueToExpression ( This, Value, IsColumn )
+&atclient
+function valueToExpression ( This, Value, IsColumn )
 
 	prefix = Left ( Value, 1 );
 	if ( prefix = "" ) then
@@ -608,10 +608,10 @@ Function valueToExpression ( This, Value, IsColumn )
 		return escapeValue ( Value, alwaysEscape + splitters );
 	endif;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function escapeValue ( Value, Escape )
+&atclient
+function escapeValue ( Value, Escape )
 	
 	s = Value;
 	for i = 1 to StrLen ( Escape ) do
@@ -621,10 +621,10 @@ Function escapeValue ( Value, Escape )
 	s = StrReplace ( s, """", """""" );
 	return s;
 
-EndFunction
+endfunction
 
-&AtClient
-Function fetchRows ( This, Table, Columns )
+&atclient
+function fetchRows ( This, Table, Columns )
 	
 	rows = new Array ();
 	moving = startIteration ( Table );
@@ -634,10 +634,10 @@ Function fetchRows ( This, Table, Columns )
 	enddo;
 	return rows;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function extractCells ( This, Table, Columns )
+&atclient
+function extractCells ( This, Table, Columns )
 
 	cells = new Array ();
 	for each column in Columns do
@@ -650,12 +650,12 @@ Function extractCells ( This, Table, Columns )
 	enddo;
 	return cells;	
 	
-EndFunction
+endfunction
 
-#if ( Server ) then
+#if ( server ) then
 
-&AtServer
-Function fetchCells ( Row, Columns )
+&atserver
+function fetchCells ( Row, Columns )
 
 	cells = new Array ();
 	for each column in Columns do
@@ -664,14 +664,14 @@ Function fetchCells ( Row, Columns )
 	enddo;
 	return cells;
 	
-EndFunction
+endfunction
 
 #endif
 
-#if ( Client ) then
+#if ( client ) then
 
-&AtClient
-Function fetchCells ( Table, Columns )
+&atclient
+function fetchCells ( Table, Columns )
 
 	cells = new Array ();
 	for each column in Columns do
@@ -684,12 +684,12 @@ Function fetchCells ( Table, Columns )
 	enddo;
 	return cells;
 	
-EndFunction
+endfunction
 
 #endif
 
-&AtClient
-Function nextRow ( Table )
+&atclient
+function nextRow ( Table )
 	
 	try
 		Table.GotoNextRow ( false );
@@ -698,10 +698,10 @@ Function nextRow ( Table )
 	endtry;
 	return true;
 
-EndFunction
+endfunction
 
-&AtClient
-Function buildScript ( Method, Name, Columns, Rows, Splitter, Margin )
+&atclient
+function buildScript ( Method, Name, Columns, Rows, Splitter, Margin )
 	
 	injectLineNumber ( Columns, Rows );
 	body = new Array ();
@@ -729,10 +729,10 @@ Function buildScript ( Method, Name, Columns, Rows, Splitter, Margin )
 	script.Add ( Chars.LF + "|"" );" );
 	return StrConcat ( script );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure injectLineNumber ( Columns, Rows )
+&atclient
+procedure injectLineNumber ( Columns, Rows )
 	
 	Columns.Insert ( 0, "#" );
 	line = 1;
@@ -741,10 +741,10 @@ Procedure injectLineNumber ( Columns, Rows )
 		line = line + 1;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function columnsWidth ( Columns, Rows )
+&atclient
+function columnsWidth ( Columns, Rows )
 	
 	width = new Array ();
 	for i = 0 to Columns.UBound () - 1 do
@@ -761,10 +761,10 @@ Function columnsWidth ( Columns, Rows )
 	width.Add ( "" );
 	return width;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function placeholder ( Width )
+&atclient
+function placeholder ( Width )
 	
 	pad = new Array ();
 	for i = 1 to Width do
@@ -772,17 +772,17 @@ Function placeholder ( Width )
 	enddo;
 	return StrConcat ( pad );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function formatValue ( Value, Placeholder )
+&atclient
+function formatValue ( Value, Placeholder )
 	
 	return Value + Mid ( Placeholder, StrLen ( Value ) + 1 );
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure CompareVTAndTable ( Debug, VT, Table, Params, Options ) export
+&atserver
+procedure CompareVTAndTable ( Debug, VT, Table, Params, Options ) export
 	
 	this = createContext ( Debug );
 	standardTable = readTable ( this, Table, This.TableTypes.Standard, Params, false );
@@ -791,20 +791,20 @@ Procedure CompareVTAndTable ( Debug, VT, Table, Params, Options ) export
 	testingTable = createTable ( tableName, columns, VT );
 	compare ( this, testingTable, standardTable, Params, Options );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function Formatting ( Text, Indent ) export
+&atclient
+function Formatting ( Text, Indent ) export
 	
 	this = createContext ( Debug );
 	table = readTable ( this, Text, This.TableTypes.Formatting, undefined, true );
 	body = formatBody ( this, table, Indent );
 	return body;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function formatBody ( This, Table, Indent )
+&atclient
+function formatBody ( This, Table, Indent )
 
 	body = new Array ();
 	margin = ? ( Indent = undefined, "", Indent );
@@ -831,4 +831,4 @@ Function formatBody ( This, Table, Indent )
 	body = StrConcat ( body, Chars.LF + margin + "|" );
 	return body;
 
-EndFunction
+endfunction

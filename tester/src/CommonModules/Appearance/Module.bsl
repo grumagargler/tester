@@ -1,5 +1,5 @@
-&AtServer
-Procedure Read ( Form, Rules = undefined ) export
+&atserver
+procedure Read ( Form, Rules = undefined ) export
 	
 	p = Form.Parameters.FunctionalOptionsParameters;
 	p.Insert ( "User", SessionParameters.User );
@@ -9,9 +9,9 @@ Procedure Read ( Form, Rules = undefined ) export
 	endif;
 	Form.AppearanceData = CoreLibrary.ParseAppearance ( Rules );
 	
-EndProcedure
+endprocedure
 
-Procedure Apply ( Form, Value = undefined, CanBeDisallowed = false ) export
+procedure Apply ( Form, Value = undefined, CanBeDisallowed = false ) export
 	
 	if ( appearanceIsReady ( Form ) ) then
 		if ( Value = undefined ) then
@@ -25,15 +25,15 @@ Procedure Apply ( Form, Value = undefined, CanBeDisallowed = false ) export
 		enddo;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Function appearanceIsReady ( Form )
+function appearanceIsReady ( Form )
 	
 	return Form.AppearanceData <> undefined;
 	
-EndFunction 
+endfunction 
 
-Procedure applyAppearance ( Form, Value, IsItemUpdate, CanBeDisallowed )
+procedure applyAppearance ( Form, Value, IsItemUpdate, CanBeDisallowed )
 	
 	items = Form.Items;
 	dependencyFound = false;
@@ -75,9 +75,9 @@ Procedure applyAppearance ( Form, Value, IsItemUpdate, CanBeDisallowed )
 		raise "Conditional appearance cannot find dependency by name: " + Value;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Function appearanceDependsOn ( Item, Value, IsItemUpdate )
+function appearanceDependsOn ( Item, Value, IsItemUpdate )
 	
 	if ( Value = undefined ) then
 		return true;
@@ -88,9 +88,9 @@ Function appearanceDependsOn ( Item, Value, IsItemUpdate )
 		return Item.Fields.Find ( Value ) <> undefined;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Procedure formatFields ( Form, Items, AppearanceItem, Result )
+procedure formatFields ( Form, Items, AppearanceItem, Result )
 	
 	yes = Result;
 	no = not Result;
@@ -161,9 +161,9 @@ Procedure formatFields ( Form, Items, AppearanceItem, Result )
 		enddo;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function expressionToValue ( Form, Expression )
+function expressionToValue ( Form, Expression )
 	
 	try
 		return eval ( Expression + "()" );
@@ -171,19 +171,19 @@ Function expressionToValue ( Form, Expression )
 		return eval ( "String(" + Expression + ")" );
 	endtry;
 	
-EndFunction
+endfunction
 
-Procedure Update ( Form, Item, CanBeDisallowed = false ) export
+procedure Update ( Form, Item, CanBeDisallowed = false ) export
 	
 	if ( appearanceIsReady ( Form ) ) then
 		applyAppearance ( Form, Item, true, CanBeDisallowed );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
 #region BuiltitFunction
 
-Function inlist ( Value, _1, _2 = undefined, _3 = undefined, _4 = undefined, _5 = undefined, _6 = undefined, _7 = undefined, _8 = undefined, _9 = undefined, _10 = undefined, _11 = undefined, _12 = undefined, _13 = undefined, _14 = undefined, _15 = undefined, _16 = undefined, _17 = undefined, _18 = undefined, _19 = undefined, _20 = undefined ) export
+function inlist ( Value, _1, _2 = undefined, _3 = undefined, _4 = undefined, _5 = undefined, _6 = undefined, _7 = undefined, _8 = undefined, _9 = undefined, _10 = undefined, _11 = undefined, _12 = undefined, _13 = undefined, _14 = undefined, _15 = undefined, _16 = undefined, _17 = undefined, _18 = undefined, _19 = undefined, _20 = undefined ) export
 	
 	return Value = _1
 	or Value = _2
@@ -206,24 +206,24 @@ Function inlist ( Value, _1, _2 = undefined, _3 = undefined, _4 = undefined, _5 
 	or Value = _19
 	or Value = _20;
 	
-EndFunction
+endfunction
 
-Function всписке ( Value, _1, _2 = undefined, _3 = undefined, _4 = undefined, _5 = undefined, _6 = undefined, _7 = undefined, _8 = undefined, _9 = undefined, _10 = undefined, _11 = undefined, _12 = undefined, _13 = undefined, _14 = undefined, _15 = undefined, _16 = undefined, _17 = undefined, _18 = undefined, _19 = undefined, _20 = undefined ) export
+function всписке ( Value, _1, _2 = undefined, _3 = undefined, _4 = undefined, _5 = undefined, _6 = undefined, _7 = undefined, _8 = undefined, _9 = undefined, _10 = undefined, _11 = undefined, _12 = undefined, _13 = undefined, _14 = undefined, _15 = undefined, _16 = undefined, _17 = undefined, _18 = undefined, _19 = undefined, _20 = undefined ) export
 	
 	return inlist ( Value, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20 );
 	
-EndFunction
+endfunction
 
-Function field ( Value, Name ) export
+function field ( Value, Name ) export
 	
 	return DF.Pick ( Value, Name );
 
-EndFunction
+endfunction
 
-Function поле ( Value, Name ) export
+function поле ( Value, Name ) export
 	
 	return field ( Value, Name );
 
-EndFunction
+endfunction
 
 #endregion

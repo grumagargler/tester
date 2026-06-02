@@ -4,38 +4,38 @@
 // Adopted by @JohnyDeath, @Grumagargler
 // **************************************************************************************************
 
-Function That ( Something, Message = "" ) export 
+function That ( Something, Message = "" ) export 
 	
 	Value = Something;
 	Details = Message;
 	Negation = false;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Not_ () export
+function Not_ () export
 	
 	Negation = true;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Не_ () export
+function Не_ () export
 	
 	return Not_ ();
 	
-EndFunction
+endfunction
 
-Function IsTrue () export
+function IsTrue () export
 	
 	if ( wrongResult ( Value = true ) ) then 
 		throwError ( valuePresentation ( true ), "should" );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function valuePresentation ( Something )
+function valuePresentation ( Something )
 	
 	length = undefined;
 	type = TypeOf ( Something );
@@ -60,9 +60,9 @@ Function valuePresentation ( Something )
 	endif;
 	return display + ? ( length = undefined, "", "[" + Format ( length, "NG=;NZ=" ) + "]" );
 	
-EndFunction
+endfunction
 
-Function wrongResult ( Result )
+function wrongResult ( Result )
 	
 	wrong = ? ( Negation, Result, not Result );
 	if ( wrong ) then
@@ -72,9 +72,9 @@ Function wrongResult ( Result )
 		return false;
 	endif;
 	
-EndFunction
+endfunction
 
-Procedure throwError ( RightValue, About )
+procedure throwError ( RightValue, About )
 	
 	expression = new Array ();
 	expression.Add ( displayValue () );
@@ -93,21 +93,21 @@ Procedure throwError ( RightValue, About )
 	endif;
 	raise msg;
 	
-EndProcedure
+endprocedure
 
-Function displayValue ()
+function displayValue ()
 	
 	return Output.Value () + " " + valuePresentation ( Value );
 	
-EndFunction
+endfunction
 
-Function ЭтоИстина () export
+function ЭтоИстина () export
 	
 	return IsTrue ();
 	
-EndFunction
+endfunction
 
-Function IsFalse () export
+function IsFalse () export
 	
 	needed = Value = false;
 	if ( wrongResult ( needed ) ) then 
@@ -115,144 +115,144 @@ Function IsFalse () export
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function ЭтоЛожь () export
+function ЭтоЛожь () export
 	
 	return IsFalse ();
 	
-EndFunction
+endfunction
 
-Function Equal ( Something ) export
+function Equal ( Something ) export
 	
 	if ( wrongResult ( Value = Something )) then 
 		comparisonError ( Something, DataCompositionComparisonType.Equal );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Procedure comparisonError ( RightValue, Operator )
+procedure comparisonError ( RightValue, Operator )
 	
 	expression = new Array ();
 	expression.Add ( Lower ( "" + Operator ) );
 	expression.Add ( " " + valuePresentation ( RightValue ) );
 	throwError ( StrConcat ( expression ), "should" );
 	
-EndProcedure
+endprocedure
 
-Function Равно ( Something ) export
+function Равно ( Something ) export
 	
 	return Equal ( Something );
 	
-EndFunction
+endfunction
 
-Function NotEqual ( Something ) export
+function NotEqual ( Something ) export
 	
 	if ( wrongResult ( Value <> Something )) then 
 		comparisonError ( Something, DataCompositionComparisonType.NotEqual );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function НеРавно ( Something ) export
+function НеРавно ( Something ) export
 	
 	return NotEqual ( Something );
 	
-EndFunction
+endfunction
 
-Function Greater ( Something ) export
+function Greater ( Something ) export
 	
 	if ( wrongResult ( Value > Something )) then 
 		comparisonError ( Something, DataCompositionComparisonType.Greater );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Больше ( Something ) export
+function Больше ( Something ) export
 	
 	return Greater ( Something );
 	
-EndFunction
+endfunction
 
-Function GreaterOrEqual ( Something ) export
+function GreaterOrEqual ( Something ) export
 	
 	if ( wrongResult ( Value >= Something )) then 
 		comparisonError ( Something, DataCompositionComparisonType.GreaterOrEqual );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function БольшеИлиРавно ( Something ) export
+function БольшеИлиРавно ( Something ) export
 	
 	return GreaterOrEqual ( Something );
 	
-EndFunction
+endfunction
 
-Function Less ( Something ) export
+function Less ( Something ) export
 	
 	if ( wrongResult ( Value < Something )) then 
 		comparisonError ( Something, DataCompositionComparisonType.Less );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Меньше ( Something ) export
+function Меньше ( Something ) export
 	
 	return Less ( Something );
 	
-EndFunction
+endfunction
 
-Function LessOrEqual ( Something ) export
+function LessOrEqual ( Something ) export
 	
 	if ( wrongResult ( Value <= Something )) then 
 		comparisonError ( Something, DataCompositionComparisonType.LessOrEqual );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function МеньшеИлиРавно ( Something ) export
+function МеньшеИлиРавно ( Something ) export
 	
 	return LessOrEqual ( Something );
 	
-EndFunction
+endfunction
 
-Function Filled () export
+function Filled () export
 	
 	if ( wrongResult ( ValueIsFilled ( Value ) )) then 
 		throwError ( Output.Filled (), "should" );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Заполнено () export
+function Заполнено () export
 	
 	return Filled ();
 	
-EndFunction
+endfunction
 
-Function Empty () export
+function Empty () export
 	
 	if ( wrongResult ( not ValueIsFilled ( Value ) ) ) then 
 		throwError ( Output.Empty (), "should" );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Пусто () export
+function Пусто () export
 	
 	return Empty ();
 	
-EndFunction
+endfunction
 
-Function Exists () export
+function Exists () export
 	
 	needed = ( Value <> undefined ) and ( Value <> null );
 	if ( wrongResult ( needed ) ) then 
@@ -260,51 +260,51 @@ Function Exists () export
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Существует () export
+function Существует () export
 	
 	return Exists ();
 	
-EndFunction
+endfunction
 
-Function IsNull () export
+function IsNull () export
 	
 	if ( wrongResult ( Value = null ) ) then 
 		throwError ( null, "should" );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function ЭтоNull () export
+function ЭтоNull () export
 	
 	return IsNull ();
 	
-EndFunction
+endfunction
 
-Function ЕстьNull () export
+function ЕстьNull () export
 	
 	return IsNull ();
 	
-EndFunction
+endfunction
 
-Function IsUndefined () export
+function IsUndefined () export
 	
 	if ( wrongResult ( Value = undefined )) then 
 		throwError ( undefined, "should" );
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function ЭтоНеопределено () export
+function ЭтоНеопределено () export
 	
 	return IsUndefined ();
 	
-EndFunction
+endfunction
 
-Function Between ( Start, Finish ) export
+function Between ( Start, Finish ) export
 	
 	needed = ( Value >= Start ) and ( Value <= Finish );
 	if ( wrongResult ( needed ) ) then 
@@ -312,15 +312,15 @@ Function Between ( Start, Finish ) export
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Между ( Start, Finish ) export
+function Между ( Start, Finish ) export
 		
 	return Between ( Start, Finish );
 	
-EndFunction
+endfunction
 
-Function Contains ( Something ) export
+function Contains ( Something ) export
 	
 	found = undefined;
 	type = TypeOf ( Value );
@@ -347,15 +347,15 @@ Function Contains ( Something ) export
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function Содержит ( Something ) export
+function Содержит ( Something ) export
 	
 	return Contains ( Something );
 	
-EndFunction
+endfunction
 
-Function Has ( Size ) export
+function Has ( Size ) export
 	
 	type = TypeOf ( Value );
 	if ( type = Type ( "Array" )
@@ -374,16 +374,16 @@ Function Has ( Size ) export
 	endif;
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-Function ИмеетДлину ( Size ) export
+function ИмеетДлину ( Size ) export
 	
 	return Has ( Size );
 	
-EndFunction
+endfunction
 
-Function Вмещает ( Size ) export
+function Вмещает ( Size ) export
 	
 	return Has ( Size );
 	
-EndFunction
+endfunction

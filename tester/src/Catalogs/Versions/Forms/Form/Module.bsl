@@ -1,24 +1,24 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	restoreTemplate ( CurrentObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure restoreTemplate ( Scenario )
+&atserver
+procedure restoreTemplate ( Scenario )
 	
 	TabDoc = Scenario.Template.Get ();
 	entitleTemplate ();
 	markAreas ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure entitleTemplate ()
+&atserver
+procedure entitleTemplate ()
 	
 	caption = Output.TemplateCaption ();
 	if ( 0 < ( TabDoc.TableWidth + TabDoc.TableHeight ) ) then
@@ -26,10 +26,10 @@ Procedure entitleTemplate ()
 	endif; 
 	Items.PageTemplate.Title = caption;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure markAreas ()
+&atserver
+procedure markAreas ()
 	
 	noline = new Line ( SpreadsheetDocumentCellLineType.None );
 	redLine = new Line ( SpreadsheetDocumentCellLineType.LargeDashed, 3 );
@@ -44,17 +44,17 @@ Procedure markAreas ()
 		area.BorderColor = redColor;
 	enddo; 
 			
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	ScenariosPanel.Push ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure NotificationProcessing ( EventName, Parameter, Source )
+&atclient
+procedure NotificationProcessing ( EventName, Parameter, Source )
 	
 	if ( EventName = Enum.MessageActivateError ()
 		or EventName = Enum.MessageDebugger () ) then
@@ -64,25 +64,25 @@ Procedure NotificationProcessing ( EventName, Parameter, Source )
 		endif; 
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateEditor () export
+&atclient
+procedure activateEditor () export
 	
 	CurrentItem = Items.Script;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure activateRow ( Line )
+&atclient
+procedure activateRow ( Line )
 	
 	Items.Script.SetTextSelectionBounds ( Line, 1, Line, StrLen ( StrGetLine ( Object.Script, Line ) ) + 1 );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnClose ( Exit )
+&atclient
+procedure OnClose ( Exit )
 	
 	ScenariosPanel.Pop ( Object.Ref );
 	
-EndProcedure
+endprocedure

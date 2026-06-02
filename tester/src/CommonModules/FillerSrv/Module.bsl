@@ -1,4 +1,4 @@
-Function GetData ( Params ) export
+function GetData ( Params ) export
 	
 	var schema;
 	var composer;
@@ -7,9 +7,9 @@ Function GetData ( Params ) export
 	FillerSrv.ExtractTables ( composer );
 	return putData ( Params.Report, Params.Variant, composer, schema, Params.Batch, Params.ClearTable );
 	
-EndFunction
+endfunction
 
-Procedure loadSchema ( Params, Schema, Composer )
+procedure loadSchema ( Params, Schema, Composer )
 	
 	SetPrivilegedMode ( true );
 	Schema = Reporter.GetSchema ( Params.Report );
@@ -18,9 +18,9 @@ Procedure loadSchema ( Params, Schema, Composer )
 	Composer.Initialize ( new DataCompositionAvailableSettingsSource ( Schema ) );
 	Composer.LoadSettings ( schema.SettingVariants [ Params.Variant ].Settings );
 	
-EndProcedure 
+endprocedure 
 
-Function putData ( Report, Variant, Composer, Schema, Batch, ClearTable )
+function putData ( Report, Variant, Composer, Schema, Batch, ClearTable )
 
 	SetPrivilegedMode ( true );
 	obj = prepareReport ( Report, Variant, Composer, Schema, ClearTable );
@@ -66,9 +66,9 @@ Function putData ( Report, Variant, Composer, Schema, Batch, ClearTable )
 	endif;
 	return p.Result;
 	
-EndFunction
+endfunction
 
-Function prepareReport ( Report, Variant, Composer, Schema, ClearTable )
+function prepareReport ( Report, Variant, Composer, Schema, ClearTable )
  	
 	obj = Reporter.Prepare ( Report );
 	p = obj.Params;
@@ -78,15 +78,15 @@ Function prepareReport ( Report, Variant, Composer, Schema, ClearTable )
 	p.ClearTable = ClearTable;
 	return obj;
 	
-EndFunction 
+endfunction 
 
-Procedure applyChangedComposer ( Params, Composer )
+procedure applyChangedComposer ( Params, Composer )
 	
 	Params.Settings = Composer.GetSettings ();
 	
-EndProcedure
+endprocedure
 
-Function prepareBatch ( Template )
+function prepareBatch ( Template )
 	
 	q = new Query ( Template.DataSets [ 0 ].Query );
 	SQL.DefineTempManager ( q );
@@ -96,9 +96,9 @@ Function prepareBatch ( Template )
 	CoreLibrary.AdjustQuery ( q );
 	return q;
 	
-EndFunction 
+endfunction 
 
-Procedure StartProcess ( val Params, val Caller, ResultAddress ) export
+procedure StartProcess ( val Params, val Caller, ResultAddress ) export
 	
 	var schema;
 	var composer;
@@ -117,17 +117,17 @@ Procedure StartProcess ( val Params, val Caller, ResultAddress ) export
 	args.Add ( Params.ClearTable );
 	Jobs.Run ( "FillerSrv.Perform", args, Caller );
 	
-EndProcedure 
+endprocedure 
 
-Procedure Perform ( Report, Variant, SettingsSource, Schema, ResultAddress, Batch, ClearTable ) export
+procedure Perform ( Report, Variant, SettingsSource, Schema, ResultAddress, Batch, ClearTable ) export
 	
 	composer = getComposer ( SettingsSource, Schema );
 	result = putData ( Report, Variant, composer, Schema, Batch, ClearTable );
 	PutToTempStorage ( result, ResultAddress );
 	
-EndProcedure
+endprocedure
 
-Function getComposer ( SettingsSource, Schema )
+function getComposer ( SettingsSource, Schema )
 	
 	if ( TypeOf ( SettingsSource ) = Type ( "DataCompositionSettingsComposer" ) ) then
 		return SettingsSource;
@@ -138,9 +138,9 @@ Function getComposer ( SettingsSource, Schema )
 		return composer;
 	endif;
 	
-EndFunction 
+endfunction 
 
-Procedure ExtractTables ( SettingsSource ) export
+procedure ExtractTables ( SettingsSource ) export
 	
 	composer = ( TypeOf ( SettingsSource ) = Type ( "DataCompositionSettingsComposer" ) );
 	settings = ? ( composer, SettingsSource.Settings, SettingsSource );
@@ -151,4 +151,4 @@ Procedure ExtractTables ( SettingsSource ) export
 		endif;
 	enddo;
 
-EndProcedure
+endprocedure

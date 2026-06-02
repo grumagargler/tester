@@ -1,37 +1,37 @@
 
-Procedure BeforeWrite ( Cancel )
+procedure BeforeWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
 	endif;
 	trimAllAttributes ();
 	
-EndProcedure
+endprocedure
 
-Procedure OnWrite ( Cancel )
+procedure OnWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure BeforeDelete ( Cancel )
+procedure BeforeDelete ( Cancel )
 	
 	UseAutomatic = false;	
 	
-EndProcedure
+endprocedure
 
-Procedure trimAllAttributes ()
+procedure trimAllAttributes ()
 	
 	attributes = getAttributes ();
 	for each attribute in attributes do
 		ThisObject [ attribute ] = TrimAll ( ThisObject [ attribute ] );
 	enddo; 
 		
-EndProcedure
+endprocedure
 
-Function getAttributes ()
+function getAttributes ()
 	
 	a = new Array ();
 	a.Add ( "Code" );
@@ -55,4 +55,4 @@ Function getAttributes ()
 	a.Add ( "WebService" );
 	return a; 
 	
-EndFunction 
+endfunction 

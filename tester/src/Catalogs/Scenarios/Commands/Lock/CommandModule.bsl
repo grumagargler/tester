@@ -1,15 +1,15 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenarios, CommandExecuteParameters )
 	
 	callback = new NotifyDescription ( "Locked", ThisObject );
 	p = new Structure ( "Scenarios", Scenarios );
 	OpenForm ( "Catalog.Scenarios.Form.Lock", p, CommandExecuteParameters.Source, CommandExecuteParameters.Uniqueness, CommandExecuteParameters.Window, CommandExecuteParameters.URL, callback );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Locked ( Errors, Params ) export
+&atclient
+procedure Locked ( Errors, Params ) export
 	
 	if ( Errors = undefined ) then
 		return;
@@ -18,4 +18,4 @@ Procedure Locked ( Errors, Params ) export
 		Output.LockError ( error );
 	enddo; 
 	
-EndProcedure 
+endprocedure 

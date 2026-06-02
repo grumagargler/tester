@@ -1,20 +1,20 @@
 	
-Procedure Unload ( Params ) export
+procedure Unload ( Params ) export
 	
 	dp = getProcessor ();
 	dp.Unload ( Params );
 	
-EndProcedure
+endprocedure
 
-Procedure Load ( Params ) export
+procedure Load ( Params ) export
 	
 	dp = getProcessor ();
 	dp.Load ( Params );
 	
-EndProcedure
+endprocedure
 
-Function getProcessor ()
+function getProcessor ()
 	
 	return DataProcessors.ExchangeData.Create ();
 	
-EndFunction
+endfunction

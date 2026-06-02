@@ -1,15 +1,15 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		fillNew ();
@@ -17,10 +17,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -28,10 +28,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillNew ()
+&atserver
+procedure fillNew ()
 	
 	SetCurrent = true;
 	Object.Date = CurrentSessionDate ();
@@ -44,10 +44,10 @@ Procedure fillNew ()
 	endif; 
 	setDescription ( Object );
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function nextVersion ()
+&atserver
+function nextVersion ()
 	
 	s = "
 	|select top 1 allowed Versions.Major, Versions.Minor as Minor,
@@ -64,42 +64,42 @@ Function nextVersion ()
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ] );
 	
-EndFunction 
+endfunction 
 
-&AtClientAtServerNoContext
-Procedure setDescription ( Object )
+&atclientatservernocontext
+procedure setDescription ( Object )
 	
 	Object.Description = Format ( Object.Major, "NG=0;NZ=0" )
 	+ "." + Format ( Object.Minor, "NG=0;NZ=0" )
 	+ "." + Format ( Object.Version, "NG=0;NZ=0" )
 	+ "." + Format ( Object.Build, "NG=0;NZ=0" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
+&atserver
+procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
 	
 	if ( SetCurrent ) then
 		setByDefault ();
 		Appearance.Apply ( ThisObject, "Object.Ref" );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setByDefault ()
+&atserver
+procedure setByDefault ()
 	
 	EnvironmentSrv.SetVersion ( Object.Ref, false );
 	SetCurrent = false;
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure VersionOnChange ( Item )
+&atclient
+procedure VersionOnChange ( Item )
 	
 	setDescription ( Object );
 	
-EndProcedure
+endprocedure

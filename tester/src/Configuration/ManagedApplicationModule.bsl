@@ -92,7 +92,7 @@ var RepositoryFilesSynchingCallback export;
 var LastActiveWindowControls export;
 var CachedControlTooltips export;
 
-Procedure BeforeStart ( Cancel )
+procedure BeforeStart ( Cancel )
 	
 	if ( UserName () = "" ) then
 		Logins.Init ();
@@ -103,9 +103,9 @@ Procedure BeforeStart ( Cancel )
 	endif; 
 	initSession ();
 	
-EndProcedure
+endprocedure
 
-Procedure defineTestManager ()
+procedure defineTestManager ()
 	
 	#if ( WebClient or MobileClient ) then
 		TestManager = false;
@@ -117,9 +117,9 @@ Procedure defineTestManager ()
 		endtry;
 	#endif
 	
-EndProcedure 
+endprocedure 
 
-Procedure OnStart ()
+procedure OnStart ()
 	
 	if ( not Starting.Allowed () ) then
 		return;
@@ -135,15 +135,15 @@ Procedure OnStart ()
 	startAgent ();
 	applyParameters ();
 	
-EndProcedure
+endprocedure
 
-Function defingeExchange ()
+function defingeExchange ()
 
 	return ( StrFind ( LaunchParameter, "READ_EXCHANGE_DATA" ) > 0 );
 	
-EndFunction
+endfunction
 
-Procedure init ()
+procedure init ()
 
 	si = new SystemInfo ();
 	FrameworkVersion = si.AppVersion;
@@ -169,9 +169,9 @@ Procedure init ()
 	MCPServer.Init ();
 	ScenariosPanel.Init ();
 
-EndProcedure
+endprocedure
 
-Procedure initSession ()
+procedure initSession ()
 	
 	#if ( WebClient ) then
 		computer = "WebClient";
@@ -202,16 +202,16 @@ Procedure initSession ()
 	set = new Structure ( "Connection", data.Connection );
 	SetInterfaceFunctionalOptionParameters ( set );
 	
-EndProcedure 
+endprocedure 
 
-Procedure initFeatures ()
+procedure initFeatures ()
 	
 	PlatformFeatures = new Structure ();
 	PlatformFeatures.Insert ( "HasTimeout", not Framework.VersionLess ( "8.3.12" ) );
 	
-EndProcedure
+endprocedure
 
-Procedure initSpecialFields ()
+procedure initSpecialFields ()
 	
 	SpecialFields = new Structure ();
 	if ( CurrentLanguage () = "en" ) then
@@ -222,9 +222,9 @@ Procedure initSpecialFields ()
 	SpecialFields.Insert ( "LineNo", column );
 	СпециальныеПоля = SpecialFields;
 	
-EndProcedure 
+endprocedure 
 
-Procedure initExtender ()
+procedure initExtender ()
 	
 	#if ( not WebClient and not MobileClient ) then
 		info = new SystemInfo ();
@@ -238,9 +238,9 @@ Procedure initExtender ()
 		ExternalMeta = new ( "AddIn.Extender.Metadata" );
 	#endif
 
-EndProcedure 
+endprocedure 
 
-Procedure openScenario ()
+procedure openScenario ()
 	
 	if ( SessionScenario.IsEmpty ()
 		and not Logins.CanEditScenarios () ) then
@@ -249,23 +249,23 @@ Procedure openScenario ()
 		OpenForm ( "Catalog.Scenarios.ObjectForm", new Structure ( "Key", SessionScenario ) );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure startAgent ()
+procedure startAgent ()
 	
 	IAmAgent = EnvironmentSrv.StartAgent ();
 	ЯАгент = IAmAgent;
 	AgentRunner.Listen ();
 	
-EndProcedure
+endprocedure
 
-Procedure agentListener () export
+procedure agentListener () export
 
 	AgentRunner.Serve ();	
 	
-EndProcedure
+endprocedure
 
-Procedure applyParameters ()
+procedure applyParameters ()
 	
 	LaunchParameters = new Map ();
 	ПараметрыЗапуска = LaunchParameters;
@@ -276,9 +276,9 @@ Procedure applyParameters ()
 	ПараметрыЗапуска = LaunchParameters;
 	AttachIdleHandler ( "delayedScenarioRun", 0.5, true );
 	
-EndProcedure 
+endprocedure 
 
-Procedure delayedScenarioRun () export
+procedure delayedScenarioRun () export
 	
 	scenario = LaunchParameters [ "Scenario" ];
 	application = LaunchParameters [ "Application" ];
@@ -302,9 +302,9 @@ Procedure delayedScenarioRun () export
 		Test.Exec ( scenario, application );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure ExternEventProcessing ( Source, Event, Data )
+procedure ExternEventProcessing ( Source, Event, Data )
 	
 	if ( Source = "Watcher"
 		and Event <> "###E###" ) then
@@ -321,9 +321,9 @@ Procedure ExternEventProcessing ( Source, Event, Data )
 		MCPServer.Proceed ( Data );
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure WatcherStartSyncing () export
+procedure WatcherStartSyncing () export
 	
 	total = TesterWatcherBuffer.UBound ();
 	index = 0;
@@ -338,9 +338,9 @@ Procedure WatcherStartSyncing () export
 	TesterWatcherBuffer.Clear ();
 	AgentRunner.Listen ();
 	
-EndProcedure
+endprocedure
 
-Procedure TesterRunsMainScenario () export
+procedure TesterRunsMainScenario () export
 	
 	TesterServerMode = true;
 	try
@@ -350,9 +350,9 @@ Procedure TesterRunsMainScenario () export
 	Watcher.SendResponse ();
 	TesterServerMode = false;
 	
-EndProcedure
+endprocedure
 
-Procedure TesterRunsSelectedScript () export
+procedure TesterRunsSelectedScript () export
 
 	TesterServerMode = true;
 	data = TesterExternalRequestObject.Data;
@@ -363,9 +363,9 @@ Procedure TesterRunsSelectedScript () export
 	Watcher.SendResponse ();
 	TesterServerMode = false;
 
-EndProcedure
+endprocedure
 
-Procedure TesterWatcherBroadcasting () export
+procedure TesterWatcherBroadcasting () export
 	
 	if ( TypeOf ( TesterExternalBroadcasting ) = Type ( "Array" ) ) then
 		list = TesterExternalBroadcasting;
@@ -376,21 +376,21 @@ Procedure TesterWatcherBroadcasting () export
 	Notify ( Enum.MessageReload (), list );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 	
-EndProcedure
+endprocedure
 
-Procedure BeforeExit ( Cancel, MessageText )
+procedure BeforeExit ( Cancel, MessageText )
 	
 	if ( IAmAgent ) then
 		//@skip-warning
 		enforceServerCall = String ( PredefinedValue ( "Catalog.OnExit.DisconnectAgent" ) );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure stopListener ()
+procedure stopListener ()
 	
 	if ( IAmAgent ) then
 		DetachIdleHandler ( "agentListener" );
 	endif;
 	
-EndProcedure
+endprocedure

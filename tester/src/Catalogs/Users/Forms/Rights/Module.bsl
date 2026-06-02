@@ -1,106 +1,106 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	RightsRelations = RightsTree.GetRelations ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	table = GetFromTempStorage ( Parameters.UserRights );
 	ValueToFormData ( table, Rights );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Commit ( Command )
+&atclient
+procedure Commit ( Command )
 	
 	Notify ( Enum.MessageUserRightsChanged (), rightsStorage () );
 	Close ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function rightsStorage ()
+&atserver
+function rightsStorage ()
 	
 	return PutToTempStorage ( FormDataToValue ( Rights, Type ( "ValueTree" ) ), UUID );
 
-EndFunction
+endfunction
 
 // *****************************************
 // *********** Table Rights
 
-&AtClient
-Procedure MarkAllRights ( Command )
+&atclient
+procedure MarkAllRights ( Command )
 	
 	RightsTree.MarkAll ( Rights );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnmarkAllRights ( Command )
+&atclient
+procedure UnmarkAllRights ( Command )
 	
 	RightsTree.UnmarkAll ( Rights );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure RightsBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure RightsBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsUseOnChange ( Item )
+&atclient
+procedure RightsUseOnChange ( Item )
 	
 	if ( RightsTree.UseChanged ( ThisObject ) ) then
 		showChanges ();	
 		RightsTree.Expand ( ThisObject );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure showChanges ()
+&atserver
+procedure showChanges ()
 	
 	RightsTree.FillChanges ( ThisObject );
 	RightsTree.ShowConfirmation ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ConfirmRights ( Command )
+&atclient
+procedure ConfirmRights ( Command )
 	
 	RightsTree.HideConfirmation ( ThisObject );	
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RevertRights ( Command )	
+&atclient
+procedure RevertRights ( Command )	
 	
 	RightsTree.RevertRights ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Help ( Command )
+&atclient
+procedure Help ( Command )
 	
 	Output.RightsConfirmation ();
 	
-EndProcedure
+endprocedure

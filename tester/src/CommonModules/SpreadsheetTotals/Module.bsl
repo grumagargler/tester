@@ -1,4 +1,4 @@
-Procedure Init ( Env ) export
+procedure Init ( Env ) export
 	
 	Env = new Structure ();
 	Env.Insert ( "Spreadsheet" );
@@ -8,9 +8,9 @@ Procedure Init ( Env ) export
 	Env.Insert ( "Areas" );
 	Env.Insert ( "Result" );
 	
-EndProcedure
+endprocedure
 
-Procedure Update ( Env ) export
+procedure Update ( Env ) export
 	
 	setAreas ( Env );
 	setInfo ( Env );
@@ -25,9 +25,9 @@ Procedure Update ( Env ) export
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure setAreas ( Env )
+procedure setAreas ( Env )
 	
 	areas = new Array ();
 	rangeType = Type ( "SpreadsheetDocumentRange" );
@@ -50,9 +50,9 @@ Procedure setAreas ( Env )
 	enddo;
 	Env.Areas = areas;
 	
-EndProcedure 
+endprocedure 
 
-Procedure setInfo ( Env )
+procedure setInfo ( Env )
 	
 	minRow = 0;
 	maxRow = 0;
@@ -69,15 +69,15 @@ Procedure setInfo ( Env )
 	Env.ManyRows = ( maxRow - minRow ) > 60;
 	Env.HugeSquare = square > 3000;
 
-EndProcedure 
+endprocedure 
 
-Procedure setWarning ( Env )
+procedure setWarning ( Env )
 	
 	Env.Result = Output.CalculationAreaTooBig ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure Calculate ( Env ) export
+procedure Calculate ( Env ) export
 	
 	sum = 0;
 	count = 0;
@@ -103,9 +103,9 @@ Procedure Calculate ( Env ) export
 		endif; 
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Function calcArea ( Spreadsheet, Area, Taken )
+function calcArea ( Spreadsheet, Area, Taken )
 	
 	sum = 0;
 	count = 0;
@@ -143,4 +143,4 @@ Function calcArea ( Spreadsheet, Area, Taken )
 	enddo; 
 	return new Structure ( "Count, Sum, Quantity", count, sum, quantity );
 
-EndFunction 
+endfunction 

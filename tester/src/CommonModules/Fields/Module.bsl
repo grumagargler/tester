@@ -1,28 +1,28 @@
-Function Focus(Name, Source = undefined, Type = undefined) export
-	
+function Focus ( Name, Source = undefined, Type = undefined ) export
+
 	place = Source;
-	parts = StrSplit(encode(Name), "/");
-	tableType = Type("TestedFormTable");
-	rowWasLocated = (tableType = TypeOf(Source));
+	parts = StrSplit ( encode ( Name ), "/" );
+	tableType = Type ( "TestedFormTable" );
+	rowWasLocated = ( tableType = TypeOf ( Source ) );
 	for each part in parts do
-		part = decode(part);
-		data = findField(TrimAll(part), place, Type);
+		part = decode ( part );
+		data = findField ( TrimAll ( part ), place, Type );
 		field = data.Field;
 		area = data.Area;
-		placeIsTable = TypeOf(place) = tableType;
+		placeIsTable = TypeOf ( place ) = tableType;
 		rowWasLocated = rowWasLocated or placeIsTable;
-		if (placeIsTable
-				and place.GetSelectedRows().Count() = 0) then
-			place.GotoFirstRow(false);
+		if ( placeIsTable
+			and place.GetSelectedRows ().Count () = 0 ) then
+			place.GotoFirstRow ( false );
 		endif;
-		if (TypeOf(data.Field) = Type("TestedFormField")) then
+		if ( TypeOf ( data.Field ) = Type ( "TestedFormField" ) ) then
 			fieldType = field.Type;
 			if ( fieldType = FormFieldType.InputField ) then
 				dropListOpened = field.DropListIsOpen ();
 			endif;
 		endif;
 		if ( currentItem ( data.Parent ) <> field ) then
-			field.Activate();
+			field.Activate ();
 		endif;
 		if ( dropListOpened <> undefined
 			and not dropListOpened ) then
@@ -34,21 +34,21 @@ Function Focus(Name, Source = undefined, Type = undefined) export
 			except
 			endtry;
 		endif;
-		if (area <> undefined) then
-			if (fieldType = FormFieldType.SpreadsheetDocumentField) then
-				field.SetCurrentArea(area);
-			elsif (not rowWasLocated
-					and fieldType <> FormFieldType.LabelField) then
-				locateRow(? ( place = undefined, tableOfColumn ( field ), place ), area);
+		if ( area <> undefined ) then
+			if ( fieldType = FormFieldType.SpreadsheetDocumentField ) then
+				field.SetCurrentArea ( area );
+			elsif ( not rowWasLocated
+				and fieldType <> FormFieldType.LabelField ) then
+				locateRow ( ? ( place = undefined, tableOfColumn ( field ), place ), area );
 			endif;
 		endif;
 		place = field;
 	enddo;
 	return data;
-	
-EndFunction
 
-Function tableOfColumn ( Control )
+endfunction
+
+function tableOfColumn ( Control )
 
 	type = TypeOf ( Control );
 	if ( type = Type ( "TestedFormField" )
@@ -62,9 +62,9 @@ Function tableOfColumn ( Control )
 	endif;
 	return undefined;
 
-EndFunction
+endfunction
 
-Function currentItem ( val Control )
+function currentItem ( val Control )
 
 	while ( true ) do
 		type = TypeOf ( Control );
@@ -89,33 +89,33 @@ Function currentItem ( val Control )
 	enddo;
 	return undefined;
 
-EndFunction
+endfunction
 
-Function encode(Name)
-	
-	return StrReplace(Name, "\/", "27E9292F");
-	
-EndFunction
+function encode ( Name )
 
-Function decode(Name)
-	
-	return StrReplace(Name, "27E9292F", "/");
-	
-EndFunction
+	return StrReplace ( Name, "\/", "27E9292F" );
 
-Function findField(Name, Source = undefined, Type = undefined)
-	
-	result = new Structure("Name, Field, Area, Parent", Name);
-	window = ?(Source = undefined, CurrentSource, Source);
+endfunction
+
+function decode ( Name )
+
+	return StrReplace ( Name, "27E9292F", "/" );
+
+endfunction
+
+function findField ( Name, Source = undefined, Type = undefined )
+
+	result = new Structure ( "Name, Field, Area, Parent", Name );
+	window = ? ( Source = undefined, CurrentSource, Source );
 	if ( window = undefined ) then
 		window = With ();
 	endif;
-	table = TypeOf(window) = Type("TestedFormTable");
-	fieldType = getFieldType(Type);
-	cell = cellInfo(Name);
-	if (isID(Name)) then
-		if (cell = undefined) then
-			field = window.GetObject(fieldType, , Mid(Name, 2));
+	table = TypeOf ( window ) = Type ( "TestedFormTable" );
+	fieldType = getFieldType ( Type );
+	cell = cellInfo ( Name );
+	if ( isID ( Name ) ) then
+		if ( cell = undefined ) then
+			field = window.GetObject ( fieldType, , Mid ( Name, 2 ) );
 			if ( not table ) then
 				implicitTable = tableOfColumn ( field );
 				if ( implicitTable <> undefined ) then
@@ -124,10 +124,10 @@ Function findField(Name, Source = undefined, Type = undefined)
 			endif;
 			result.Field = field;
 		else
-			if (table) then
-				locateRow(window, cell.Area);
+			if ( table ) then
+				locateRow ( window, cell.Area );
 			endif;
-			field = window.GetObject(fieldType, , Mid(cell.Field, 2));
+			field = window.GetObject ( fieldType, , Mid ( cell.Field, 2 ) );
 			if ( not table ) then
 				implicitTable = tableOfColumn ( field );
 				if ( implicitTable <> undefined ) then
@@ -138,161 +138,161 @@ Function findField(Name, Source = undefined, Type = undefined)
 			result.Area = cell.Area;
 		endif;
 	else
-		if (cell = undefined) then
-			objects = window.FindObjects(fieldType, Name);
+		if ( cell = undefined ) then
+			objects = window.FindObjects ( fieldType, Name );
 		else
-			if (table) then
-				locateRow(window, cell.Area);
+			if ( table ) then
+				locateRow ( window, cell.Area );
 			endif;
-			objects = window.FindObjects(fieldType, cell.Field);
+			objects = window.FindObjects ( fieldType, cell.Field );
 			result.Area = cell.Area;
 		endif;
-		count = objects.Count();
-		if (count = 0) then
+		count = objects.Count ();
+		if ( count = 0 ) then
 			try
-				result = findField("!"+Name, Source, Type);
+				result = findField ( "!" + Name, Source, Type );
 				return result;
 			except
 			endtry;
-			s = Name + ?(Type = undefined, "", " (" + Type + ")");
-			raise Output.FieldNotFound(new Structure("Field", s));
+			s = Name + ? ( Type = undefined, "", " (" + Type + ")" );
+			raise Output.FieldNotFound ( new Structure ( "Field", s ) );
 		else
-			if (count > 1) then
-				showObjects(Name, objects);
+			if ( count > 1 ) then
+				showObjects ( Name, objects );
 			endif;
-			result.Field = objects[0];
+			result.Field = objects [ 0 ];
 		endif;
 	endif;
 	result.Parent = window;
 	return result;
-	
-EndFunction
 
-Function isID ( Name )
+endfunction
 
-	return (StrStartsWith(Name, "#")
-			or StrStartsWith(Name, "!"))
-			and StrLen(Name) <> 1;
+function isID ( Name )
 
-EndFunction
+	return ( StrStartsWith ( Name, "#" )
+		or StrStartsWith ( Name, "!" ) )
+		and StrLen ( Name ) <> 1;
 
-Function cellInfo(Name)
-	
+endfunction
+
+function cellInfo ( Name )
+
 	result = undefined;
-	i = StrFind(Name, "[");
-	if (i > 0) then
-		j = StrFind(Name, "]", , i);
-		if (j > 0) then
-			result = new Structure();
-			result.Insert("Field", TrimR(Left(Name, i - 1)));
-			result.Insert("Area", TrimAll(Mid(Name, i + 1, j - i - 1)));
+	i = StrFind ( Name, "[" );
+	if ( i > 0 ) then
+		j = StrFind ( Name, "]", , i );
+		if ( j > 0 ) then
+			result = new Structure ();
+			result.Insert ( "Field", TrimR ( Left ( Name, i - 1 ) ) );
+			result.Insert ( "Area", TrimAll ( Mid ( Name, i + 1, j - i - 1 ) ) );
 		endif;
 	endif;
 	return result;
-	
-EndFunction
 
-Procedure locateRow(Table, Row)
-	
-	#if ( ThinClient or ThickClientManagedApplication ) then
+endfunction
+
+procedure locateRow ( Table, Row )
+
+#if ( ThinClient or ThickClientManagedApplication ) then
 	editing = Table.CurrentModeIsEdit ();
 	if ( editing ) then
-		Table.EndEditRow();
+		Table.EndEditRow ();
 	else
-		Table.Activate();
+		Table.Activate ();
 	endif;
 	try
 		// This navigation is "just in case".
 		// We do not care if first row is aready activated
-		Table.GotoFirstRow(false);
+		Table.GotoFirstRow ( false );
 	except
 	endtry;
 	column = SpecialFields.LineNo;
-	field = Table.FindObject( , column);
-	if (field = undefined
-			or not field.CurrentVisible()) then
-		for i = 1 to Number(Row) - 1 do
-			Table.GotoNextRow(false);
+	field = Table.FindObject ( , column );
+	if ( field = undefined
+		or not field.CurrentVisible () ) then
+		for i = 1 to Number ( Row ) - 1 do
+			Table.GotoNextRow ( false );
 		enddo;
 	else
-		search = new Map();
-		search.Insert(column, Row);
-		Table.GotoRow(search, RowGotoDirection.Down);
+		search = new Map ();
+		search.Insert ( column, Row );
+		Table.GotoRow ( search, RowGotoDirection.Down );
 	endif;
 	if ( editing ) then
 		Table.ChangeRow ();
 	endif;
-	#endif
-	
-EndProcedure
+#endif
 
-Function Retrieve(Name, Source = undefined, Type = undefined) export
-	
+endprocedure
+
+function Retrieve ( Name, Source = undefined, Type = undefined ) export
+
 	place = Source;
-	parts = StrSplit(encode(Name), "/");
+	parts = StrSplit ( encode ( Name ), "/" );
 	for each part in parts do
-		part = decode(part);
-		data = findField(TrimAll(part), place, Type);
+		part = decode ( part );
+		data = findField ( TrimAll ( part ), place, Type );
 		place = data.Field;
 	enddo;
 	return data;
-	
-EndFunction
 
-Procedure showObjects(Field, Objects)
-	
-	types = new Array();
-	types.Add(Type("TestedFormDecoration"));
-	types.Add(Type("TestedFormField"));
-	types.Add(Type("TestedFormGroup"));
-	types.Add(Type("TestedFormButton"));
-	types.Add(Type("TestedFormItemAddition"));
-	places = new Array();
+endfunction
+
+procedure showObjects ( Field, Objects )
+
+	types = new Array ();
+	types.Add ( Type ( "TestedFormDecoration" ) );
+	types.Add ( Type ( "TestedFormField" ) );
+	types.Add ( Type ( "TestedFormGroup" ) );
+	types.Add ( Type ( "TestedFormButton" ) );
+	types.Add ( Type ( "TestedFormItemAddition" ) );
+	places = new Array ();
 	for each obj in Objects do
-		objType = TypeOf(obj);
+		objType = TypeOf ( obj );
 		info = "" + objType;
-		if (types.Find(objType) <> undefined) then
+		if ( types.Find ( objType ) <> undefined ) then
 			info = info + " / " + obj.Type;
 		endif;
-		places.Add(Output.NameAndType(new Structure("Name, Type", obj.Name, info)));
+		places.Add ( Output.NameAndType ( new Structure ( "Name, Type", obj.Name, info ) ) );
 	enddo;
-	s = StrConcat(places, ", ");
+	s = StrConcat ( places, ", " );
 	s = s + ". " + Output.AvoidAmbiguity ();
-	p = new Structure();
-	p.Insert("Field", Field);
-	p.Insert("Places", s);
-	warning = Output.ManyPlaces(p);
-	Runtime.ShowWarning(warning);
-	
-EndProcedure
+	p = new Structure ();
+	p.Insert ( "Field", Field );
+	p.Insert ( "Places", s );
+	warning = Output.ManyPlaces ( p );
+	Runtime.ShowWarning ( warning );
 
-Function getFieldType(Type)
-	
-	if (Type = undefined) then
+endprocedure
+
+function getFieldType ( Type )
+
+	if ( Type = undefined ) then
 		return undefined;
-	elsif (Type = "Field"
-			or Type = "Поле") then
-		return Type("TestedFormField");
-	elsif (Type = "Group"
-			or Type = "Группа") then
-		return Type("TestedFormGroup");
-	elsif (Type = "Button"
-			or Type = "Кнопка") then
-		return Type("TestedFormButton");
-	elsif (Type = "Table"
-			or Type = "Таблица") then
-		return Type("TestedFormTable");
-	elsif (Type = "Decoration"
-			or Type = "Декорация") then
-		return Type("TestedFormDecoration");
+	elsif ( Type = "Field"
+		or Type = "Поле" ) then
+		return Type ( "TestedFormField" );
+	elsif ( Type = "Group"
+		or Type = "Группа" ) then
+		return Type ( "TestedFormGroup" );
+	elsif ( Type = "Button"
+		or Type = "Кнопка" ) then
+		return Type ( "TestedFormButton" );
+	elsif ( Type = "Table"
+		or Type = "Таблица" ) then
+		return Type ( "TestedFormTable" );
+	elsif ( Type = "Decoration"
+		or Type = "Декорация" ) then
+		return Type ( "TestedFormDecoration" );
 	endif;
-	
-EndFunction
 
-Function FetchValue(Field, Source = undefined, Type = undefined) export
-	
-	if (TypeOf(Field) = Type("String")) then
-		data = Fields.Retrieve(Field, Source, Type);
+endfunction
+
+function FetchValue ( Field, Source = undefined, Type = undefined ) export
+
+	if ( TypeOf ( Field ) = Type ( "String" ) ) then
+		data = Fields.Retrieve ( Field, Source, Type );
 		element = data.Field;
 		area = data.Area;
 		parent = data.Parent;
@@ -301,35 +301,35 @@ Function FetchValue(Field, Source = undefined, Type = undefined) export
 		area = undefined;
 		parent = undefined;
 	endif;
-	tableType = Type("TestedFormTable");
-	if (TypeOf(Source) = tableType) then
-		element.Activate();
-		if (area <> undefined) then
-			locateRow(Source, area);
+	tableType = Type ( "TestedFormTable" );
+	if ( TypeOf ( Source ) = tableType ) then
+		element.Activate ();
+		if ( area <> undefined ) then
+			locateRow ( Source, area );
 		endif;
-		return RemoveSeachingTags(Source.GetCellText());
+		return RemoveSeachingTags ( Source.GetCellText () );
 	else
 		elementType = element.Type;
-		if (elementType = FormFieldType.SpreadsheetDocumentField) then
-			return element.GetAreaText(?(area = undefined, element.GetCurrentAreaAddress(), area));
+		if ( elementType = FormFieldType.SpreadsheetDocumentField ) then
+			return element.GetAreaText ( ? ( area = undefined, element.GetCurrentAreaAddress (), area ) );
 		else
-			if (TypeOf(parent) = tableType) then
-				return RemoveSeachingTags(parent.GetCellText(element.Name));
+			if ( TypeOf ( parent ) = tableType ) then
+				return RemoveSeachingTags ( parent.GetCellText ( element.Name ) );
 			else
 				return getDisplayedText ( element, undefined );
 			endif;
 		endif;
 	endif;
-	
-EndFunction
 
-Function RemoveSeachingTags ( Text ) export
+endfunction
+
+function RemoveSeachingTags ( Text ) export
 
 	return Regexp.Replace ( Text, "<[^>]*>", "" );
 
-EndFunction
+endfunction
 
-Function getDisplayedText ( Control, ClientField )
+function getDisplayedText ( Control, ClientField )
 
 	type = Control.Type;
 	if ( type = FormFieldType.InputField
@@ -350,283 +350,283 @@ Function getDisplayedText ( Control, ClientField )
 	endif;
 	return data;
 
-EndFunction
+endfunction
 
-Procedure CheckValue(Field, Value, Source = undefined, Type = undefined) export
-	
-	if (TypeOf(Source) = Type("TestedFormTable")) then
+procedure CheckValue ( Field, Value, Source = undefined, Type = undefined ) export
+
+	if ( TypeOf ( Source ) = Type ( "TestedFormTable" ) ) then
 		// Bug workaroud for 8.3.7.1901: The method EndEditRow should be executed,
 		// otherwise, system will be adding rows into the Table infinitely
 		try
-			Source.EndEditRow();
+			Source.EndEditRow ();
 		except
 		endtry;
 	endif;
-	result = Fields.FetchValue(Field, Source, Type);
-	if (TableProcessor.ValuesEqual(result, Value)) then
+	result = Fields.FetchValue ( Field, Source, Type );
+	if ( TableProcessor.ValuesEqual ( result, Value ) ) then
 		return;
 	endif;
-	p = new Structure();
-	if (TypeOf(CurrentSource) = Type("TestedForm")) then
+	p = new Structure ();
+	if ( TypeOf ( CurrentSource ) = Type ( "TestedForm" ) ) then
 		form = CurrentSource.FormName;
 		title = CurrentSource.TitleText;
 	else
 		form = "<...>";
 		title = "<...>";
 	endif;
-	p.Insert("Form", form);
-	p.Insert("Title", title);
-	name = ?(TypeOf(Field) = Type("String"), Field, Field.TitleText);
-	p.Insert("Field", name);
-	p.Insert("Value", Value);
-	p.Insert("Result", result);
-	Runtime.ThrowError(Output.CheckError(p), Debug);
-	
-EndProcedure
+	p.Insert ( "Form", form );
+	p.Insert ( "Title", title );
+	name = ? ( TypeOf ( Field ) = Type ( "String" ), Field, Field.TitleText );
+	p.Insert ( "Field", name );
+	p.Insert ( "Value", Value );
+	p.Insert ( "Result", result );
+	Runtime.ThrowError ( Output.CheckError ( p ), Debug );
 
-Procedure CheckTableContent ( Table, Params, Options, Source ) export
-	
+endprocedure
+
+procedure CheckTableContent ( Table, Params, Options, Source ) export
+
 	TableProcessor.CompareFieldAndTable ( Table, Params, Options, Source );
-	
-EndProcedure
 
-Procedure CheckAppearance(Name, Value, Flag = true, Source = undefined, Type = undefined) export
-	
-	field = Fields.Retrieve(Name, Source, Type).Field;
-	if (Value = "Visible"
-			or Value = "Видимость") then
-		state = field.CurrentVisible();
-	elsif (Value = "Enable"
-			or Value = "Доступность") then
-		state = field.CurrentEnable();
-	elsif (Value = "ReadOnly"
-			or Value = "ТолькоЧтение") then
-		state = field.CurrentReadOnly();
+endprocedure
+
+procedure CheckAppearance ( Name, Value, Flag = true, Source = undefined, Type = undefined ) export
+
+	field = Fields.Retrieve ( Name, Source, Type ).Field;
+	if ( Value = "Visible"
+		or Value = "Видимость" ) then
+		state = field.CurrentVisible ();
+	elsif ( Value = "Enable"
+		or Value = "Доступность" ) then
+		state = field.CurrentEnable ();
+	elsif ( Value = "ReadOnly"
+		or Value = "ТолькоЧтение" ) then
+		state = field.CurrentReadOnly ();
 	else
-		p = new Structure();
-		p.Insert("Value", Value);
-		Runtime.ThrowError(Output.CheckAppearanceIncorrect(p), Debug);
+		p = new Structure ();
+		p.Insert ( "Value", Value );
+		Runtime.ThrowError ( Output.CheckAppearanceIncorrect ( p ), Debug );
 		return;
 	endif;
-	if (state = Flag) then
+	if ( state = Flag ) then
 		return;
 	endif;
-	p = new Structure();
-	p.Insert("Field", Name);
-	p.Insert("Value", Value);
-	p.Insert("Flag", Flag);
-	p.Insert("State", state);
-	Runtime.ThrowError(Output.CheckAppearanceError(p), Debug);
-	
-EndProcedure
+	p = new Structure ();
+	p.Insert ( "Field", Name );
+	p.Insert ( "Value", Value );
+	p.Insert ( "Flag", Flag );
+	p.Insert ( "State", state );
+	Runtime.ThrowError ( Output.CheckAppearanceError ( p ), Debug );
 
-Procedure CheckSpreadsheet(Name, Source = undefined, Type = undefined, Template = undefined) export
-	
-	if (Template = undefined) then
-		stack = Debug.Stack[Debug.Level];
-		spreadsheet = RuntimeSrv.GetSpreadsheet(stack.Module, stack.IsVersion);
-		if (spreadsheet = undefined) then
-			raise Output.TemplateEmpty();
+endprocedure
+
+procedure CheckSpreadsheet ( Name, Source = undefined, Type = undefined, Template = undefined ) export
+
+	if ( Template = undefined ) then
+		stack = Debug.Stack [ Debug.Level ];
+		spreadsheet = RuntimeSrv.GetSpreadsheet ( stack.Module, stack.IsVersion );
+		if ( spreadsheet = undefined ) then
+			raise Output.TemplateEmpty ();
 		endif;
 	else
 		spreadsheet = Template;
 	endif;
-	result = Fields.Retrieve(Name, Source, Type).Field;
-	areas = Collections.DeserializeTable(spreadsheet.Areas);
+	result = Fields.Retrieve ( Name, Source, Type ).Field;
+	areas = Collections.DeserializeTable ( spreadsheet.Areas );
 	tabDoc = spreadsheet.Template;
 	for each range in areas do
 		for j = range.Up to range.Bottom do
 			for i = range.Left to range.Right do
-				area = getArea(j, i);
-				original = tabDoc.Area(area).Text;
-				actual = result.GetAreaText(area);
-				if (not equal(original, actual)) then
-					p = new Structure("Area, Original, Actual", area, original, actual);
-					raise Output.AreaComparisonError(p);
+				area = getArea ( j, i );
+				original = tabDoc.Area ( area ).Text;
+				actual = result.GetAreaText ( area );
+				if ( not equal ( original, actual ) ) then
+					p = new Structure ( "Area, Original, Actual", area, original, actual );
+					raise Output.AreaComparisonError ( p );
 				endif;
 			enddo;
 		enddo;
 	enddo;
-	
-EndProcedure
 
-Function getArea(R, C)
-	
-	return "R" + Format(R, "NG=") + "C" + Format(C, "NG=");
-	
-EndFunction
+endprocedure
 
-Function equal(Original, Actual)
-	
-	if (Original = "{*}") then
-		return not IsBlankString(Actual);
-	elsif (StrStartsWith(Original, "{")
-			and StrEndsWith(Original, "}")) then
-		s = TrimAll(Original);
-		s = Mid(s, 2, StrLen(s) - 2);
-		s = Output.Sformat(s, __);
-		asterisk = StrFind(s, "*");
-		if (asterisk = 0) then
+function getArea ( R, C )
+
+	return "R" + Format ( R, "NG=" ) + "C" + Format ( C, "NG=" );
+
+endfunction
+
+function equal ( Original, Actual )
+
+	if ( Original = "{*}" ) then
+		return not IsBlankString ( Actual );
+	elsif ( StrStartsWith ( Original, "{" )
+		and StrEndsWith ( Original, "}" ) ) then
+		s = TrimAll ( Original );
+		s = Mid ( s, 2, StrLen ( s ) - 2 );
+		s = Output.Sformat ( s, __ );
+		asterisk = StrFind ( s, "*" );
+		if ( asterisk = 0 ) then
 			return s = Actual;
-		elsif (asterisk = 1) then
-			return StrEndsWith(Actual, Mid(s, asterisk + 1));
+		elsif ( asterisk = 1 ) then
+			return StrEndsWith ( Actual, Mid ( s, asterisk + 1 ) );
 		else
-			return StrStartsWith(Actual, Left(s, asterisk - 1));
+			return StrStartsWith ( Actual, Left ( s, asterisk - 1 ) );
 		endif;
 	else
-		return Lower(Original) = Lower(Actual);
+		return Lower ( Original ) = Lower ( Actual );
 	endif;
-	
-EndFunction
 
-Function GetControl(Name, Source = undefined, Type = undefined) export
-	
-	data = Fields.Retrieve(Name, Source, Type);
+endfunction
+
+function GetControl ( Name, Source = undefined, Type = undefined ) export
+
+	data = Fields.Retrieve ( Name, Source, Type );
 	field = data.Field;
 	area = data.Area;
-	if (data.Area <> undefined) then
-		if (field.Type = FormFieldType.SpreadsheetDocumentField) then
-			field.SetCurrentArea(area);
-			data.Field = field.GetCurrentAreaField();
+	if ( data.Area <> undefined ) then
+		if ( field.Type = FormFieldType.SpreadsheetDocumentField ) then
+			field.SetCurrentArea ( area );
+			data.Field = field.GetCurrentAreaField ();
 		else
 			table = data.Parent;
-			if (table = undefined) then
-				locateRow(Source, area);
+			if ( table = undefined ) then
+				locateRow ( Source, area );
 			else
-				locateRow(table, area);
+				locateRow ( table, area );
 			endif;
 		endif;
 	endif;
 	return data;
-	
-EndFunction
 
-Function SetValue(Name, Value, Source = undefined, Type = undefined, ChooseValue = false, TestSelection = false) export
-	
-	data = Fields.Focus(Name, Source, Type);
+endfunction
+
+function SetValue ( Name, Value, Source = undefined, Type = undefined, ChooseValue = false, TestSelection = false ) export
+
+	data = Fields.Focus ( Name, Source, Type );
 	field = data.Field;
 	fieldType = field.Type;
-	if (fieldType = FormFieldType.RadioButtonField) then
-		field.SelectOption(Value);
+	if ( fieldType = FormFieldType.RadioButtonField ) then
+		field.SelectOption ( Value );
 	else
-		stringValue = String(Value);
-		if (fieldType = FormFieldType.SpreadsheetDocumentField) then
-			field.BeginEditCurrentArea();
-			putValue(data, stringValue, ChooseValue, TestSelection);
-			field.EndEditCurrentArea();
-		elsif (fieldType = FormFieldType.InputField) then
-			table = editRow(data, Source);
-			putValue(data, stringValue, ChooseValue, TestSelection);
-			finishEditing(table);
-		elsif (fieldType = FormFieldType.FormattedDocumentField) then
-			if (Framework.VersionLess("8.3.13")) then
-				field.InputHTML(Value);
+		stringValue = String ( Value );
+		if ( fieldType = FormFieldType.SpreadsheetDocumentField ) then
+			field.BeginEditCurrentArea ();
+			putValue ( data, stringValue, ChooseValue, TestSelection );
+			field.EndEditCurrentArea ();
+		elsif ( fieldType = FormFieldType.InputField ) then
+			table = editRow ( data, Source );
+			putValue ( data, stringValue, ChooseValue, TestSelection );
+			finishEditing ( table );
+		elsif ( fieldType = FormFieldType.FormattedDocumentField ) then
+			if ( Framework.VersionLess ( "8.3.13" ) ) then
+				field.InputHTML ( Value );
 			else
-				field.InputDocumentHTML(Value);
+				field.InputDocumentHTML ( Value );
 			endif;
-		elsif (fieldType = FormFieldType.CheckBoxField) then
-			table = editRow(data, Source);
+		elsif ( fieldType = FormFieldType.CheckBoxField ) then
+			table = editRow ( data, Source );
 			currentValue = Boolean ( field.GetDataPresentation () );
 			if ( currentValue <> Boolean ( Value ) ) then
 				field.SetCheck ();
 			endif;
-			finishEditing(table);
+			finishEditing ( table );
 		else
-			field.InputText(Value);
+			field.InputText ( Value );
 			if ( fieldType = FormItemAdditionType.SearchStringRepresentation ) then
 				Pause ( TesterDynamicListSearchWaitTime );
 			endif;
 		endif;
 	endif;
 	return field;
-	
-EndFunction
 
-Procedure putValue(FieldData, Value, ChooseValue, TestSelection)
-	
+endfunction
+
+procedure putValue ( FieldData, Value, ChooseValue, TestSelection )
+
 	field = FieldData.Field;
 	try
-		field.InputText(Value);
+		field.InputText ( Value );
 	except
 		error = ErrorProcessing.BriefErrorDescription ( ErrorInfo () );
 		readonly = field.CurrentReadOnly ();
 		raise error + ? ( StrEndsWith ( error, "." ), " ", ". " )
 			+ ? ( readonly, Output.FieldIsReadOnly (), Output.SetValueFailed () );
 	endtry;
-	if (ChooseValue) then
+	if ( ChooseValue ) then
 		try
-			opened = field.WaitForDropListGeneration();
+			opened = field.WaitForDropListGeneration ();
 		except
 			opened = false;
 		endtry;
-		if (opened) then
-			if (field.DropListIsOpen()) then
-				field.ExecuteChoiceFromChoiceList(0);
-				if (TestSelection) then
+		if ( opened ) then
+			if ( field.DropListIsOpen () ) then
+				field.ExecuteChoiceFromChoiceList ( 0 );
+				if ( TestSelection ) then
 					fieldName = FieldData.Name;
 					newValue = Fields.FetchValue ( fieldName, FieldData.Parent );
-					if (Lower(newValue) <> Lower(Value)) then
+					if ( Lower ( newValue ) <> Lower ( Value ) ) then
 						Fields.ClearControl ( fieldName );
-						raise Output.WrongFieldValue(new Structure("NewValue", newValue));
+						raise Output.WrongFieldValue ( new Structure ( "NewValue", newValue ) );
 					endif;
 				endif;
 			endif;
 		endif;
 	endif;
-	
-EndProcedure
 
-Function editRow(FieldData, Source)
-	
-	tableType = Type("TestedFormTable");
-	if (TypeOf(FieldData.Parent) = tableType) then
+endprocedure
+
+function editRow ( FieldData, Source )
+
+	tableType = Type ( "TestedFormTable" );
+	if ( TypeOf ( FieldData.Parent ) = tableType ) then
 		table = FieldData.Parent;
-	elsif (TypeOf(Source) = tableType) then
+	elsif ( TypeOf ( Source ) = tableType ) then
 		table = Source;
 	else
 		return undefined;
 	endif;
-	if (table.CurrentModeIsEdit()) then
+	if ( table.CurrentModeIsEdit () ) then
 		return undefined;
 	endif;
-	table.ChangeRow();
+	table.ChangeRow ();
 	return table;
-	
-EndFunction
 
-Procedure finishEditing(Table)
-	
-	if (Table <> undefined and Table.CurrentModeIsEdit()) then
-		Table.EndEditRow();
+endfunction
+
+procedure finishEditing ( Table )
+
+	if ( Table <> undefined and Table.CurrentModeIsEdit () ) then
+		Table.EndEditRow ();
 	endif;
-	
-EndProcedure
 
-Function StartChoosing(Name, Source = undefined, Type = undefined) export
-	
-	data = Fields.Focus(Name, Source, Type);
+endprocedure
+
+function StartChoosing ( Name, Source = undefined, Type = undefined ) export
+
+	data = Fields.Focus ( Name, Source, Type );
 	field = data.Field;
-	if (TypeOf(field) = Type("TestedFormTable")) then
+	if ( TypeOf ( field ) = Type ( "TestedFormTable" ) ) then
 		field.Choose ();
 	else
 		fieldType = field.Type;
-		if (fieldType = FormFieldType.SpreadsheetDocumentField) then
-			field.BeginEditCurrentArea();
+		if ( fieldType = FormFieldType.SpreadsheetDocumentField ) then
+			field.BeginEditCurrentArea ();
 		else
-			editRow(data, Source);
+			editRow ( data, Source );
 		endif;
-		field.StartChoosing();
+		field.StartChoosing ();
 	endif;
 	return field;
-	
-EndFunction
 
-Function ClearControl(Name, Source = undefined, Type = undefined) export
-	
-	data = Fields.GetControl(Name, Source, Type);
+endfunction
+
+function ClearControl ( Name, Source = undefined, Type = undefined ) export
+
+	data = Fields.GetControl ( Name, Source, Type );
 	field = data.Field;
-	field.Activate();
-	table = editRow(data, Source);
+	field.Activate ();
+	table = editRow ( data, Source );
 	if ( data.Field.Type = FormItemAdditionType.ViewStatusRepresentation ) then
 		field = data.Field;
 		i = field.GetViewStatusItemTexts ().Count ();
@@ -635,78 +635,78 @@ Function ClearControl(Name, Source = undefined, Type = undefined) export
 			field.DeleteViewStatusItem ( i );
 		enddo;
 	else
-		field.Clear();
+		field.Clear ();
 	endif;
-	finishEditing(table);
+	finishEditing ( table );
 	return data;
-	
-EndFunction
 
-Procedure NextField() export
-	
+endfunction
+
+procedure NextField () export
+
 	type = TypeOf ( CurrentSource );
 	if ( type = Type ( "TestedForm" )
 		or type = Type ( "TestedFormTable" ) ) then
-		CurrentSource.GotoNextItem();
+		CurrentSource.GotoNextItem ();
 	else
 		raise Output.WrongNextUse ();
 	endif;
-	
-EndProcedure
 
-Procedure Select(Name, Value, Source = undefined, Type = undefined) export
-	
-	data = Fields.Focus(Name, Source, Type);
+endprocedure
+
+procedure Select ( Name, Value, Source = undefined, Type = undefined ) export
+
+	data = Fields.Focus ( Name, Source, Type );
 	field = data.Field;
-	table = editRow(data, Source);
-	if (not field.DropListIsOpen()) then
-		field.OpenDropList();
+	table = editRow ( data, Source );
+	if ( not field.DropListIsOpen () ) then
+		field.OpenDropList ();
 	endif;
-	field.ExecuteChoiceFromChoiceList(Value);
-	finishEditing(table);
-	
-EndProcedure
+	field.ExecuteChoiceFromChoiceList ( Value );
+	finishEditing ( table );
 
-Function ClickField(Name, Source = undefined, Type = undefined) export
-	
-	if (TypeOf(Source) = Type("TestedWindowCommandInterface")) then
-		data = Fields.Retrieve(Name, Source, Type);
+endprocedure
+
+function ClickField ( Name, Source = undefined, Type = undefined ) export
+
+	if ( TypeOf ( Source ) = Type ( "TestedWindowCommandInterface" ) ) then
+		data = Fields.Retrieve ( Name, Source, Type );
 		field = data.Field;
 	else
-		data = Fields.Focus(Name, Forms.FindSource(Source), Type);
+		data = Fields.Focus ( Name, Forms.FindSource ( Source ), Type );
 		field = data.Field;
 	endif;
-	type = TypeOf(field);
-	if (type = Type("TestedFormField")) then
+	type = TypeOf ( field );
+	if ( type = Type ( "TestedFormField" ) ) then
 		fieldType = field.Type;
-		if (fieldType = FormFieldType.CheckBoxField) then
-			field.SetCheck();
-		elsif (fieldType = FormFieldType.LabelField) then
+		if ( fieldType = FormFieldType.CheckBoxField ) then
+			field.SetCheck ();
+		elsif ( fieldType = FormFieldType.LabelField ) then
 			try
-				field.ClickFormattedStringHyperlink(getPosition(data.Area));
+				field.ClickFormattedStringHyperlink ( getPosition ( data.Area ) );
 			except
 				try
-					field.Click();
+					field.Click ();
 				except
-					raise Output.UnableToClick(new Structure("Field", Name));
+					raise Output.UnableToClick ( new Structure ( "Field", Name ) );
 				endtry;
 			endtry;
 		else
-			field.Click();
+			field.Click ();
 		endif;
-	elsif (type = Type("TestedFormDecoration")) then
+	elsif ( type = Type ( "TestedFormDecoration" ) ) then
 		try
-			field.ClickFormattedStringHyperlink(getPosition(data.Area));
+			field.ClickFormattedStringHyperlink ( getPosition ( data.Area ) );
 		except
-			field.Click();
+			field.Click ();
 		endtry;
-	elsif (type = Type("TestedFormGroup")) then
+	elsif ( type = Type ( "TestedFormGroup" ) ) then
 		try
-			field.Expand();
+			field.Expand ();
 		except
-			field.Collapse();
+			field.Collapse ();
 		endtry;
-	elsif (type = Type("TestedFormButton")) then
+	elsif ( type = Type ( "TestedFormButton" ) ) then
 		try
 			field.Click ();
 		except
@@ -718,13 +718,13 @@ Function ClickField(Name, Source = undefined, Type = undefined) export
 			endif;
 		endtry;
 	else
-		field.Click();
+		field.Click ();
 	endif;
 	return field;
-	
-EndFunction
 
-Function controlEnabled ( val Control )
+endfunction
+
+function controlEnabled ( val Control )
 
 	enabled = Control.CurrentEnable ();
 	if ( TypeOf ( Control ) = Type ( "TestedForm" ) ) then
@@ -735,24 +735,24 @@ Function controlEnabled ( val Control )
 			and controlEnabled ( Control.GetParent () );
 	endif;
 
-EndFunction
+endfunction
 
-Function getPosition(Area)
-	
-	if (Area = undefined) then
+function getPosition ( Area )
+
+	if ( Area = undefined ) then
 		return 0;
 	endif;
 	try
-		position = Number(Area);
+		position = Number ( Area );
 		return position - 1;
 	except
 		return Area;
 	endtry;
-	
-EndFunction
 
-Function FetchSpreadsheetContent ( Field, Source = undefined ) export
-	
+endfunction
+
+function FetchSpreadsheetContent ( Field, Source = undefined ) export
+
 	controlType = Type ( "TestedFormField" );
 	if ( TypeOf ( Field ) = Type ( "String" ) ) then
 		control = Fields.Retrieve ( Field, Source, controlType ).Field;
@@ -760,16 +760,16 @@ Function FetchSpreadsheetContent ( Field, Source = undefined ) export
 		control = Field;
 	endif;
 	if ( TypeOf ( control ) <> controlType
-		or control.Type <> FormFieldType.SpreadsheetDocumentField) then
+		or control.Type <> FormFieldType.SpreadsheetDocumentField ) then
 		raise Output.SpreadsheetNotFound ();
 	endif;
 	return fetchSpreadsheet ( control );
-		
-EndFunction
 
-Function fetchSpreadsheet ( Field )
+endfunction
 
-	#if ( not WebClient ) then
+function fetchSpreadsheet ( Field )
+
+#if ( not WebClient ) then
 		mxl = GetTempFileName ( "mxl" );
 		xlsx = GetTempFileName ( "xlsx" );
 		App.SetFileDialogResult ( true, mxl );
@@ -792,12 +792,12 @@ Function fetchSpreadsheet ( Field )
 		data.Write ( xlsx );
 		DeleteFilesAsync ( mxl );
 		return xlsx;
-	#endif
+#endif
 
-EndFunction
+endfunction
 
-Function FetchTableContent ( Field, Source = undefined ) export
-	
+function FetchTableContent ( Field, Source = undefined ) export
+
 	control = getTable ( Field, Source );
 	control.GotoFirstRow ();
 	control.SelectAllRows ();
@@ -810,10 +810,10 @@ Function FetchTableContent ( Field, Source = undefined ) export
 	else
 		return tableData ( control, rows );
 	endif;
-		
-EndFunction
 
-Function getTable ( Field, Source )
+endfunction
+
+function getTable ( Field, Source )
 
 	controlType = Type ( "TestedFormTable" );
 	if ( TypeOf ( Field ) = Type ( "String" ) ) then
@@ -829,9 +829,9 @@ Function getTable ( Field, Source )
 	endif;
 	return control;
 
-EndFunction
+endfunction
 
-Function getColumns ( Table )
+function getColumns ( Table )
 
 	items = Table.GetChildObjects ();
 	columns = new Array ();
@@ -843,9 +843,9 @@ Function getColumns ( Table )
 	enddo;
 	return columns;
 
-EndFunction
+endfunction
 
-Function tableData ( Control, Rows )
+function tableData ( Control, Rows )
 
 	table = new Array ();
 	columns = getColumns ( Control );
@@ -877,15 +877,15 @@ Function tableData ( Control, Rows )
 	endif;
 	return table;
 
-EndFunction
+endfunction
 
-Function cellValue ( Value )
+function cellValue ( Value )
 
 	return RemoveSeachingTags ( StrConcat ( StrSplit ( Value, Char ( 160 ) + Char ( 8239 ) + Char ( 8195 ) + Char ( 8194 ) ) ) );
 
-EndFunction
+endfunction
 
-Procedure addToTable ( Table, Row, Columns )
+procedure addToTable ( Table, Row, Columns )
 
 	data = new Structure ();
 	for each column in Columns do
@@ -893,9 +893,9 @@ Procedure addToTable ( Table, Row, Columns )
 	enddo;
 	Table.Add ( data );
 
-EndProcedure
+endprocedure
 
-Function GetWindowControls () export
+function GetWindowControls () export
 
 	formType = Type ( "TestedForm" );
 	window = App.GetActiveWindow ();
@@ -916,7 +916,7 @@ Function GetWindowControls () export
 	LastActiveWindowControls = Conversion.ToJSON ( elements, false );
 	return new Structure ( "ActiveForm, Elements", form, elements );
 
-EndFunction
+endfunction
 
 function clientControls ( Window, Form )
 
@@ -940,7 +940,7 @@ function clientControls ( Window, Form )
 endfunction
 
 procedure applyMetadata ( ClientControls, Form )
-	
+
 	info = getMetadata ( Form, ClientControls.language );
 	if ( info = undefined ) then
 		return;
@@ -968,7 +968,7 @@ procedure applyMetadata ( ClientControls, Form )
 		enddo;
 	enddo;
 	items.Insert ( Enum.ConstantsEntityInfoMark (), info.explanation );
-	
+
 endprocedure
 
 function getMetadata ( Form, Language )
@@ -990,7 +990,7 @@ function getMetadata ( Form, Language )
 
 endfunction
 
-Procedure prepareElements ( Elements, Objects, Context )
+procedure prepareElements ( Elements, Objects, Context )
 
 	// What is CurrentDropList for?
 	// As soon as a drop-down list is opened in a field, all input fields will report
@@ -1019,9 +1019,9 @@ Procedure prepareElements ( Elements, Objects, Context )
 		endif;
 	enddo;
 
-EndProcedure
+endprocedure
 
-Function tableColumns ( Objects, Context )
+function tableColumns ( Objects, Context )
 
 	columns = new Array ();
 	textField = Type ( "TestedFormField" );
@@ -1037,9 +1037,9 @@ Function tableColumns ( Objects, Context )
 	enddo;
 	return columns;
 
-EndFunction
+endfunction
 
-Function isInvisible ( Control, ClientControls )
+function isInvisible ( Control, ClientControls )
 
 	type = TypeOf ( Control );
 	if ( type = Type ( "TestedFormField" )
@@ -1063,15 +1063,16 @@ Function isInvisible ( Control, ClientControls )
 	endif;
 	return false;
 
-EndFunction
+endfunction
 
-Function controlToElement ( Control, Context )
+function controlToElement ( Control, Context )
 
 	type = TypeOf ( Control );
 	if ( type = Type ( "TestedClientApplicationWindow" ) ) then
 		element = new Structure ( "Caption, HomePage, IsMain, URL, Type" );
 		FillPropertyValues ( element, Control );
 	else
+		clientControls = Context.ClientControls;
 		element = new Structure ( "Name, TitleText, Type" );
 		FillPropertyValues ( element, Control );
 		currentElement = injectCurrentItem ( Control, element );
@@ -1090,7 +1091,7 @@ Function controlToElement ( Control, Context )
 			if ( type = Type ( "TestedFormButton" ) ) then
 				try
 					// Select Type dialog is weird and breaks the documented execution
-					if ( controlChecked ( Control, Context.ClientControls ) ) then
+					if ( controlChecked ( Control, clientControls ) ) then
 						Element.Insert ( "PressedOrChecked", true );
 					endif;
 				except
@@ -1098,23 +1099,25 @@ Function controlToElement ( Control, Context )
 			elsif ( type = Type ( "TestedFormGroup" ) ) then
 				groupElement ( Control, element, Context );
 			elsif ( type = Type ( "TestedFormDecoration" ) ) then
-				element.Insert ( "DecorationType", String ( Control.Type ) );
+				if ( clientControls = undefined ) then
+					element.Insert ( "DecorationType", String ( Control.Type ) );
+				endif;
 			elsif ( type = Type ( "TestedFormField" ) ) then
 				fieldElement ( Control, element, Context );
 			elsif ( type = Type ( "TestedFormTable" ) ) then
-				injectTooltip ( Control, element, Context );
+				tableElement ( Control, element, Context );
 			elsif ( type = Type ( "TestedFormItemAddition" )
 				and Control.Type = FormItemAdditionType.SearchStringRepresentation ) then
 					element.Insert ( "SearchString", true );
 			endif;
 		endif;
 	endif;
-	element.Type = String ( Control );
+	injectType ( element, Control, clientControls );
 	return element;
 
-EndFunction
+endfunction
 
-Function controlChecked ( Control, ClientControls )
+function controlChecked ( Control, ClientControls )
 
 	name = Control.Name;
 	if ( ClientControls <> undefined and ClientControls.Property ( name ) ) then
@@ -1123,36 +1126,36 @@ Function controlChecked ( Control, ClientControls )
 		return Control.CurrentCheck ();
 	endif;
 
-EndFunction
+endfunction
 
-Function determineDropList ( Control )
+function determineDropList ( Control )
 
 	open = false;
 	type = typeOfControl ( Control );
 	if ( type = FormFieldType.InputField ) then
 		try
 			open = Control.DropListIsOpen ();
-		except;
+		except
 		endtry;
 	endif;
 	return ? ( open, Control, undefined );
 
-EndFunction
+endfunction
 
-Function typeOfControl ( Control )
+function typeOfControl ( Control )
 
 	type = TypeOf ( Control );
-	if ( type = Type("TestedFormField")
-		or type = Type("TestedFormGroup")
-		or type = Type("TestedFormButton")
-		or type = Type("TestedFormDecoration")
-		or type = Type("TestedFormItemAddition") ) then
+	if ( type = Type ( "TestedFormField" )
+		or type = Type ( "TestedFormGroup" )
+		or type = Type ( "TestedFormButton" )
+		or type = Type ( "TestedFormDecoration" )
+		or type = Type ( "TestedFormItemAddition" ) ) then
 		return Control.Type;
 	endif;
 
-EndFunction
+endfunction
 
-Function injectCurrentItem ( Source, Element )
+function injectCurrentItem ( Source, Element )
 
 	type = TypeOf ( Source );
 	if ( type = Type ( "TestedForm" ) ) then
@@ -1174,30 +1177,30 @@ Function injectCurrentItem ( Source, Element )
 	endif;
 	return control;
 
-EndFunction
+endfunction
 
-Procedure injectEntityInfo ( Element, Context )
-	
+procedure injectEntityInfo ( Element, Context )
+
 	clientControls = Context.ClientControls;
 	info = undefined;
 	if ( clientControls <> undefined
 		and clientControls.Property ( Enum.ConstantsEntityInfoMark (), info ) ) then
 		Element.Insert ( "EntityShortDescription", info );
 	endif;
-	
-EndProcedure
 
-Procedure injectTooltip ( Control, Element, Context )
-	
+endprocedure
+
+procedure injectTooltip ( Control, Element, Context )
+
 	tooltip = getTooltip ( Control, Context );
 	if ( not IsBlankString ( tooltip )
 		and Lower ( Element.TitleText ) <> Lower ( tooltip ) ) then
 		Element.Insert ( "ToolTip", tooltip );
 	endif;
-	
-EndProcedure
 
-Function getTooltip ( Control, Context )
+endprocedure
+
+function getTooltip ( Control, Context )
 
 	name = Control.Name;
 	clientControls = Context.ClientControls;
@@ -1222,14 +1225,17 @@ Function getTooltip ( Control, Context )
 	CachedControlTooltips [ valueKey ] = tooltip;
 	return tooltip;
 
-EndFunction
+endfunction
 
-Procedure groupElement ( Control, Element, Context )
+procedure groupElement ( Control, Element, Context )
 
 	clientControls = Context.ClientControls;
+	if ( clientControls = undefined ) then
+		element.Insert ( "GroupType", String ( Control.Type ) );
+		return;
+	endif;
 	name = Control.Name;
-	if ( clientControls <> undefined
-		and clientControls [ name ].Collapsible ) then
+	if ( clientControls [ name ].Collapsible ) then
 		element.Insert ( "GroupType", Output.CollapsibleGroup () );
 		// Looks like bug in 1C 8.3.27, `CurrentOpened` forks in opposite way
 		groupIsClosed = Control.CurrentOpened ();
@@ -1237,13 +1243,11 @@ Procedure groupElement ( Control, Element, Context )
 			element.Insert ( "SystemHint", Output.CollapsibleGroupSystemHint (
 				new Structure ( "Name", name ) ) );
 		endif;
-	else
-		element.Insert ( "GroupType", String ( Control.Type ) );
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure fieldElement ( Control, Element, Context )
+procedure fieldElement ( Control, Element, Context )
 
 	clientControls = Context.ClientControls;
 	if ( clientControls <> undefined and clientControls.Property ( Control.Name ) ) then
@@ -1251,7 +1255,9 @@ Procedure fieldElement ( Control, Element, Context )
 	endif;
 	type = Control.Type;
 	dataType = undefined;
-	Element.Insert ( "FieldType", String ( type ) );
+	if ( clientField = undefined ) then
+		Element.Insert ( "FieldType", String ( type ) );
+	endif;
 	if ( clientField <> undefined
 		and clientField.Property ( "DataType", dataType ) ) then
 		Element.Insert ( "DataType", dataType );
@@ -1297,9 +1303,9 @@ Procedure fieldElement ( Control, Element, Context )
 		endif;
 	endif;
 
-EndProcedure
+endprocedure
 
-Function spreadsheetInfo ( Control )
+function spreadsheetInfo ( Control )
 
 	rows = Control.GetDocumentDataAreaVerticalSize ();
 	columns = Control.GetDocumentDataAreaHorizontalSize ();
@@ -1310,9 +1316,53 @@ Function spreadsheetInfo ( Control )
 	endif;
 	return info;
 
-EndFunction
+endfunction
 
-Function FetchMainMenu () export
+procedure tableElement ( Control, Element, Context )
+
+	var table;
+
+	clientControls = Context.ClientControls;
+	if ( clientControls = undefined
+		or not clientControls.Property ( Control.Name, table ) ) then
+		return;
+	endif;
+	representation = table.Representation;
+	if ( representation = "HierarchicalList" ) then
+		Element.Insert ( "TableIsHierarchicalList", true );
+	elsif ( representation = "Tree" ) then
+		Element.Insert ( "TableIsTree", true );
+	endif;
+	if ( table.AutoInsertNewRow and table.ChangeRowSet ) then
+		Element.Insert ( "AutoAddNewRow", true );
+	elsif ( not table.ChangeRowSet ) then
+		Element.Insert ( "ChangeRowSet", false );
+	endif;
+	Element.Insert ( "TableData", table.TableData );
+
+endprocedure
+
+procedure injectType ( Element, Control, ClientControls )
+
+	var field, type;
+
+	if ( ClientControls <> undefined ) then
+		conrolType = TypeOf ( Control );
+		if ( conrolType = Type ( "TestedClientApplicationWindow" ) ) then
+			type = String ( Type ( "ClientApplicationWindow" ) );
+		elsif ( conrolType = Type ( "TestedForm" ) ) then
+			type = String ( Type ( "ClientApplicationForm" ) );
+		elsif ( ClientControls.Property ( Element.Name, field ) ) then
+			type = ? ( field.ControlType = undefined, field.Type, field.ControlType );
+		else
+			type = String ( Control );
+		endif;
+	endif;
+	Element.Type = ? ( type = undefined, String ( Control ), type );
+
+endprocedure
+
+function FetchMainMenu () export
 
 	interface = MainWindow.GetCommandInterface ();
 	sections = interface.FindObject ( , "Sections panel" );
@@ -1354,15 +1404,19 @@ Function FetchMainMenu () export
 		commandInterface.Add ( group );
 		commands = menu.GetChildObjects ();
 		for each command in commands do
-			if ( Type ( command ) = groupType ) then
-				submenu = new Structure ( "Group, Items", command.TitleText, new Array () );
-				for each subcommand in command.GetChildObjects () do
-					submenu.Items.Add ( new Structure ( "Item, URL", subcommand.TitleText, subcommand.URL ) );
-				enddo;
-			else
-				submenu = new Structure ( "Item, URL", command.TitleText, command.URL );
-			endif;
-			subsystem.Items.Add ( submenu );
+			try
+				if ( Type ( command ) = groupType ) then
+					submenu = new Structure ( "Group, Items", command.TitleText, new Array () );
+					for each subcommand in command.GetChildObjects () do
+						submenu.Items.Add ( new Structure ( "Item, URL", subcommand.TitleText, subcommand.URL ) );
+					enddo;
+				else
+					submenu = new Structure ( "Item, URL", command.TitleText, command.URL );
+				endif;
+				subsystem.Items.Add ( submenu );
+			except
+				// suppress all types of dangled/broken links
+			endtry;
 		enddo;
 	enddo;
 	if ( lastSection <> undefined ) then
@@ -1370,9 +1424,9 @@ Function FetchMainMenu () export
 	endif;
 	return commandInterface;
 
-EndFunction
+endfunction
 
-Function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
+function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
 
 	if ( TypeOf ( Table ) = Type ( "TestedFormTable" ) ) then
 		target = Table;
@@ -1383,7 +1437,7 @@ Function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
 		gotoFirstRow ( target );
 	endif;
 	if ( isID ( Column ) ) then
-		data = Fields.Retrieve(Column, Source);
+		data = Fields.Retrieve ( Column, Source );
 		columnTitle = data.Field.TitleText;
 	else
 		columnTitle = Column;
@@ -1415,13 +1469,13 @@ Function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
 		raise error;
 	endif;
 
-EndFunction
+endfunction
 
-Procedure gotoFirstRow ( Table )
+procedure gotoFirstRow ( Table )
 
 	try
 		Table.GotoFirstRow ( false );
 	except
 	endtry;
 
-EndProcedure
+endprocedure

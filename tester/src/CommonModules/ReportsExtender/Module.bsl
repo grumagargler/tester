@@ -1,4 +1,4 @@
-Function StatusPresentation ( Status, Encountered ) export
+function StatusPresentation ( Status, Encountered ) export
 	
 	if ( Encountered > 1 ) then
 		return String ( Status ) + " (" + Encountered + ")";
@@ -6,4 +6,4 @@ Function StatusPresentation ( Status, Encountered ) export
 		return String ( Status );
 	endif; 
 	
-EndFunction 
+endfunction 

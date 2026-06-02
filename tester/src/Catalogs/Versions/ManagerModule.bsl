@@ -1,25 +1,25 @@
-Procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
+procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
 	
 	Fields.Add ( "Path" );
 	StandardProcessing = false;
 	
-EndProcedure
+endprocedure
 
-Procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
+procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
 	
 	StandardProcessing = false;
 	Presentation = Enum.OthersVersionPrefix () + Data.Path;
 	
-EndProcedure
+endprocedure
 
-Procedure Create ( Scenario, Memo = undefined ) export
+procedure Create ( Scenario, Memo = undefined ) export
 	
 	version = createVersion ( Scenario );
 	stampVersion ( Scenario, version, Memo );
 	
-EndProcedure 
+endprocedure 
 
-Function createVersion ( Scenario )
+function createVersion ( Scenario )
 	
 	obj = CreateItem ();
 	source = Scenario.GetObject ();
@@ -33,9 +33,9 @@ Function createVersion ( Scenario )
 	obj.Write ();
 	return obj.Ref;
 	
-EndFunction 
+endfunction 
 
-Procedure stampVersion ( Scenario, Version, Memo )
+procedure stampVersion ( Scenario, Version, Memo )
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.Versions.CreateRecordManager ();
@@ -46,4 +46,4 @@ Procedure stampVersion ( Scenario, Version, Memo )
 	r.Write ();
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 

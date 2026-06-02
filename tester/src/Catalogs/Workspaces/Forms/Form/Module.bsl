@@ -1,75 +1,75 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		initNew ();		
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initNew ()
+&atserver
+procedure initNew ()
 	
 	Object.Owner = SessionParameters.User;
 	Object.Computer = DF.Pick ( SessionParameters.Session, "Computer" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	LocalFiles.SetDocumentsFolder ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
+&atserver
+procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 	
 	groupApplications ( CurrentObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure groupApplications ( CurrentObject )
+&atserver
+procedure groupApplications ( CurrentObject )
 	
 	CurrentObject.Applications.GroupBy ( "Application" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AfterWrite ( WriteParameters )
+&atclient
+procedure AfterWrite ( WriteParameters )
 	
 	if ( not Object.DeletionMark ) then
 		WorkspaceForm.Create ( Object.Ref );
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure WorkspaceStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure WorkspaceStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	StandardProcessing = false;
 	chooseFile ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure chooseFile ()
+&atclient
+procedure chooseFile ()
 	
 	dialog = new FileDialog ( FileDialogMode.Save );
 	dialog.Filter = Output.VSCodeWorkspace ( new Structure ( "Extension", RepositoryFiles.VSCodeWorkspace () ) );
 	dialog.Show ( new NotifyDescription ( "SelectFile", ThisObject ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure SelectFile ( File, Params ) export
+&atclient
+procedure SelectFile ( File, Params ) export
 	
 	if ( File = undefined ) then
 		return;
@@ -77,20 +77,20 @@ Procedure SelectFile ( File, Params ) export
 	Modified = true;
 	Object.Workspace = File [ 0 ];
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Applications List
 
-&AtClient
-Procedure ApplicationsOnChange ( Item )
+&atclient
+procedure ApplicationsOnChange ( Item )
 	
 	updateFile ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure updateFile ()
+&atclient
+procedure updateFile ()
 	
 	list = new Array ();
 	for each row in Object.Applications do
@@ -100,10 +100,10 @@ Procedure updateFile ()
 	Object.Description = fileName; 
 	Object.Workspace = UserDocumentsFolder + fileName + RepositoryFiles.VSCodeWorkspace ();
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function fileName ( val Applications )
+&atservernocontext
+function fileName ( val Applications )
 	
 	s = "select Applications.Code as Code
 	|from Catalog.Applications as Applications
@@ -113,4 +113,4 @@ Function fileName ( val Applications )
 	q.SetParameter ( "Applications", Applications );
 	return StrConcat ( q.Execute ().Unload ().UnloadColumn ( "Code" ), "-" );
 	
-EndFunction
+endfunction

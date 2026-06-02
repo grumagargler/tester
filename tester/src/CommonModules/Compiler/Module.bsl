@@ -1,5 +1,4 @@
-
-Function Build ( val Scenario, val ProgramCode = undefined, val ServerOnly = false ) export
+function Build ( val Scenario, val ProgramCode = undefined, val ServerOnly = false ) export
 	
 	processor = DataProcessors.Compiler.Create ();
 	processor.Scenario = Scenario;
@@ -7,9 +6,9 @@ Function Build ( val Scenario, val ProgramCode = undefined, val ServerOnly = fal
 	processor.ServerOnly = ServerOnly;
 	return processor.Compile ();
 	
-EndFunction
+endfunction
 
-Function Call ( val Scenario, val Module, val IsVersion, val Application, val InsideFolder, val OnServer ) export
+function Call ( val Scenario, val Module, val IsVersion, val Application, val InsideFolder, val OnServer ) export
 	
 	parent = ? ( InsideFolder, getParent ( Module, IsVersion ), undefined );
 	ref = RuntimeSrv.FindScenario ( Scenario, getApplication ( Module, IsVersion ), Application, parent );
@@ -22,9 +21,9 @@ Function Call ( val Scenario, val Module, val IsVersion, val Application, val In
 	result = new Structure ( "Compilation, Scenario", processor.Compile (), ref );
 	return result;
 	
-EndFunction
+endfunction
 
-Function getParent ( Module, IsVersion )
+function getParent ( Module, IsVersion )
 	
 	s = "
 	|select case when Scenarios.Tree then Scenarios.Ref else Scenarios.Parent end as Parent
@@ -42,10 +41,10 @@ Function getParent ( Module, IsVersion )
 	q = new Query ( s );
 	q.SetParameter ( "Module", Module );
 	return q.Execute ().Unload () [ 0 ].Parent;
+	
+endfunction
 
-EndFunction 
-
-Function getApplication ( Module, IsVersion )
+function getApplication ( Module, IsVersion )
 	
 	s = "
 	|select top 1 Scenarios.Application as Application
@@ -56,14 +55,14 @@ Function getApplication ( Module, IsVersion )
 	q.SetParameter ( "Module", Module );
 	application = q.Execute ().Unload () [ 0 ].Application;
 	return ? ( application.IsEmpty (), EnvironmentSrv.GetApplication (), application );
+	
+endfunction
 
-EndFunction 
-
-Function SyntaxCode ( val ProgramCode ) export
+function SyntaxCode ( val ProgramCode ) export
 	
 	processor = DataProcessors.Compiler.Create ();
 	processor.Script = ProgramCode;
 	processor.ServerOnly = false;
 	return processor.SyntaxCode ();
 	
-EndFunction 
+endfunction

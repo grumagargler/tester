@@ -21,7 +21,7 @@ var ParametersLimit;
 var ProgressStep;
 var ModuleSize;
 
-Function Compile() export
+function Compile() export
 	
 	init();
 	enumerate();
@@ -29,9 +29,9 @@ Function Compile() export
 	assemble();
 	return result();
 	
-EndFunction
+endfunction
 
-Procedure init()
+procedure init()
 	
 	Program = new Array();
 	Module = DF.Pick(Scenario, "Code");
@@ -41,9 +41,9 @@ Procedure init()
 		Script = DF.Pick(Scenario, "Script");
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function extractServerCode(Scope)
+function extractServerCode(Scope)
 	
 	boundaries = getBoundaries(Scope);
 	if (boundaries = undefined) then
@@ -52,9 +52,9 @@ Function extractServerCode(Scope)
 	removeClientCode(Scope, boundaries);
 	return StrConcat(Scope, Chars.LF);
 	
-EndFunction
+endfunction
 
-Function getBoundaries(Scope)
+function getBoundaries(Scope)
 	
 	start = - 1;
 	end = - 1;
@@ -80,9 +80,9 @@ Function getBoundaries(Scope)
 		return undefined;
 	endif;
 	
-EndFunction
+endfunction
 
-Procedure removeClientCode(Scope, Boundaries)
+procedure removeClientCode(Scope, Boundaries)
 	
 	for i = 0 to Boundaries.Start - 2 do
 		Scope[i] = "";
@@ -93,9 +93,9 @@ Procedure removeClientCode(Scope, Boundaries)
 	enddo;
 	Scope.Insert(end, "~_end:");
 	
-EndProcedure
+endprocedure
 
-Procedure fixReturn(Scope, SyntaxOnly)
+procedure fixReturn(Scope, SyntaxOnly)
 	
 	running = not SyntaxOnly;
 	i = 0;
@@ -122,9 +122,9 @@ Procedure fixReturn(Scope, SyntaxOnly)
 		i = i + 1;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function findLogicalLineEnd(Scope, StartLine)
+function findLogicalLineEnd(Scope, StartLine)
 
 	state = newLogicalLineState();
 	size = Scope.UBound();
@@ -139,9 +139,9 @@ Function findLogicalLineEnd(Scope, StartLine)
 	enddo;
 	return size;
 
-EndFunction
+endfunction
 
-Procedure finalize(Scope, SyntaxOnly)
+procedure finalize(Scope, SyntaxOnly)
 	
 	s = "
 	|~_return:
@@ -168,9 +168,9 @@ Procedure finalize(Scope, SyntaxOnly)
 	endif;
 	Scope.Add(s);
 	
-EndProcedure
+endprocedure
 
-Procedure enumerate()
+procedure enumerate()
 	
 	lastLine = 0;
 	checking = false;
@@ -208,15 +208,15 @@ Procedure enumerate()
 		addCheck();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function newLogicalLineState()
+function newLogicalLineState()
 
 	return new Structure("InString, Nesting, Ended", false, 0, false);
 
-EndFunction
+endfunction
 
-Function logicalLineState(Scope, Line, State)
+function logicalLineState(Scope, Line, State)
 
 	row = Scope[Line];
 	inString = State.InString;
@@ -259,9 +259,9 @@ Function logicalLineState(Scope, Line, State)
 	ended = not logicalLineContinues(Scope, Line, normal, inString, nesting);
 	return new Structure("InString, Nesting, Ended", inString, nesting, ended);
 
-EndFunction
+endfunction
 
-Function logicalLineContinues(Scope, Line, Normal, InString, Nesting)
+function logicalLineContinues(Scope, Line, Normal, InString, Nesting)
 
 	if (InString
 			or Nesting > 0) then
@@ -292,9 +292,9 @@ Function logicalLineContinues(Scope, Line, Normal, InString, Nesting)
 	endif;
 	return nextLineContinues(Scope, Line);
 
-EndFunction
+endfunction
 
-Function nextLineContinues(Scope, Line)
+function nextLineContinues(Scope, Line)
 
 	for i = Line + 1 to Scope.UBound() do
 		row = Scope[i];
@@ -309,9 +309,9 @@ Function nextLineContinues(Scope, Line)
 	enddo;
 	return false;
 
-EndFunction
+endfunction
 
-Function moduleEnds(Rows)
+function moduleEnds(Rows)
 	
 	count = 0;
 	for each row in rows do
@@ -322,9 +322,9 @@ Function moduleEnds(Rows)
 	enddo;
 	return count;
 	
-EndFunction
+endfunction
 
-Function endOfModule(Row)
+function endOfModule(Row)
 	
 	normal = Lower(TrimL(Row));
 	for each item in ProcedureStarts do
@@ -339,9 +339,9 @@ Function endOfModule(Row)
 	enddo;
 	return false;
 	
-EndFunction
+endfunction
 
-Function operation(Row)
+function operation(Row)
 	
 	passing = continuationRow(Row)
 		or StrStartsWith(Row, "//")
@@ -355,9 +355,9 @@ Function operation(Row)
 		or StrStartsWith(Row, "function ");
 	return not passing;
 
-EndFunction
+endfunction
 
-Function continuationRow(Row)
+function continuationRow(Row)
 
 	return StrStartsWith(Row, "|")
 		or StrStartsWith(Row, "(")
@@ -386,22 +386,22 @@ Function continuationRow(Row)
 		or StrStartsWith(Row, "и(")
 		or StrStartsWith(Row, "не(");
 
-EndFunction
+endfunction
 
-Procedure addCheck()
+procedure addCheck()
 	
 	Program.Add(";Debugger.ErrorCheck ( Debug );");
 	
-EndProcedure
+endprocedure
 
-Procedure debugInfo(Line, LastLine)
+procedure debugInfo(Line, LastLine)
 	
 	command = hook("""" + Module + """", Line);
 	Program.Insert(LastLine, command);
 	
-EndProcedure
+endprocedure
 
-Function hook(Module, Line)
+function hook(Module, Line)
 	
 	debugCall = debugger ( Line );
 	if ( ServerOnly ) then
@@ -417,7 +417,7 @@ Function hook(Module, Line)
 			|				Debug.EvaluationResult = Eval ( Debug.Evaluate );
 			|				Debug.EvaluationError = false;
 			|			except
-			|				Debug.EvaluationResult = BriefErrorDescription ( ErrorInfo () );
+			|				Debug.EvaluationResult = ErrorProcessing.BriefErrorDescription ( ErrorInfo () );
 			|				Debug.EvaluationError = true;
 			|			endtry;
 			|		endif;
@@ -432,18 +432,18 @@ Function hook(Module, Line)
 	endif;
 	return StrReplace(s, Chars.LF, " ");
 	
-EndFunction
+endfunction
 
-Function debugger ( Line )
+function debugger ( Line )
 
 	row = Format(Line, "NG=;NZ=");
 	progressing = ?(Line > ModuleSize, "undefined", Format(Round(Line * ProgressStep, 0, RoundMode.Round15as20), "NG=;NZ="));
 	return "Debugger.Line ( Chronograph, Debug, """ + Module + """, "
 		+ row + ", " + IsVersion + ", """ + Scenario + """, " + progressing + " )";
 	
-EndFunction
+endfunction
 
-Procedure compileProcedures(Scope, SyntaxOnly)
+procedure compileProcedures(Scope, SyntaxOnly)
 	
 	extractProcedures(Scope, SyntaxOnly);
 	replaceCalls(Scope);
@@ -451,9 +451,9 @@ Procedure compileProcedures(Scope, SyntaxOnly)
 		prepareProcedures();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure extractProcedures(Scope, SyntaxOnly)
+procedure extractProcedures(Scope, SyntaxOnly)
 	
 	details = undefined;
 	begin = false;
@@ -512,9 +512,9 @@ Procedure extractProcedures(Scope, SyntaxOnly)
 		begin = begin and not end;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function rowDefined(Scope, Line)
+function rowDefined(Scope, Line)
 	
 	row = Scope[Line];
 	if (IsBlankString(row)) then
@@ -523,9 +523,9 @@ Function rowDefined(Scope, Line)
 	CurrentRow = TrimAll(Lower(row));
 	return true;
 	
-EndFunction
+endfunction
 
-Function procedureBegins(Scope, Line, Directive)
+function procedureBegins(Scope, Line, Directive)
 	
 	descriptor = Lexer.Declaration ( ProcedureStarts, CurrentRow );
 	if (descriptor = undefined) then
@@ -538,9 +538,9 @@ Function procedureBegins(Scope, Line, Directive)
 	params = procParams(Scope, name);
 	return new Structure("Name, Function, Params, Script, Directive, Start, End", name, descriptor.Function, params, new Array(), Directive, Line, Line);
 	
-EndFunction
+endfunction
 
-Function procName(Scope, Line, NameBegins)
+function procName(Scope, Line, NameBegins)
 	
 	for i = Line to Scope.UBound() do
 		normal = Lower(Scope[i]);
@@ -558,9 +558,9 @@ Function procName(Scope, Line, NameBegins)
 		endif;
 	enddo;
 	
-EndFunction
+endfunction
 
-Function procParams(Scope, Name)
+function procParams(Scope, Name)
 	
 	list = "";
 	started = false;
@@ -601,9 +601,9 @@ Function procParams(Scope, Name)
 		i = i + 1;
 	enddo;
 	
-EndFunction
+endfunction
 
-Function paramsLoader(Params)
+function paramsLoader(Params)
 	
 	loader = "";
 	counter = 1;
@@ -616,9 +616,9 @@ Function paramsLoader(Params)
 	enddo;
 	return loader;
 	
-EndFunction
+endfunction
 
-Procedure declareParams(Scope, Line, Params)
+procedure declareParams(Scope, Line, Params)
 	
 	declaration = "";
 	for each param in Params.Params do
@@ -629,16 +629,16 @@ Procedure declareParams(Scope, Line, Params)
 		Scope[i] = "";
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function getDirective()
+function getDirective()
 	
 	directive = Directives[CurrentRow];
 	return ?(directive = undefined, 0, directive);
 	
-EndFunction
+endfunction
 
-Procedure replaceCalls(Scope)
+procedure replaceCalls(Scope)
 	
 	for i = 0 to Scope.UBound() do
 		row = Scope[i];
@@ -664,9 +664,9 @@ Procedure replaceCalls(Scope)
 		Scope[i] = row;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Procedure prepareProcedures()
+procedure prepareProcedures()
 	
 	for each proc in Procedures do
 		rows = proc.Script;
@@ -676,15 +676,15 @@ Procedure prepareProcedures()
 		finalizeProcedure(rows);
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Procedure finalizeProcedure(Scope)
+procedure finalizeProcedure(Scope)
 	
 	Scope.Add("~_return:");
 	
-EndProcedure
+endprocedure
 
-Procedure assemble()
+procedure assemble()
 	
 	if (RunSelected) then
 		Program.Insert(0, attachEnvironment());
@@ -697,9 +697,9 @@ Procedure assemble()
 	finalize(Program, false);
 	Compiled = StrConcat(Program, Chars.LF);
 	
-EndProcedure
+endprocedure
 
-Function attachEnvironment()
+function attachEnvironment()
 	
 	s = "
 		|try
@@ -709,9 +709,9 @@ Function attachEnvironment()
 		|";
 	return s;
 	
-EndFunction
+endfunction
 
-Function getProcedures()
+function getProcedures()
 	
 	enter = Chars.LF;
 	splitter = enter + "|";
@@ -723,17 +723,17 @@ Function getProcedures()
 	enddo;
 	return StrConcat(list, enter);
 	
-EndFunction
+endfunction
 
-Function result()
+function result()
 	
 	p = new Structure("Compiled");
 	p.Compiled = Compiled;
 	return p;
 	
-EndFunction
+endfunction
 
-Function SyntaxCode() export
+function SyntaxCode() export
 	
 	rows = StrSplit(Script, Chars.LF);
 	compileProcedures(rows, true);
@@ -743,16 +743,16 @@ Function SyntaxCode() export
 	composeServer(rows);
 	return new Structure("Client, Server", ClientSyntax, ServerSyntax);
 	
-EndFunction
+endfunction
 
-Procedure composeClient(Scope)
+procedure composeClient(Scope)
 	
 	clientCode = "if ( false ) then " + StrConcat(Scope, Chars.LF) + Chars.LF + "endif;";
 	ClientSyntax = StrReplace(clientCode, Clauses.IfClient, Clauses.IfNotServer);
 	
-EndProcedure
+endprocedure
 
-Procedure composeServer(Scope)
+procedure composeServer(Scope)
 	
 	serverCode = extractServerCode(Scope);
 	if (serverCode = undefined) then
@@ -760,7 +760,7 @@ Procedure composeServer(Scope)
 	endif;
 	ServerSyntax = StrReplace(serverCode, Clauses.IfServer, Clauses.IfNotClient);
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Variables Initialization

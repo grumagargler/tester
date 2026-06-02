@@ -1,13 +1,13 @@
-&AtClient
+&atclient
 var ControlPosition;
-&AtClient
+&atclient
 var FieldsMap;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	applyParams ();
@@ -17,10 +17,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -31,80 +31,80 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	MetadataFilter = Catalogs.Metadata.Ref ( Parameters.Form );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure applyParams ()
+&atserver
+procedure applyParams ()
 	
 	if ( Parameters.SelectOnly ) then
 		Items.Pages.PagesRepresentation = FormPagesRepresentation.None;
 		Items.GroupScript.Visible = false;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure initList ()
+&atserver
+procedure initList ()
 	
 	DC.SetParameter ( List, "User", SessionParameters.User );
 	DC.SetParameter ( List, "Application", Parameters.Application );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByMetadata ()
+&atserver
+procedure filterByMetadata ()
 	
 	DC.ChangeFilter ( List, "Metadata", MetadataFilter, not MetadataFilter.IsEmpty () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure OnLoadDataFromSettingsAtServer ( Settings )
+&atserver
+procedure OnLoadDataFromSettingsAtServer ( Settings )
 	
 	filterByType ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByType ()
+&atserver
+procedure filterByType ()
 	
 	DC.ChangeFilter ( List, "Type", TypeFilter, not TypeFilter.IsEmpty () );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	init ();
 	syncItem ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure init ()
+&atclient
+procedure init ()
 	
 	Port = AppData.Port;
 	flagConnected ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure flagConnected ()
+&atclient
+procedure flagConnected ()
 	
 	Connected = AppData.Connected;
 	Appearance.Apply ( ThisObject, "Connected" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure syncItem ()
+&atclient
+procedure syncItem ()
 	
 	if ( FieldsMap = undefined ) then
 		fill ();
@@ -122,10 +122,10 @@ Procedure syncItem ()
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Function positionKey ( val Position, val Application, val Meta )
+&atservernocontext
+function positionKey ( val Position, val Application, val Meta )
 	
 	p = new Structure ( "User, Application, Metadata, Position" );
 	p.User = SessionParameters.User;
@@ -134,13 +134,13 @@ Function positionKey ( val Position, val Application, val Meta )
 	p.Position = Position;
 	return InformationRegisters.Controls.CreateRecordKey ( p );
 	
-EndFunction 
+endfunction 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure SelectForm ( Command )
+&atclient
+procedure SelectForm ( Command )
 	
 	if ( not Connected ) then
 		if ( not attach ( Port, true ) ) then
@@ -149,10 +149,10 @@ Procedure SelectForm ( Command )
 	endif;
 	ShowChooseFromMenu ( new NotifyDescription ( "FormSelected", ThisObject ), findForms (), Items.ListCommands );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function attach ( ToPort = undefined, Silently )
+&atclient
+function attach ( ToPort = undefined, Silently )
 	
 	if ( Silently ) then
 		try
@@ -168,10 +168,10 @@ Function attach ( ToPort = undefined, Silently )
 	flagConnected ();
 	return attached;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function findForms ()
+&atclient
+function findForms ()
 
 	set = new ValueList ();
 	objects = App.FindObjects ( Type ( "TestedForm" ) );
@@ -180,41 +180,41 @@ Function findForms ()
 	enddo; 
 	return set;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure FormSelected ( Form, Params ) export
+&atclient
+procedure FormSelected ( Form, Params ) export
 	
 	if ( Form <> undefined ) then
 		fill ( form.Value );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure TypeFilterOnChange ( Item )
+&atclient
+procedure TypeFilterOnChange ( Item )
 	
 	filterByType ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateList ()
+&atclient
+procedure activateList ()
 	
 	CurrentItem = Items.List;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UpdateList ( Command )
+&atclient
+procedure UpdateList ( Command )
 	
 	fill ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fill ( Form = undefined )
+&atclient
+procedure fill ( Form = undefined )
 	
 	if ( not Connected ) then
 		if ( not attach ( Port, true ) ) then
@@ -225,10 +225,10 @@ Procedure fill ( Form = undefined )
 	store ();
 	withActiveForm ();
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure fillControls ( Form )
+&atclient
+procedure fillControls ( Form )
 	
 	Controls.Clear ();
 	ControlPosition = 0;
@@ -243,10 +243,10 @@ Procedure fillControls ( Form )
 		addControl ( field );
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure addControl ( Field )
+&atclient
+procedure addControl ( Field )
 	
 	row = Controls.Add ();
 	FillPropertyValues ( row, Field );
@@ -266,18 +266,18 @@ Procedure addControl ( Field )
 	FieldsMap [ ControlPosition ] = Field; // TestedField cannot be used as a key
 	ControlPosition = ControlPosition + 1;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure store ()
+&atserver
+procedure store ()
 	
 	MetadataFilter = storeMetadata ();
 	filterByMetadata ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function storeMetadata ()
+&atserver
+function storeMetadata ()
 	
 	user = SessionParameters.User;
 	application = Parameters.Application;
@@ -310,19 +310,19 @@ Function storeMetadata ()
 	commitRecordset ( recordset );
 	return currentMeta;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure commitRecordset ( Recordset )
+&atserver
+procedure commitRecordset ( Recordset )
 	
 	if ( Recordset <> undefined ) then
 		Recordset.Write ();
 	endif; 
 				
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function newRecordset ( Meta )
+&atserver
+function newRecordset ( Meta )
 	
 	r = InformationRegisters.Controls.CreateRecordSet ();
 	r.Filter.User.Set ( SessionParameters.User );
@@ -330,10 +330,10 @@ Function newRecordset ( Meta )
 	r.Filter.Metadata.Set ( Meta );
 	return r;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure withActiveForm ()
+&atclient
+procedure withActiveForm ()
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		if ( not Connected ) then
@@ -348,17 +348,17 @@ Procedure withActiveForm ()
 		With ( name );
 	#endif
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CompleteSelection ( Command )
+&atclient
+procedure CompleteSelection ( Command )
 	
 	completePicking ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure completePicking ()
+&atclient
+procedure completePicking ()
 	
 	if ( Parameters.SelectOnly ) then
 		NotifyChoice ( selectedID () );
@@ -366,10 +366,10 @@ Procedure completePicking ()
 		NotifyChoice ( ? ( Script = "", selectedID (), Script ) );
 	endif;
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function selectedID ()
+&atclient
+function selectedID ()
 	
 	if ( tableRow () = undefined ) then
 		return undefined;
@@ -378,45 +378,45 @@ Function selectedID ()
 		return Conversion.Wrap ( name );
 	endif;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function tableRow ()
+&atclient
+function tableRow ()
 	
 	return Items.List.CurrentData;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Sync ( Command )
+&atclient
+procedure Sync ( Command )
 	
 	syncItem ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ConnectClient ( Command )
+&atclient
+procedure ConnectClient ( Command )
 	
 	attach ( Port, false );
 	fill ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure DisconnectClient ( Command )
+&atclient
+procedure DisconnectClient ( Command )
 	
 	Test.DisconnectClient ();
 	flagConnected ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** List
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	if ( Parameters.SelectOnly ) then
@@ -425,18 +425,18 @@ Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 		ScenarioForm.OpenAssistant ( Items.List, Items.ListName, true, SelectedForm, Parameters.Application );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListChoiceProcessing ( Item, SelectedValue, StandardProcessing )
+&atclient
+procedure ListChoiceProcessing ( Item, SelectedValue, StandardProcessing )
 	
 	StandardProcessing = false;
 	applyAction ( SelectedValue );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyAction ( Action )
+&atclient
+procedure applyAction ( Action )
 	
 	if ( TypeOf ( Action ) = Type ( "String" ) ) then
 		Script = Script + Action + Chars.LF;
@@ -448,4 +448,4 @@ Procedure applyAction ( Action )
 		Script = Script + Action.Expression + Chars.LF;
 	endif;
 	
-EndProcedure 
+endprocedure 

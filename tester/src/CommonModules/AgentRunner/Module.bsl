@@ -1,4 +1,4 @@
-Procedure Listen () export
+procedure Listen () export
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		if ( IAmAgent ) then
@@ -6,9 +6,9 @@ Procedure Listen () export
 		endif;
 	#endif
 	
-EndProcedure
+endprocedure
 
-Procedure Serve () export
+procedure Serve () export
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		try
@@ -30,17 +30,17 @@ Procedure Serve () export
 		AgentRunner.Listen ();
 	#endif
 	
-EndProcedure
+endprocedure
 
-Procedure startServing ( Job )
+procedure startServing ( Job )
 	
 	RunningDelegatedJob = true;
 	ВыполняетсяДелегированноеЗадание = true;
 	CurrentDelegatedJob = new Structure ( "Job, Row", Job );
 		
-EndProcedure
+endprocedure
 
-Procedure proceed ( Work, Table )
+procedure proceed ( Work, Table )
 	
 	job = Work.Job;
 	params = ? ( Work.Parameters = "", "", Conversion.FromJSON ( Work.Parameters ) ); 
@@ -67,9 +67,9 @@ Procedure proceed ( Work, Table )
 		endif;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function getJobOptions ( Row )
+function getJobOptions ( Row )
 	
 	try
 		options = Conversion.FromJSON ( Row.Options );
@@ -78,9 +78,9 @@ Function getJobOptions ( Row )
 	endtry;
 	return options;
 	
-EndFunction
+endfunction
 
-Procedure applyOptionsBeforeExec ( Options )
+procedure applyOptionsBeforeExec ( Options )
 	
 	app = Options.PinApplication;
 	if ( app <> undefined ) then
@@ -91,9 +91,9 @@ Procedure applyOptionsBeforeExec ( Options )
 		PinApplication ( version );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure applyOptionsAfterExec ( Options )
+procedure applyOptionsAfterExec ( Options )
 	
 	try
 		if ( options.CloseAllAfter ) then
@@ -105,19 +105,19 @@ Procedure applyOptionsAfterExec ( Options )
 	except
 	endtry;
 	
-EndProcedure
+endprocedure
 
-Procedure splitSessions ()
+procedure splitSessions ()
 	
 	ExternalLibrary.Pause ( 2 );
 	
-EndProcedure
+endprocedure
 
-Procedure stopServing ()
+procedure stopServing ()
 	
 	TesterAgent.Finish ( CurrentDelegatedJob.Job );
 	RunningDelegatedJob = false;
 	ВыполняетсяДелегированноеЗадание = false;
 	CurrentDelegatedJob = undefined;
 		
-EndProcedure
+endprocedure

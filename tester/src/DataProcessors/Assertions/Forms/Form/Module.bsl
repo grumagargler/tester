@@ -1,13 +1,13 @@
-&AtClient
-Function That ( CheckVal, Message = "" ) export 
+&atclient
+function That ( CheckVal, Message = "" ) export 
 	
 	runMethod ( "That", 2, CheckVal, Message );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure runMethod ( val Method, val Agruments, val P1 = undefined, val P2 = undefined )
+&atserver
+procedure runMethod ( val Method, val Agruments, val P1 = undefined, val P2 = undefined )
 	
 	p = new Array ();
 	for i = 1 to Agruments do
@@ -17,273 +17,273 @@ Procedure runMethod ( val Method, val Agruments, val P1 = undefined, val P2 = un
 	Execute ( "obj." + Method + "( " + StrConcat ( p, "," ) + " )" );
 	ValueToFormAttribute ( obj, "Object" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function Not_ () export
+&atclient
+function Not_ () export
 	
 	runMethod ( "Not_", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Не_ () export
+&atclient
+function Не_ () export
 	
 	return Not_ ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function IsTrue () export 
+&atclient
+function IsTrue () export 
 	
 	runMethod ( "IsTrue", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ЭтоИстина () export
+&atclient
+function ЭтоИстина () export
 	
 	return IsTrue ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function IsFalse () export 
+&atclient
+function IsFalse () export 
 	
 	runMethod ( "IsFalse", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ЭтоЛожь () export
+&atclient
+function ЭтоЛожь () export
 	
 	return IsFalse ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Equal ( Value ) export 
+&atclient
+function Equal ( Value ) export 
 	
 	runMethod ( "Equal", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Равно ( Value ) export
+&atclient
+function Равно ( Value ) export
 	
 	return Equal ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function NotEqual ( Value ) export 
+&atclient
+function NotEqual ( Value ) export 
 	
 	runMethod ( "NotEqual", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function НеРавно ( Value ) export
+&atclient
+function НеРавно ( Value ) export
 	
 	return NotEqual ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Greater ( Value ) export 
+&atclient
+function Greater ( Value ) export 
 	
 	runMethod ( "Greater", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Больше ( Value ) export
+&atclient
+function Больше ( Value ) export
 	
 	return Greater ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function GreaterOrEqual ( Value ) export 
+&atclient
+function GreaterOrEqual ( Value ) export 
 	
 	runMethod ( "GreaterOrEqual", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function БольшеИлиРавно ( Value ) export
+&atclient
+function БольшеИлиРавно ( Value ) export
 	
 	return GreaterOrEqual ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Less ( Value ) export 
+&atclient
+function Less ( Value ) export 
 	
 	runMethod ( "Less", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Меньше ( Value ) export
+&atclient
+function Меньше ( Value ) export
 	
 	return Less ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function LessOrEqual ( Value ) export 
+&atclient
+function LessOrEqual ( Value ) export 
 	
 	runMethod ( "LessOrEqual", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function МеньшеИлиРавно ( Value ) export
+&atclient
+function МеньшеИлиРавно ( Value ) export
 	
 	return LessOrEqual ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Filled () export 
+&atclient
+function Filled () export 
 	
 	runMethod ( "Filled", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Заполнено () export
+&atclient
+function Заполнено () export
 	
 	return Filled ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Empty () export 
+&atclient
+function Empty () export 
 	
 	runMethod ( "Empty", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Пусто () export
+&atclient
+function Пусто () export
 	
 	return Empty ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Exists () export 
+&atclient
+function Exists () export 
 	
 	runMethod ( "Exists", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Существует () export
+&atclient
+function Существует () export
 	
 	return Exists ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function IsNull () export 
+&atclient
+function IsNull () export 
 	
 	runMethod ( "IsNull", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ЭтоNull () export
+&atclient
+function ЭтоNull () export
 	
 	return IsNull ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ЕстьNull () export
+&atclient
+function ЕстьNull () export
 	
 	return IsNull ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function IsUndefined () export 
+&atclient
+function IsUndefined () export 
 	
 	runMethod ( "IsUndefined", 0 );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ЭтоНеопределено () export
+&atclient
+function ЭтоНеопределено () export
 	
 	return IsUndefined ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Between ( Start, Finish ) export 
+&atclient
+function Between ( Start, Finish ) export 
 	
 	runMethod ( "Between", 2, Start, Finish );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Между ( Start, Finish ) export
+&atclient
+function Между ( Start, Finish ) export
 	
 	return Between ( Start, Finish );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Contains ( Value ) export 
+&atclient
+function Contains ( Value ) export 
 	
 	runMethod ( "Contains", 1, Value );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Содержит ( Value ) export
+&atclient
+function Содержит ( Value ) export
 	
 	return Contains ( Value );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Has ( Size ) export 
+&atclient
+function Has ( Size ) export 
 	
 	runMethod ( "Has", 1, Size );
 	return ThisObject;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ИмеетДлину ( Size ) export
+&atclient
+function ИмеетДлину ( Size ) export
 	
 	return Has ( Size );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Вмещает ( Size ) export
+&atclient
+function Вмещает ( Size ) export
 	
 	return Has ( Size );
 	
-EndFunction
+endfunction

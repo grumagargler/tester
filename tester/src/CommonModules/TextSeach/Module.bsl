@@ -1,4 +1,4 @@
-Procedure Update () export
+procedure Update () export
 	
 	if ( FullTextSearch.GetFullTextSearchMode () = FullTextMode.Disable
 		or FullTextSearch.IndexTrue () ) then
@@ -6,13 +6,13 @@ Procedure Update () export
 	endif;
 	FullTextSearch.UpdateIndex ( false, true );
 	
-EndProcedure 
+endprocedure 
 
-Procedure Merge () export
+procedure Merge () export
 	
 	if ( FullTextSearch.GetFullTextSearchMode () = FullTextMode.Disable ) then
 		return;
 	endif; 
 	FullTextSearch.UpdateIndex ( true );
 	
-EndProcedure
+endprocedure

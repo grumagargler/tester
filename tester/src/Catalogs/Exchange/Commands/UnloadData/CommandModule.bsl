@@ -1,6 +1,6 @@
 
-&AtClient
-Procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
 	
 	ClearMessages ();
 	p = getNodeData ( CommandParameter );
@@ -18,17 +18,17 @@ Procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
 	endif;
 	refreshForm ( CommandExecuteParameters.Source );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function getNodeData ( Node )
+&atserver
+function getNodeData ( Node )
 
 	return Catalogs.Exchange.GetNodeData ( Node ); 
 	
-EndFunction 
+endfunction 
 
-&AtServer 
-Procedure runProcessServer ( Node )
+&atserver 
+procedure runProcessServer ( Node )
 	
 	p = new Structure ();
 	p.Insert ( "Node", Node );
@@ -37,10 +37,10 @@ Procedure runProcessServer ( Node )
 	p.Insert ( "ID", "" );
 	DataProcessors.ExchangeData.Unload ( p );	
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure refreshForm ( Form )
+&atclient
+procedure refreshForm ( Form )
 	
 	name = Form.FormName;
 	if ( name = "Catalog.Exchange.Form.List" ) then
@@ -52,4 +52,4 @@ Procedure refreshForm ( Form )
 		return;
 	endif;
 	
-EndProcedure
+endprocedure

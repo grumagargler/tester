@@ -1,4 +1,4 @@
-Function XLSXData ( MXLData ) export
+function XLSXData ( MXLData ) export
 
 	stream = MXLData.OpenStreamForRead ();
 	tabdoc = new SpreadsheetDocument ();
@@ -10,4 +10,4 @@ Function XLSXData ( MXLData ) export
 	DeleteFiles ( xlsx );
 	return data;
 
-EndFunction
+endfunction

@@ -1,4 +1,4 @@
-Procedure CleanTimelapse ( val Session, val Scenario, val DateTo ) export
+procedure CleanTimelapse ( val Session, val Scenario, val DateTo ) export
 	
 	checkAccess ( Session );
 	selection = recorderSelection ( Session, Scenario, DateTo );
@@ -12,9 +12,9 @@ Procedure CleanTimelapse ( val Session, val Scenario, val DateTo ) export
 	enddo;
 	CommitTransaction ();
 	
-EndProcedure
+endprocedure
 
-Procedure checkAccess ( Session )
+procedure checkAccess ( Session )
 	
 	if ( Session = undefined
 		or IsInRole ( Metadata.Roles.Administrator ) ) then
@@ -26,9 +26,9 @@ Procedure checkAccess ( Session )
 		raise Output.SessionAccessError ();
 	endif;
 
-EndProcedure
+endprocedure
 
-Function recorderSelection ( Session, Scenario, DateTo )
+function recorderSelection ( Session, Scenario, DateTo )
 	
 	q = new Query ();
 	where = new Array ();
@@ -52,4 +52,4 @@ Function recorderSelection ( Session, Scenario, DateTo )
 	|where " + StrConcat ( where, " and " );
 	return q.Execute ().Select ();
 	
-EndFunction
+endfunction

@@ -1,9 +1,9 @@
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure FormClose ( Command )
+&atclient
+procedure FormClose ( Command )
 	
 	Close ();
 	
-EndProcedure
+endprocedure

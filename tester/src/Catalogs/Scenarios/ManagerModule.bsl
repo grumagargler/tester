@@ -1,35 +1,35 @@
-Procedure FormGetProcessing ( FormType, Parameters, SelectedForm, AdditionalInformation, StandardProcessing )
+procedure FormGetProcessing ( FormType, Parameters, SelectedForm, AdditionalInformation, StandardProcessing )
 	
 	if ( newScenario ( FormType, Parameters ) ) then
 		SelectedForm = "New";
 		StandardProcessing = false;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function newScenario ( Type, Parameters )
+function newScenario ( Type, Parameters )
 	
 	return Type = "ObjectForm"
 	and not Parameters.Property ( "Key" )
 	and not Parameters.Property ( "CopyingValue" );
 	
-EndFunction
+endfunction
 
-Procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
+procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
 	
 	Fields.Add ( "Path" );
 	StandardProcessing = false;
 	
-EndProcedure
+endprocedure
 
-Procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
+procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
 	
 	StandardProcessing = false;
 	Presentation = Data.Path;
 	
-EndProcedure
+endprocedure
 
-Procedure Rollback ( Scenario, Version ) export
+procedure Rollback ( Scenario, Version ) export
 	
 	obj = Scenario.GetObject ();
 	source = Version.GetObject ();
@@ -40,9 +40,9 @@ Procedure Rollback ( Scenario, Version ) export
 	obj.AdditionalProperties.Insert ( "Restored", true );
 	obj.Write ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure RemoveAsMain ( Scenario ) export
+procedure RemoveAsMain ( Scenario ) export
 	
 	SetPrivilegedMode ( true );
 	for each user in getScenarioUsers ( Scenario ) do
@@ -52,9 +52,9 @@ Procedure RemoveAsMain ( Scenario ) export
 	enddo; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure
+endprocedure
 
-Function Locked ( Scenario ) export
+function Locked ( Scenario ) export
 	
 	user = InformationRegisters.Editing.Get ( new Structure ( "Scenario", Scenario ) ).User;
 	if ( user = SessionParameters.User ) then
@@ -66,9 +66,9 @@ Function Locked ( Scenario ) export
 	endif; 
 	return true;
 	
-EndFunction
+endfunction
 
-Function getScenarioUsers ( Scenario )
+function getScenarioUsers ( Scenario )
 	
 	s = "
 	|select Scenarios.User as User
@@ -79,9 +79,9 @@ Function getScenarioUsers ( Scenario )
 	q.SetParameter ( "Scenario", Scenario );
 	return q.Execute ().Unload ().UnloadColumn ( "User" );
 	
-EndFunction 
+endfunction 
 
-Function ChangeChildren ( Parent, OldPath, NewPath, OldApp, NewApp, SavedLocally ) export
+function ChangeChildren ( Parent, OldPath, NewPath, OldApp, NewApp, SavedLocally ) export
 	
 	changePath = ( OldPath <> NewPath )
 	and not pathAlreadyChanged ( Parent, NewPath );
@@ -111,9 +111,9 @@ Function ChangeChildren ( Parent, OldPath, NewPath, OldApp, NewApp, SavedLocally
 	enddo;
 	return true;
 		
-EndFunction
+endfunction
 
-Function pathAlreadyChanged ( Parent, ParentPath )
+function pathAlreadyChanged ( Parent, ParentPath )
 	
 	s = "
 	|select top 1 1
@@ -126,9 +126,9 @@ Function pathAlreadyChanged ( Parent, ParentPath )
 	q.SetParameter ( "Path", ParentPath + ".%" );
 	return not q.Execute ().IsEmpty ();
 
-EndFunction
+endfunction
 
-Function appAlreadyChanged ( Parent, Application )
+function appAlreadyChanged ( Parent, Application )
 	
 	s = "
 	|select top 1 1
@@ -142,9 +142,9 @@ Function appAlreadyChanged ( Parent, Application )
 	q.SetParameter ( "Application", Application );
 	return q.Execute ().IsEmpty ();
 
-EndFunction
+endfunction
 
-Function getChildren ( Scenario )
+function getChildren ( Scenario )
 	
 	s = "
 	|select Scenarios.Ref as Ref, Scenarios.Path as Path, Scenarios.Application as Application
@@ -156,9 +156,9 @@ Function getChildren ( Scenario )
 	q.SetParameter ( "Parent", Scenario.Ref );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-Procedure SetPath ( Object ) export
+procedure SetPath ( Object ) export
 	
 	ancestor = Object.Parent;
 	if ( ancestor.IsEmpty () ) then
@@ -167,9 +167,9 @@ Procedure SetPath ( Object ) export
 		Object.Path = DF.Pick ( ancestor, "Path" ) + "." + Object.Description;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure RemoveFile ( Scenario, Application, Path, Tree, AlreadyRemoved ) export
+procedure RemoveFile ( Scenario, Application, Path, Tree, AlreadyRemoved ) export
 	
 	SetPrivilegedMode ( true );
 	uid = Scenario.UUID ();
@@ -183,9 +183,9 @@ Procedure RemoveFile ( Scenario, Application, Path, Tree, AlreadyRemoved ) expor
 	enddo; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function getRepos ( Application, ExceptMe )
+function getRepos ( Application, ExceptMe )
 	
 	s = "
 	|select Repositories.Ref as Ref
@@ -203,9 +203,9 @@ Function getRepos ( Application, ExceptMe )
 	q.SetParameter ( "Application", Application );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction
+endfunction
 
-Function ApplicationsInside ( CommonFolder, ExceptApplication ) export
+function ApplicationsInside ( CommonFolder, ExceptApplication ) export
 	
 	s = "
 	|select distinct Scenarios.Application as Ref
@@ -219,9 +219,9 @@ Function ApplicationsInside ( CommonFolder, ExceptApplication ) export
 	q.SetParameter ( "Except", ExceptApplication );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction
+endfunction
 
-Function DeleteChildren ( Parent, RepoApplication ) export
+function DeleteChildren ( Parent, RepoApplication ) export
 	
 	for each child in getVictims ( Parent, RepoApplication ) do
 		baby = child.Ref;
@@ -238,9 +238,9 @@ Function DeleteChildren ( Parent, RepoApplication ) export
 	enddo;
 	return true;
 		
-EndFunction
+endfunction
 
-Function getVictims ( Scenario, Application )
+function getVictims ( Scenario, Application )
 	
 	s = "
 	|select Scenarios.Ref as Ref, Scenarios.Application as Application
@@ -257,9 +257,9 @@ Function getVictims ( Scenario, Application )
 	q.SetParameter ( "Application", Application );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-Procedure SetSorting ( Object ) export
+procedure SetSorting ( Object ) export
 	
 	objectType = Object.Type;
 	if ( objectType = Enums.Scenarios.Library ) then
@@ -272,9 +272,9 @@ Procedure SetSorting ( Object ) export
 		Object.Sorting = 3;
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Function CheckDoubles ( Object ) export
+function CheckDoubles ( Object ) export
 	
 	if ( doubleExists ( Object ) ) then
 		Output.ScenarioAlreadyExists ( new Structure ( "Name", Object.Path ), "Description", Object.Ref );
@@ -283,9 +283,9 @@ Function CheckDoubles ( Object ) export
 		return true;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Function doubleExists ( Object )
+function doubleExists ( Object )
 	
 	s = "
 	|select top 1 1
@@ -300,9 +300,9 @@ Function doubleExists ( Object )
 	q.SetParameter ( "Path", Object.Path );
 	return not q.Execute ().IsEmpty ();
 	
-EndFunction 
+endfunction 
 
-Procedure UpdateFiles ( Object ) export
+procedure UpdateFiles ( Object ) export
 	
 	path = RepositoryFiles.ScenarioFile ( Object );
 	if ( path = undefined ) then
@@ -327,9 +327,9 @@ Procedure UpdateFiles ( Object ) export
 	r.File = file;
 	r.Write ();
 
-EndProcedure
+endprocedure
 
-Function GetProperties ( Scenario ) export
+function GetProperties ( Scenario ) export
 
 	properties = new Structure ( "Version, Type, Tree, Severity, Creator, LastCreator, Memo, Tags" );
 	properties.Version = Enum.ConstantsFormatVersion ();
@@ -342,9 +342,9 @@ Function GetProperties ( Scenario ) export
 	properties.Tags = getTags ( Scenario );
 	return Conversion.ToJSON ( properties );
 	
-EndFunction
+endfunction
 
-Function getTags ( Scenario )
+function getTags ( Scenario )
 
 	s = "select Tags.Tag.Description as Tag
 	|from Catalog.TagKeys.Tags as Tags
@@ -353,6 +353,6 @@ Function getTags ( Scenario )
 	q.SetParameter ( "Key", Scenario.Tag );
 	return q.Execute ().Unload ().UnloadColumn ( "Tag" );
 	
-EndFunction
+endfunction
 
 

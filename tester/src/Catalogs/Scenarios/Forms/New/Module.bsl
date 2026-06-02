@@ -1,26 +1,26 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		ScenarioForm.Init ( ThisObject );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure BeforeWrite ( Cancel, WriteParameters )
+&atclient
+procedure BeforeWrite ( Cancel, WriteParameters )
 	
 	if ( not ScenarioForm.SaveParents ( Object, undefined ) ) then
 		Cancel = true;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AfterWrite ( WriteParameters )
+&atclient
+procedure AfterWrite ( WriteParameters )
 	
 	ScenarioForm.RereadParents ( Object, undefined );
 	ref = Object.Ref;
@@ -34,14 +34,14 @@ Procedure AfterWrite ( WriteParameters )
 		OpenForm ( "Catalog.Scenarios.ObjectForm", new Structure ( "Key", ref ) );
 	endif;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure DescriptionOnChange ( Item )
+&atclient
+procedure DescriptionOnChange ( Item )
 	
 	Object.Description = TrimAll ( Object.Description );
 	
-EndProcedure
+endprocedure

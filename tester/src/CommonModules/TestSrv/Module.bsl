@@ -1,4 +1,4 @@
-Function Data ( val Scenario ) export
+function Data ( val Scenario ) export
 	
 	app = DF.Pick ( Scenario, "Application" );
 	if ( app.IsEmpty () ) then
@@ -13,9 +13,9 @@ Function Data ( val Scenario ) export
 	result.Connected = false;
 	return result;
 	
-EndFunction 
+endfunction 
 
-Function getData ( App )
+function getData ( App )
 	
 	s = "
 	|select allowed Applications.Computer as Computer, Applications.ClientID as ClientID,
@@ -53,15 +53,15 @@ Function getData ( App )
 	q.SetParameter ( "Session", SessionParameters.Session );
 	return q.Execute ().Unload () [ 0 ];
 	
-EndFunction
+endfunction
 
-Function SessionDate () export
+function SessionDate () export
 	
 	return CurrentSessionDate ();
 	
-EndFunction 
+endfunction 
 
-Function Version ( val Expression ) export
+function Version ( val Expression ) export
 	
 	operation = decompose ( Expression );
 	if ( operation = undefined ) then
@@ -75,9 +75,9 @@ Function Version ( val Expression ) export
 	endif; 
 	return Eval ( "info.Current " + operation.Operator + " info.Compared" );
 
-EndFunction 
+endfunction 
 
-Function decompose ( Expression )
+function decompose ( Expression )
 	
 	pattern = "([^<>=]+)(>|<|=|<>|>=|<=)([^<>=]+)"; // "Application = 1.2.3.4"
 	matches = Regexp.Select ( Expression, pattern );
@@ -91,9 +91,9 @@ Function decompose ( Expression )
 	result.Insert ( "Version", TrimAll ( match [ 2 ] ) );
 	return result;
 	
-EndFunction 
+endfunction 
 
-Function versionsData ( Operation )
+function versionsData ( Operation )
 	
 	q = new Query ();
 	filter = filterByVersion ( q, Operation );
@@ -131,9 +131,9 @@ Function versionsData ( Operation )
 	result.Insert ( "Compared", ? ( compared.Count () = 0, undefined, compared [ 0 ].Date ) );
 	return result;
 	
-EndFunction 
+endfunction 
 
-Function filterByVersion ( Q, Operation )
+function filterByVersion ( Q, Operation )
 	
 	pattern = "\d+";
 	parts = StrSplit ( Operation.Version, "." );
@@ -163,9 +163,9 @@ Function filterByVersion ( Q, Operation )
 	enddo; 
 	return ? ( filter.Count () = 0, "", " and " + StrConcat ( filter, " and " ) );
 	
-EndFunction 
+endfunction 
 
-Function GetVersion ( val Version, val Application ) export
+function GetVersion ( val Version, val Application ) export
 	
 	ref = findVersion ( Version, Application );
 	if ( ref = undefined ) then
@@ -173,9 +173,9 @@ Function GetVersion ( val Version, val Application ) export
 	endif;
 	return ref;
 	
-EndFunction
+endfunction
 
-Function findVersion ( Version, Application )
+function findVersion ( Version, Application )
 	
 	s = "
 	|select top 1 allowed Versions.Ref as Ref
@@ -191,4 +191,4 @@ Function findVersion ( Version, Application )
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Ref );
 	
-EndFunction
+endfunction

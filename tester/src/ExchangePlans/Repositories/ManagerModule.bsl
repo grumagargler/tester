@@ -1,4 +1,4 @@
-Procedure Reset ( Node ) export
+procedure Reset ( Node ) export
 	
 	SetPrivilegedMode ( true );
 	set = Metadata.FindByType ( TypeOf ( Node ) ).Content;
@@ -7,18 +7,18 @@ Procedure Reset ( Node ) export
 	enddo;
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Procedure Sync ( Scenario, Application, SavedLocally ) export
+procedure Sync ( Scenario, Application, SavedLocally ) export
 
 	SetPrivilegedMode ( true );
 	nodes = getNodes ( Application, SavedLocally );
 	ExchangePlans.RecordChanges ( nodes, Scenario );
 	SetPrivilegedMode ( false );
 
-EndProcedure 
+endprocedure 
 
-Function getNodes ( Application, ExceptMe )
+function getNodes ( Application, ExceptMe )
 	
 	s = "
 	|select Repositories.Ref as Ref
@@ -37,9 +37,9 @@ Function getNodes ( Application, ExceptMe )
 	q.SetParameter ( "Session", SessionParameters.Session );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction
+endfunction
 
-Procedure MarkDeletion ( User ) export
+procedure MarkDeletion ( User ) export
 	
 	SetPrivilegedMode ( true );
 	for each node in userNodes ( User ) do
@@ -47,9 +47,9 @@ Procedure MarkDeletion ( User ) export
 	enddo; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function userNodes ( User )
+function userNodes ( User )
 	
 	s = "
 	|select Nodes.Ref as Ref
@@ -61,4 +61,4 @@ Function userNodes ( User )
 	q.SetParameter ( "User", User );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction 
+endfunction 

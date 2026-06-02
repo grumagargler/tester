@@ -1,5 +1,5 @@
 
-Function Init ( Name ) export
+function Init ( Name ) export
 	
 	id = "AddIn.Extender." + Name;
 	try
@@ -10,9 +10,9 @@ Function Init ( Name ) export
 	endtry;
 	return lib;
 	
-EndFunction
+endfunction
 
-Procedure Load () export
+procedure Load () export
 	
 	loaded = false;
 	file = EnvironmentSrv.Library ();
@@ -38,15 +38,15 @@ Procedure Load () export
 		raise Output.LibraryFailed ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Function attach ( Path )
+function attach ( Path )
 	
 	return AttachAddIn ( Path, "Extender", AddInType.Native, AddInAttachmentType.NotIsolated );
 	
-EndFunction
+endfunction
 
-Function requiredVersion ()
+function requiredVersion ()
 	
 	required = 9039;
 	try
@@ -57,4 +57,4 @@ Function requiredVersion ()
 	endtry;
 	return version >= required;
 		
-EndFunction
+endfunction

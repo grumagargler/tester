@@ -1,5 +1,5 @@
 
-#if ( Server or ThickClientOrdinaryApplication or ExternalConnection ) then
+#if ( server or thickclientordinaryapplication or externalconnection ) then
 	
 var TempDirectory;
 var IsJob;
@@ -9,7 +9,7 @@ var IDProcess;
 var DataNodes;
 var ThisNode;
 
-Procedure Unload ( Params ) export 
+procedure Unload ( Params ) export 
 	
 	init ( Params );
 	fillDataNodes ( "Unload", Params );
@@ -31,9 +31,9 @@ Procedure Unload ( Params ) export
 	enddo;
 	Exchange.DeleteTempDirectory ( TempDirectory );
 
-EndProcedure
+endprocedure
 
-Procedure Load ( Params ) export
+procedure Load ( Params ) export
 	
 	init ( Params );
 	if ( Params.Update ) then
@@ -65,9 +65,9 @@ Procedure Load ( Params ) export
 		endif;
 	endif;
 			
-EndProcedure
+endprocedure
 
-Procedure init ( Params )
+procedure init ( Params )
 	
 	IsJob = Params.IsJob;
 	IDProcess = ? ( Params.ID = "", String ( new UUID () ), Params.ID );
@@ -79,9 +79,9 @@ Procedure init ( Params )
 		TempDirectory = Exchange.CreateTempDir ( postfix );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure fillDataNodes ( Command, Params )
+procedure fillDataNodes ( Command, Params )
 	
 	s = "
 	|// 
@@ -175,9 +175,9 @@ Procedure fillDataNodes ( Command, Params )
 	enddo;
 	defineThisNode ();
 	
-EndProcedure
+endprocedure
 
-Function fillData ( Columns, Selection )	
+function fillData ( Columns, Selection )	
 	
 	p = new Structure ();
 	for each column in Columns do
@@ -187,7 +187,7 @@ Function fillData ( Columns, Selection )
 	
 endfunction
 
-Procedure defineThisNode ()
+procedure defineThisNode ()
 	
 	for each item in DataNodes do
 		data = item.Value;
@@ -200,9 +200,9 @@ Procedure defineThisNode ()
 		raise Output.NotDefineThisNode ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function createFile ( Data )
+function createFile ( Data )
 	
 	fileName = "";
 	if ( Data.ExchangeTransport = Enums.ExchangeTransport.WebService ) then
@@ -219,9 +219,9 @@ Function createFile ( Data )
 	fileName = writeChanges ( name, Data.Node );
 	return fileName;
 	
-EndFunction
+endfunction
 
-Function checkFileExist ( Data )
+function checkFileExist ( Data )
 	
 	Output.CheckPreviousFileExchange ();
 	name = getFileName ( DataNodes [ ThisNode ].Code, Data.Code, Data.PrefixFileName ) + "*";
@@ -238,15 +238,15 @@ Function checkFileExist ( Data )
 	endif;
 	return cancel; 
 	
-EndFunction
+endfunction
 
-Function getFileName ( From, Target, Prefix )
+function getFileName ( From, Target, Prefix )
 	
 	return "Message_from_" + From + "_to_" + Target + ? ( Prefix = "", "", "_" ) + Prefix;
 	
-EndFunction
+endfunction
 
-Function checkFileFtp ( Data, Mask )
+function checkFileFtp ( Data, Mask )
 	
 	if ( StrLen ( Data.FolderFTPUnLoad ) > 0 ) then
 		folder = Data.FolderFTPUnLoad + "/";
@@ -256,9 +256,9 @@ Function checkFileFtp ( Data, Mask )
 	cancel = checkStandartClient ( folder, Data, Mask );
 	return cancel; 
 
-EndFunction
+endfunction
 
-Function checkStandartClient ( Folder, Data, Mask )
+function checkStandartClient ( Folder, Data, Mask )
 	
 	cancel = false;
 	ftp = getFTPClient ( Data );
@@ -274,9 +274,9 @@ Function checkStandartClient ( Folder, Data, Mask )
 	endif; 
 	return cancel; 
 	
-EndFunction
+endfunction
 
-Function getFTPClient ( Data )
+function getFTPClient ( Data )
 	
 	try
 		ftp = new FTPConnection (
@@ -289,16 +289,16 @@ Function getFTPClient ( Data )
 	endtry; 
 	return ftp; 
 
-EndFunction
+endfunction
 
-Function checkDateExchange ( File )
+function checkDateExchange ( File )
 	
 	stringDate = Mid ( Right ( File, 18 ), 1, 14 );
 	return ( Date ( stringDate ) < ToUniversalTime ( CurrentSessionDate () ) ); 
 	
-EndFunction
+endfunction
 
-Function checkFileDisk ( Data, Mask )
+function checkFileDisk ( Data, Mask )
 	
 	if ( IsJob ) then
 		folder = Data.FolderDiskUnLoadJob;
@@ -309,9 +309,9 @@ Function checkFileDisk ( Data, Mask )
 	cancelXml = findFilesDisk ( Data, folder, Mask, "*.xml" );
 	return ( cancelZip or cancelXml );	
 
-EndFunction
+endfunction
 
-Function findFilesDisk ( Data, Folder, Mask, Postfix )
+function findFilesDisk ( Data, Folder, Mask, Postfix )
 	
 	files = FindFiles ( Folder, Mask + Postfix );	
 	cancel = false;
@@ -323,15 +323,15 @@ Function findFilesDisk ( Data, Folder, Mask, Postfix )
 	enddo;
 	return cancel; 
 	
-EndFunction 
+endfunction 
 
-Function getUniversalTime ()
+function getUniversalTime ()
 	
 	return Format ( ToUniversalTime ( CurrentSessionDate () ), "DF=yyyyMMddHHmmss" );
 	
-EndFunction
+endfunction
 
-Function writeChanges ( Name, Node )
+function writeChanges ( Name, Node )
 	
 	xml = TempDirectory + Name + ".xml";
 	writerXML = new XMLWriter ();
@@ -351,18 +351,18 @@ Function writeChanges ( Name, Node )
 	Exchange.EraseFile ( xml );
 	return zip; 
 	
-EndFunction
+endfunction
 
-Procedure compressFile ( Source, Archive )
+procedure compressFile ( Source, Archive )
 
 	writer = new ZipFileWriter ();
 	writer.Open ( Archive );  
 	writer.Add ( Source ); 
 	writer.Write ();
 		
-EndProcedure 
+endprocedure 
 
-Procedure unloadFile ( Data, FileName )
+procedure unloadFile ( Data, FileName )
 	
 	transport = Data.ExchangeTransport;
 	if ( transport = Enums.ExchangeTransport.Email ) then
@@ -375,9 +375,9 @@ Procedure unloadFile ( Data, FileName )
 		unloadToWS ( data, fileName );	
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure unloadToEmail ( Data, FileName )
+procedure unloadToEmail ( Data, FileName )
 	
 	Output.UnLoadToEmail ();
 	email = getEmail ( Data );
@@ -396,9 +396,9 @@ Procedure unloadToEmail ( Data, FileName )
 	Output.MessageSent ( new Structure ( "Node", Data.Code ) );
 	email.Logoff ();	
 	
-EndProcedure
+endprocedure
 
-Function getEmail ( Data )
+function getEmail ( Data )
 
 	profile = getProfile ( Data );
 	email = new InternetMail ();
@@ -413,9 +413,9 @@ Function getEmail ( Data )
 	endtry;
 	return email; 
 	
-EndFunction
+endfunction
 
-Function getProfile ( Data )
+function getProfile ( Data )
 	
 	p = new InternetMailProfile ();
 	p.User = Data.UserEmail;
@@ -439,9 +439,9 @@ Function getProfile ( Data )
 	endif; 
 	return p;
 
-EndFunction
+endfunction
 
-Function getMailProtocol ( Data )
+function getMailProtocol ( Data )
 	
 	if ( Data.Protocol = Enums.Protocols.POP3 ) then
 		protocol = InternetMailProtocol.POP3;
@@ -452,9 +452,9 @@ Function getMailProtocol ( Data )
 	endif;
 	return protocol;
 	
-EndFunction
+endfunction
 
-Procedure checkRecipients ( Data, Recipients )
+procedure checkRecipients ( Data, Recipients )
 	
 	if ( Recipients.Count () = 0 ) then
 		return;
@@ -467,9 +467,9 @@ Procedure checkRecipients ( Data, Recipients )
 		Output.IncorrectRecipients ( p );
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure unloadToFTP ( Data, FileName )
+procedure unloadToFTP ( Data, FileName )
 	
 	Output.UnLoadToFTP ();
 	if ( StrLen ( Data.FolderFTPLoad ) > 0 ) then
@@ -484,18 +484,18 @@ Procedure unloadToFTP ( Data, FileName )
 		Output.MessageSent ( new Structure ( "Node", Data.Code ) );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Procedure unloadToDisk ( Data, FileName )
+procedure unloadToDisk ( Data, FileName )
 	
 	Output.UnloadToDisk ();
 	destination = ? ( IsJob, Data.FolderDiskUnLoadJob, Data.FolderDiskUnLoadHandle ) + GetPathSeparator () + StrReplace ( FileName, TempDirectory, "" );
 	FileCopy ( FileName, destination );
 	Output.MessageSent ( new Structure ( "Node", Data.Code ) );
 		
-EndProcedure
+endprocedure
 
-Procedure unloadToWS ( Data, FileName )
+procedure unloadToWS ( Data, FileName )
 	
 	Output.UnLoadFromWS ();
 	if ( ExchangePlans.MasterNode () = undefined ) then
@@ -507,9 +507,9 @@ Procedure unloadToWS ( Data, FileName )
 		Exchange.WSWrite ( p );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function getWSPamas ( Data, FileName )
+function getWSPamas ( Data, FileName )
 	
 	p = new Structure ();
 	p.Insert ( "Path", "" );
@@ -525,9 +525,9 @@ Function getWSPamas ( Data, FileName )
 	p.Insert ( "FileExchange", name );
 	return p; 
 
-EndFunction
+endfunction
 
-Procedure loadFile ( Data )
+procedure loadFile ( Data )
 	
 	transport = Data.ExchangeTransport;
 	if ( transport = Enums.ExchangeTransport.Email ) then
@@ -543,9 +543,9 @@ Procedure loadFile ( Data )
 		checkCounterFiles ();		
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure loadFromEmail ( Data )
+procedure loadFromEmail ( Data )
 	
 	email = getEmail ( Data );
 	if ( email = Undefined ) then
@@ -558,9 +558,9 @@ Procedure loadFromEmail ( Data )
 	endif;
 	email.Logoff ();
 			
-EndProcedure
+endprocedure
 
-Procedure findMails ( Data, Email, Mails )
+procedure findMails ( Data, Email, Mails )
 	
 	msg = undefined;
 	senderName = Data.Code + ? ( Data.PrefixFileName = "", "", "_" + Data.PrefixFileName );
@@ -583,9 +583,9 @@ Procedure findMails ( Data, Email, Mails )
 	endif;
 	deleteEmails ( Email, mailsDelete );
 	
-EndProcedure
+endprocedure
 
-Procedure readMail ( Data, Mail )
+procedure readMail ( Data, Mail )
 	
 	attachment = Mail.Attachments [ 0 ];
 	Output.MailReceived ();
@@ -594,18 +594,18 @@ Procedure readMail ( Data, Mail )
 	binary.Write ( name );
 	readTemp ( Data );
 	
-EndProcedure
+endprocedure
 
-Procedure deleteEmails ( Email, Mails )
+procedure deleteEmails ( Email, Mails )
 	
 	if ( Mails.Count () > 0 ) then
 		Email.DeleteMessages ( Mails );
 		Email.ClearDeletedMassages ();
 	endif;	
 	
-EndProcedure 
+endprocedure 
 
-Procedure loadFromFTP ( Data )
+procedure loadFromFTP ( Data )
 
 	if ( Data.UseStandartFTPClient ) then
 		getFromFTP ( Data );
@@ -614,9 +614,9 @@ Procedure loadFromFTP ( Data )
 	endif;
 	readTemp ( Data );
 	
-EndProcedure
+endprocedure
 
-Procedure getFromFTP ( Data )
+procedure getFromFTP ( Data )
 	
 	Output.LoadFromFTP ();
 	mask = getMask ( Data );
@@ -631,16 +631,16 @@ Procedure getFromFTP ( Data )
 		enddo;
 	endif;
 		
-EndProcedure
+endprocedure
 
-Procedure loadFromDisk ( Data )
+procedure loadFromDisk ( Data )
 	
 	getFromDisk ( Data );
 	readTemp ( Data );
 		
-EndProcedure
+endprocedure
 
-Procedure getFromDisk ( Data )	
+procedure getFromDisk ( Data )	
 	
 	Output.LoadFromNetworkDisk ();
 	mask = getMask ( Data );
@@ -648,9 +648,9 @@ Procedure getFromDisk ( Data )
 	copyToTemp ( folder, mask + ".zip" );
 	copyToTemp ( folder, mask + ".xml" );
 	
-EndProcedure
+endprocedure
 
-Procedure copyToTemp ( Folder, Mask )
+procedure copyToTemp ( Folder, Mask )
 	
 	files = FindFiles ( Folder, Mask );	
 	for each f in files do
@@ -658,17 +658,17 @@ Procedure copyToTemp ( Folder, Mask )
 		Exchange.EraseFile ( f.FullName );
 	enddo;
 	
-EndProcedure 
+endprocedure 
 
-Function getMask ( Data )
+function getMask ( Data )
 	
 	postFix = ? ( Data.ExchangeTransport = Enums.ExchangeTransport.WebService, "*", "_Date_*" ); 
 	mask = getFileName ( Data.Code, DataNodes [ ThisNode ].Code, Data.PrefixFileName ) + postFix; 
 	return mask; 
 	
-EndFunction 
+endfunction 
 
-Procedure readTemp ( Data )	
+procedure readTemp ( Data )	
 	
 	mask = getMask ( Data );
 	files = FindFiles ( TempDirectory, mask );
@@ -685,17 +685,17 @@ Procedure readTemp ( Data )
 		enddo;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure checkCounterFiles ()
+procedure checkCounterFiles ()
 	
 	if ( CounterFiles = 0 ) then
 		Output.NoNewExchangeFiles ();
 	endif;	
 	
-EndProcedure
+endprocedure
 
-Procedure loadFromWS ( Data )
+procedure loadFromWS ( Data )
 	
 	Output.LoadFromWS ();
 	if ExchangePlans.MasterNode () = undefined then
@@ -712,9 +712,9 @@ Procedure loadFromWS ( Data )
 		readTemp ( Data );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Function getWSForMaster ()
+function getWSForMaster ()
 	
 	folder = TempFilesDir () + "ExchangeWebService_" + IDProcess + GetPathSeparator ();
 	files = FindFiles ( folder, "Message*.zip", false );
@@ -728,9 +728,9 @@ Function getWSForMaster ()
 	endif;
 	return result; 
 	
-EndFunction 
+endfunction 
 	 
-Procedure read ( Data, FileExchange )
+procedure read ( Data, FileExchange )
 	
 	extension = Right ( FileExchange, 3 );
 	if ( extension = "zip" ) then
@@ -743,9 +743,9 @@ Procedure read ( Data, FileExchange )
 	endif;
 	readChanges ( Data, xml );
 	
-EndProcedure
+endprocedure
 
-Function unZipFile ( FileExchange )	
+function unZipFile ( FileExchange )	
 	
 	reader = new ZipFileReader ();
 	reader.Open ( FileExchange );
@@ -755,9 +755,9 @@ Function unZipFile ( FileExchange )
 	Exchange.EraseFile ( FileExchange );
 	return xml;
 	
-EndFunction 
+endfunction 
 
-Procedure readChanges ( Data, FileXML )
+procedure readChanges ( Data, FileXML )
 	
 	xmlReader = new XMLReader ();
 	xmlReader.OpenFile ( FileXml );
@@ -778,9 +778,9 @@ Procedure readChanges ( Data, FileXML )
 	Exchange.EraseFile ( FileXml );
 	Output.ReadingChangesComplete ( new Structure ( "Node", Data.Code ) );
 	
-EndProcedure 
+endprocedure 
 
-Procedure checkUpdate ( Data, FileXML, Error )
+procedure checkUpdate ( Data, FileXML, Error )
 	
 	isUpdate = checkUpdateMessage ( Error );
 	if ( isUpdate ) then
@@ -797,9 +797,9 @@ Procedure checkUpdate ( Data, FileXML, Error )
 	Output.ErrorReceivingData ( new Structure ( "Error, FileXml", Error, FileXml ) );
 	Exchange.EraseFile ( FileXml );
 	
-EndProcedure
+endprocedure
 
-Function checkUpdateMessage ( Error )
+function checkUpdateMessage ( Error )
 	
 	isUpdate = false;
 	if ( StrFind ( Error, "Обновление может быть выполнено в режиме Конфигуратор." ) > 0 ) then
@@ -809,9 +809,9 @@ Function checkUpdateMessage ( Error )
 	endif;
 	return isUpdate; 
 	
-EndFunction 
+endfunction 
 
-Procedure handleErrors ( Data )
+procedure handleErrors ( Data )
 	
 	if ( not Data.SendedEMailError ) then
 		if ( IsJob ) then
@@ -824,17 +824,17 @@ Procedure handleErrors ( Data )
 		endif; 	
 	endif; 
 
-EndProcedure
+endprocedure
 
-Procedure writeNumbersError ( Ref, NumbersOfErrors )
+procedure writeNumbersError ( Ref, NumbersOfErrors )
 	
 	s = new Structure ();
 	s.Insert ( "NumbersOfErrors", NumbersOfErrors );
 	Catalogs.Exchange.WriteAttributes ( Ref, s );	
 	
-EndProcedure 
+endprocedure 
 
-Procedure sendReport ( Data )
+procedure sendReport ( Data )
 	
 	theme = Output.SubjectErrorReport ( new Structure ( "Node, CurrentDate", Data.Code, CurrentSessionDate () ) );
 	if ( CounterFiles = 0 ) then
@@ -853,9 +853,9 @@ Procedure sendReport ( Data )
 		Exchange.SendEMail ( p );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Function getReceivers ( Data )
+function getReceivers ( Data )
 	
 	s = "
 	|select 
@@ -870,9 +870,9 @@ Function getReceivers ( Data )
 	query.SetParameter ( "Ref", Data.Ref );		
 	return ( query.Execute ().Unload () );
 
-EndFunction
+endfunction
 
-Procedure updateConfiguration ( Params )
+procedure updateConfiguration ( Params )
 	
 	Output.WillBeRunRereadFileExchange ();
 	fillDataNodes ( "Load", Params.Node );
@@ -898,15 +898,15 @@ Procedure updateConfiguration ( Params )
 	Exchange.DeleteTempDirectory ( TempDirectory );
 	Output.FinishedRereadFileExchange ();	
 	
-EndProcedure
+endprocedure
 
-Procedure luckyUnload ( Ref )
+procedure luckyUnload ( Ref )
 	
 	Catalogs.Exchange.WriteAttributes ( Ref, new Structure ( "DateUnload", CurrentSessionDate () ) );
 	
-EndProcedure
+endprocedure
 
-Procedure luckyReadData ( Ref )
+procedure luckyReadData ( Ref )
 	
 	s = new Structure ();
 	s.Insert ( "DateLoad", CurrentSessionDate () );
@@ -915,9 +915,9 @@ Procedure luckyReadData ( Ref )
 	s.Insert ( "SendedEMailError", false );
 	Catalogs.Exchange.WriteAttributes ( Ref, s );
 	
-EndProcedure
+endprocedure
 
-Procedure readUpdateMessage ( Ref, FileXml )
+procedure readUpdateMessage ( Ref, FileXml )
 	
 	s = new Structure ();
 	s.Insert ( "FileMessage", FileXml );
@@ -925,23 +925,23 @@ Procedure readUpdateMessage ( Ref, FileXml )
 	s.Insert ( "Update", false );
 	Catalogs.Exchange.WriteAttributes ( Ref, s );
 	
-EndProcedure 
+endprocedure 
 
-Procedure writeSendedReport ( Ref )
+procedure writeSendedReport ( Ref )
 	
 	s = new Structure ();
 	s.Insert ( "SendedEMailError", true );
 	Catalogs.Exchange.WriteAttributes ( Ref, s );
 	
-EndProcedure 
+endprocedure 
 
-Procedure clearUpdateAttributes ( Node )
+procedure clearUpdateAttributes ( Node )
 	
 	p = new Structure ();
 	p.Insert ( "FileMessage", "" );
 	p.Insert ( "NumbersOfErrors", 0 );
 	Catalogs.Exchange.WriteAttributes ( Node, p )
 	
-EndProcedure 
+endprocedure 
 
 #endif

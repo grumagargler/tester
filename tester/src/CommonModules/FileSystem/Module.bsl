@@ -1,6 +1,6 @@
 
-&AtServer
-Function SpreadsheetType ( TableType ) export
+&atserver
+function SpreadsheetType ( TableType ) export
 	
 	if ( TableType = Enums.TableTypes.PDF ) then
 		return SpreadsheetDocumentFileType.PDF;
@@ -16,10 +16,10 @@ Function SpreadsheetType ( TableType ) export
 		return SpreadsheetDocumentFileType.MXL;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function TableExtension ( TableType ) export
+&atserver
+function TableExtension ( TableType ) export
 	
 	if ( TableType = Enums.TableTypes.DOCX ) then
 		return "docx";
@@ -35,25 +35,25 @@ Function TableExtension ( TableType ) export
 		return "ods";
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Function GetBaseName ( File ) export
+function GetBaseName ( File ) export
 
 	dot = StrFind ( File, ".", SearchDirection.FromEnd );
 	return ? ( dot = 0, File, Mid ( File, 1, dot - 1 ) );
 
-EndFunction
+endfunction
 
-Function Extension ( File ) export
+function Extension ( File ) export
 
 	separator = StrFind ( File, GetPathSeparator (), SearchDirection.FromEnd );
 	dot = StrFind ( File, ".", SearchDirection.FromEnd );
 	return ? ( dot > separator, Lower ( Mid ( File, dot ) ), "" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function RemoveSlash ( Path ) export
+&atclient
+function RemoveSlash ( Path ) export
 	
 	s = TrimAll ( Path );
 	while ( StrEndsWith ( s, GetPathSeparator () ) ) do
@@ -61,9 +61,9 @@ Function RemoveSlash ( Path ) export
 	enddo; 
 	return s;
 	
-EndFunction
+endfunction
 
-Function GetParent ( Folder ) export
+function GetParent ( Folder ) export
 	
 	// Do not use GetPathSeparator () bacause we do not know from where files come
 	dot = StrFind ( Folder, "/", SearchDirection.FromEnd );
@@ -72,9 +72,9 @@ Function GetParent ( Folder ) export
 	endif; 
 	return ? ( dot = 0, undefined, Left ( Folder, dot - 1 ) );
 
-EndFunction
+endfunction
 
-Function GetFileName ( Path ) export
+function GetFileName ( Path ) export
 
 	a = StrFind ( Path, "\", SearchDirection.FromEnd );
 	if ( a = 0 ) then
@@ -82,4 +82,4 @@ Function GetFileName ( Path ) export
 	endif;
 	return ? ( a = 0, Path, Mid ( Path, a + 1 ) );
 	
-EndFunction
+endfunction

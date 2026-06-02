@@ -1,32 +1,32 @@
 
-Function module ()
+function module ()
 	
 	return CoreExtension;
 	
-EndFunction
+endfunction
 
-Procedure AdjustQuery ( Query ) export
+procedure AdjustQuery ( Query ) export
 	
 	//@skip-warning
 	Query.Text = module ().GetLibrary ( "Root" ).AdjustQuery ( Query.Text );
 	
-EndProcedure
+endprocedure
 
-Function QueryTables ( Query ) export
+function QueryTables ( Query ) export
 	
 	//@skip-warning
 	return Conversion.FromJSON ( module ().GetLibrary ( "Root" ).QueryTables ( Query ) );
 	
-EndFunction
+endfunction
 
-Procedure AugmentQuery ( Query ) export
+procedure AugmentQuery ( Query ) export
 	
 	//@skip-warning
 	module ().GetLibrary ( "Root" ).AugmentQuery ( Query );
 	
-EndProcedure
+endprocedure
 
-Function ParseAppearance ( Rules ) export
+function ParseAppearance ( Rules ) export
 	
 	//@skip-warning
 	result = Conversion.FromJSON ( module ().GetLibrary ( "Root" ).ParseAppearance ( StrConcat ( Rules, ";" ) ) );
@@ -35,37 +35,37 @@ Function ParseAppearance ( Rules ) export
 	endif;
 	return new FixedArray ( result );
 	
-EndFunction
+endfunction
 
-Function codemodule ()
+function codemodule ()
 	
 	return CoreFunctions;
 	
-EndFunction
+endfunction
 
-Function Condition1 ( Value1, Value2 ) export
+function Condition1 ( Value1, Value2 ) export
 	
 	//@skip-warning
 	return module ().GetLibrary ( "Collections" ).Condition1 ( Value1, Value2 );
 	
-EndFunction
+endfunction
 
-Function Condition2 ( Value1, Value2, Value3 ) export
+function Condition2 ( Value1, Value2, Value3 ) export
 	
 	//@skip-warning
 	return module ().GetLibrary ( "Collections" ).Condition2 ( Value1, Value2, Value3 );
 	
-EndFunction
+endfunction
 
-Function GetFileHash ( File ) export
+function GetFileHash ( File ) export
 
 	return module ().GetLibrary ( "Root" ).GetHash ( File );
 
-EndFunction
+endfunction
 
-Function GetStringHash ( String, AddBOM ) export
+function GetStringHash ( String, AddBOM ) export
 
 	return module ().GetLibrary ( "Root" ).GetStringHash ( String, AddBOM );
 
-EndFunction
+endfunction
 

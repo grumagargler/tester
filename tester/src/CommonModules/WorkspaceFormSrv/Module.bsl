@@ -1,4 +1,4 @@
-Function GetFolders ( val Workspace ) export
+function GetFolders ( val Workspace ) export
 
 	s = "select Workspaces.Workspace as Workspace
 	|from Catalog.Workspaces as Workspaces
@@ -28,16 +28,16 @@ Function GetFolders ( val Workspace ) export
 	result.Folders = Collections.Serialize ( data [ 1 ].Unload () );
 	return result;
 
-EndFunction
+endfunction
 
-Function ScenarioContext ( val Scenario ) export
+function ScenarioContext ( val Scenario ) export
 	
 	application = DF.Pick ( Scenario, "Application" );
 	return workspaceData ( application );
 	
-EndFunction
+endfunction
 
-Function workspaceData ( Application )
+function workspaceData ( Application )
 	
 	s = "// VSCode
 	|select Sessions.Computer.VSCode as VSCode
@@ -64,4 +64,4 @@ Function workspaceData ( Application )
 	result.Workspaces = data [ 1 ].Unload ().UnloadColumn ( "Workspace" );
 	return result;
 	
-EndFunction
+endfunction

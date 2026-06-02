@@ -1,80 +1,80 @@
-&AtClient
+&atclient
 var TableRow;
-&AtClient
+&atclient
 var RowStart;
-&AtClient
+&atclient
 var RowEnd;
-&AtClient
+&atclient
 var ColumnStart;
-&AtClient
+&atclient
 var ColumnEnd;
-&AtClient
+&atclient
 var SelectionStart;
-&AtClient
+&atclient
 var SelectionEnd;
-&AtClient
+&atclient
 var FieldsRow;
-&AtClient
+&atclient
 var FieldsMap;
-&AtClient
+&atclient
 var TestedForm;
-&AtClient
+&atclient
 var OldParent;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer(CurrentObject)
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 
-	readMyself(CurrentObject);
+	readMyself ( CurrentObject );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readMyself(CurrentObject)
+&atserver
+procedure readMyself ( CurrentObject )
 
-	iHook();
-	initTags();
-	readStatus();
-	restoreTemplate(CurrentObject);
-	Appearance.Apply(ThisObject);
+	iHook ();
+	initTags ();
+	readStatus ();
+	restoreTemplate ( CurrentObject );
+	Appearance.Apply ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure iHook()
-	
-	WebHook = Constants.Webhook.Get() = Object.Ref;
-	
-EndProcedure
+&atserver
+procedure iHook ()
 
-&AtServer
-Procedure initTags()
+	WebHook = Constants.Webhook.Get () = Object.Ref;
 
-	initTagsList();
-	initTagsFilter();
+endprocedure
 
-EndProcedure
+&atserver
+procedure initTags ()
 
-&AtServer
-Procedure initTagsList()
+	initTagsList ();
+	initTagsFilter ();
+
+endprocedure
+
+&atserver
+procedure initTagsList ()
 
 	set = Items.TagsList.ChoiceList;
-	tags = readTags();
-	if (tags = undefined) then
-		set.Clear();
+	tags = readTags ();
+	if ( tags = undefined ) then
+		set.Clear ();
 	else
-		insertTag(tags, set)
+		insertTag ( tags, set );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function readTags()
+&atserver
+function readTags ()
 
 	tag = Object.Tag;
-	if (tag.IsEmpty()) then
+	if ( tag.IsEmpty () ) then
 		return undefined;
 	endif;
 	s = "
@@ -83,164 +83,164 @@ Function readTags()
 	|where Tags.Ref = &Key
 	|and not Tags.Tag.DeletionMark
 	|";
-	q = new Query(s);
-	q.SetParameter("Key", tag);
-	return q.Execute().Unload().UnloadColumn("Tag");
+	q = new Query ( s );
+	q.SetParameter ( "Key", tag );
+	return q.Execute ().Unload ().UnloadColumn ( "Tag" );
 
-EndFunction
+endfunction
 
-&AtClientAtServerNoContext
-Procedure insertTag(Tag, List)
+&atclientatservernocontext
+procedure insertTag ( Tag, List )
 
-	if (TypeOf(Tag) = Type("Array")) then
-		List.LoadValues(Tag);
+	if ( TypeOf ( Tag ) = Type ( "Array" ) ) then
+		List.LoadValues ( Tag );
 	else
-		List.Add(Tag);
+		List.Add ( Tag );
 	endif;
-	List.SortByValue();
+	List.SortByValue ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initTagsFilter()
+&atserver
+procedure initTagsFilter ()
 
-	tags = getTagClassifier();
+	tags = getTagClassifier ();
 	for each row in tags do
 		tag = row.Ref;
-		item = TagsFilter.FindByValue(tag);
-		if (item = undefined) then
-			TagsFilter.Add(tag, row.Description);
+		item = TagsFilter.FindByValue ( tag );
+		if ( item = undefined ) then
+			TagsFilter.Add ( tag, row.Description );
 		endif;
 	enddo;
-	TagsFilter.SortByPresentation();
+	TagsFilter.SortByPresentation ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function getTagClassifier()
+&atserver
+function getTagClassifier ()
 
 	s = "
 		|select Tags.Ref as Ref, Tags.Description as Description
 		|from Catalog.Tags as Tags
 		|where not Tags.DeletionMark
 		|";
-	q = new Query(s);
-	return q.Execute().Unload();
+	q = new Query ( s );
+	return q.Execute ().Unload ();
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure readStatus()
+&atserver
+procedure readStatus ()
 
 	Locked = false;
 	LockedBy = undefined;
-	if (Object.Ref.IsEmpty()) then
+	if ( Object.Ref.IsEmpty () ) then
 		Locked = true;
 		return;
 	endif;
-	info = InformationRegisters.Editing.Get(new Structure("Scenario", Object.Ref));
-	if (info.User.IsEmpty()) then
+	info = InformationRegisters.Editing.Get ( new Structure ( "Scenario", Object.Ref ) );
+	if ( info.User.IsEmpty () ) then
 		return;
 	endif;
 	user = info.User;
-	if (user = SessionParameters.User) then
+	if ( user = SessionParameters.User ) then
 		Locked = true;
 	else
 		LockedBy = "" + user + ", " + info.Date;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure restoreTemplate(Scenario)
+&atserver
+procedure restoreTemplate ( Scenario )
 
-	TabDoc = Scenario.Template.Get();
-	TemplateChanged = Object.Ref.IsEmpty();
-	entitleTemplate(ThisObject);
+	TabDoc = Scenario.Template.Get ();
+	TemplateChanged = Object.Ref.IsEmpty ();
+	entitleTemplate ( ThisObject );
 	AreasStorage = "";
-	markAreas();
+	markAreas ();
 
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure entitleTemplate(Form)
+&atclientatservernocontext
+procedure entitleTemplate ( Form )
 
 	items = Form.Items;
 	tabDoc = Form.TabDoc;
-	caption = Output.TemplateCaption();
-	if (0 < (tabDoc.TableWidth + tabDoc.TableHeight)) then
+	caption = Output.TemplateCaption ();
+	if ( 0 < ( tabDoc.TableWidth + tabDoc.TableHeight ) ) then
 		caption = caption + " *";
 	endif;
 	items.PageTemplate.Title = caption;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure markAreas(val List = undefined)
+&atserver
+procedure markAreas ( val List = undefined )
 
-	noline = new Line(SpreadsheetDocumentCellLineType.None);
-	redLine = new Line(SpreadsheetDocumentCellLineType.LargeDashed, 3);
-	redColor = new Color(255, 0, 0);
-	savedAreas = getSavedAreas();
-	if (List = undefined) then
-		set = Object.Areas.Unload(, "Name").UnloadColumn("Name");
+	noline = new Line ( SpreadsheetDocumentCellLineType.None );
+	redLine = new Line ( SpreadsheetDocumentCellLineType.LargeDashed, 3 );
+	redColor = new Color ( 255, 0, 0 );
+	savedAreas = getSavedAreas ();
+	if ( List = undefined ) then
+		set = Object.Areas.Unload ( , "Name" ).UnloadColumn ( "Name" );
 	else
 		set = List;
 	endif;
 	for each name in set do
-		savedAreas[name] = TabDoc.GetArea(Name);
-		area = TabDoc.Area(name);
+		savedAreas [ name ] = TabDoc.GetArea ( Name );
+		area = TabDoc.Area ( name );
 		area.TopBorder = noline;
 		area.LeftBorder = noline;
 		area.RightBorder = noline;
 		area.BottomBorder = noline;
-		area.Outline(redLine, redLine, redLine, redLine);
+		area.Outline ( redLine, redLine, redLine, redLine );
 		area.BorderColor = redColor;
 	enddo;
-	saveAreas(savedAreas);
+	saveAreas ( savedAreas );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function getSavedAreas()
+&atserver
+function getSavedAreas ()
 
-	if (AreasStorage = "") then
-		return new Map();
+	if ( AreasStorage = "" ) then
+		return new Map ();
 	else
-		return GetFromTempStorage(AreasStorage);
+		return GetFromTempStorage ( AreasStorage );
 	endif;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure saveAreas(Areas)
+&atserver
+procedure saveAreas ( Areas )
 
-	AreasStorage = PutToTempStorage(Areas, UUID);
+	AreasStorage = PutToTempStorage ( Areas, UUID );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnCreateAtServer(Cancel, StandardProcessing)
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 
-	if (Object.Ref.IsEmpty()) then
-		if (not Parameters.CopyingValue.IsEmpty()) then
-			restoreTemplate(Parameters.CopyingValue);
+	if ( Object.Ref.IsEmpty () ) then
+		if ( not Parameters.CopyingValue.IsEmpty () ) then
+			restoreTemplate ( Parameters.CopyingValue );
 		endif;
-		ScenarioForm.Init(ThisObject);
-		readStatus();
-		initTags();
+		ScenarioForm.Init ( ThisObject );
+		readStatus ();
+		initTags ();
 	endif;
 	initEditor ();
-	bindWorkplace();
-	setView();
-	setFilters();
-	showFilters(ThisObject);
+	bindWorkplace ();
+	setView ();
+	setFilters ();
+	showFilters ( ThisObject );
 	readAppearance ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -267,37 +267,37 @@ Procedure readAppearance ()
 	|Script show not AdvancedEditor;
 	|Editor show AdvancedEditor
 	|" );
-	Appearance.Read ( ThisObject, rules );
+		Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initEditor ()
-	
+&atserver
+procedure initEditor ()
+
 	AdvancedEditor = Framework.AdvancedEditor ();
 	TesterVersion = StrReplace ( Metadata.Version, ".", "_" );
-	EditorStorage = PutToTempStorage ( Catalogs.Scenarios.GetTemplate ( "Editor" ), UUID ); 
+	EditorStorage = PutToTempStorage ( Catalogs.Scenarios.GetTemplate ( "Editor" ), UUID );
 	if ( EnvironmentSrv.WebClient () ) then
 		Editor = Catalogs.Scenarios.GetTemplate ( "EditorWeb" ).GetText ();
 	endif;
-	
-EndProcedure
 
-&AtServer
-Procedure bindWorkplace()
+endprocedure
 
-	params = new Array();
-	params.Add(new ChoiceParameter("Filter.Owner", SessionParameters.User));
-	Items.WorkplaceFilter.ChoiceParameters = new FixedArray(params);
+&atserver
+procedure bindWorkplace ()
 
-EndProcedure
+	params = new Array ();
+	params.Add ( new ChoiceParameter ( "Filter.Owner", SessionParameters.User ) );
+	Items.WorkplaceFilter.ChoiceParameters = new FixedArray ( params );
 
-&AtServer
-Procedure setView()
+endprocedure
+
+&atserver
+procedure setView ()
 
 	control = Items.List;
-	if (StatusFilter = 0 and IsBlankString(SearchString)
-			and not tagsFiltered()) then
+	if ( StatusFilter = 0 and IsBlankString ( SearchString )
+		and not tagsFiltered () ) then
 		control.Representation = TableRepresentation.Tree;
 	else
 		control.Representation = TableRepresentation.List;
@@ -306,73 +306,73 @@ Procedure setView()
 	Items.ListDescription.Visible = not showPath;
 	Items.ListFullDescription.Visible = showPath;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function tagsFiltered()
+&atserver
+function tagsFiltered ()
 
 	for each item in TagsFilter do
-		if (item.Check) then
+		if ( item.Check ) then
 			return true;
 		endif;
 	enddo;
 	return false;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure setFilters()
+&atserver
+procedure setFilters ()
 
-	DC.SetParameter(List, "User", SessionParameters.User);
-	ApplicationFilter = EnvironmentSrv.GetApplication();
-	WorkplaceFilter = CommonSettingsStorage.Load(Enum.SettingsWorkplaceFilter());
-	applicationFixed(ThisObject);
-	filterByApplication();
-	filterByWorkplace();
-	filterByDeletion();
+	DC.SetParameter ( List, "User", SessionParameters.User );
+	ApplicationFilter = EnvironmentSrv.GetApplication ();
+	WorkplaceFilter = CommonSettingsStorage.Load ( Enum.SettingsWorkplaceFilter () );
+	applicationFixed ( ThisObject );
+	filterByApplication ();
+	filterByWorkplace ();
+	filterByDeletion ();
 
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Function applicationFixed(Form)
+&atclientatservernocontext
+function applicationFixed ( Form )
 
 	object = Form.Object;
 	application = object.Application;
-	if (Form.ApplicationFilter <> application and not application.IsEmpty()) then
+	if ( Form.ApplicationFilter <> application and not application.IsEmpty () ) then
 		Form.ApplicationFilter = application;
 		return true;
 	else
 		return false;
 	endif;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure filterByApplication()
+&atserver
+procedure filterByApplication ()
 
-	if (ApplicationFilter.IsEmpty()) then
-		DC.ChangeFilter(List, "Application", undefined, false);
+	if ( ApplicationFilter.IsEmpty () ) then
+		DC.ChangeFilter ( List, "Application", undefined, false );
 	else
-		filter = new Array();
-		filter.Add(Catalogs.Applications.EmptyRef());
-		filter.Add(ApplicationFilter);
-		DC.ChangeFilter(List, "Application", filter, true, DataCompositionComparisonType.InList);
+		filter = new Array ();
+		filter.Add ( Catalogs.Applications.EmptyRef () );
+		filter.Add ( ApplicationFilter );
+		DC.ChangeFilter ( List, "Application", filter, true, DataCompositionComparisonType.InList );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByWorkplace()
+&atserver
+procedure filterByWorkplace ()
 
-	show = DC.FindParameter(List, "Show");
-	hide = DC.FindParameter(List, "Hide");
+	show = DC.FindParameter ( List, "Show" );
+	hide = DC.FindParameter ( List, "Hide" );
 	show.Use = false;
 	hide.Use = false;
-	if (WorkplaceFilter.IsEmpty()) then
+	if ( WorkplaceFilter.IsEmpty () ) then
 		return;
 	endif;
-	set = WorkplaceFilter.Scenarios.UnloadColumn("Scenario");
-	if (WorkplaceFilter.Exclude) then
+	set = WorkplaceFilter.Scenarios.UnloadColumn ( "Scenario" );
+	if ( WorkplaceFilter.Exclude ) then
 		hide.Use = true;
 		hide.Value = set;
 	else
@@ -380,75 +380,75 @@ Procedure filterByWorkplace()
 		show.Value = set;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByDeletion()
+&atserver
+procedure filterByDeletion ()
 
-	if (DeletionFilter) then
-		DC.DeleteFilter(List, "DeletionMark");
+	if ( DeletionFilter ) then
+		DC.DeleteFilter ( List, "DeletionMark" );
 	else
-		DC.ChangeFilter(List, "DeletionMark", false, true);
+		DC.ChangeFilter ( List, "DeletionMark", false, true );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Procedure showFilters(Form)
+&atclientatservernocontext
+procedure showFilters ( Form )
 
 	label = Form.Items.ShowOptionsLabel;
-	if (Form.ShowOptions) then
-		label.Title = Output.OptionsLabelHide();
+	if ( Form.ShowOptions ) then
+		label.Title = Output.OptionsLabelHide ();
 	else
-		parts = new Array();
+		parts = new Array ();
 		value = Form.ApplicationFilter;
-		if (not value.IsEmpty()) then
-			parts.Add(value);
+		if ( not value.IsEmpty () ) then
+			parts.Add ( value );
 		endif;
 		value = Form.WorkplaceFilter;
-		if (not value.IsEmpty()) then
-			parts.Add(value);
+		if ( not value.IsEmpty () ) then
+			parts.Add ( value );
 		endif;
 		value = Form.StatusFilter;
-		if (value = 1) then
-			parts.Add(Output.LockedLabel());
-		elsif (value = 2) then
-			parts.Add(Output.UnlockedLabel());
+		if ( value = 1 ) then
+			parts.Add ( Output.LockedLabel () );
+		elsif ( value = 2 ) then
+			parts.Add ( Output.UnlockedLabel () );
 		endif;
-		value = selectedTags(Form);
-		if (value <> "") then
-			parts.Add(Output.TagsFilter() + ": " + value);
+		value = selectedTags ( Form );
+		if ( value <> "" ) then
+			parts.Add ( Output.TagsFilter () + ": " + value );
 		endif;
-		if (parts.Count() = 0) then
-			label.Title = Output.OptionsLabelShow();
+		if ( parts.Count () = 0 ) then
+			label.Title = Output.OptionsLabelShow ();
 		else
-			label.Title = Output.FilterLabelShow() + StrConcat(parts, " | ");
+			label.Title = Output.FilterLabelShow () + StrConcat ( parts, " | " );
 		endif;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Function selectedTags(Form)
+&atclientatservernocontext
+function selectedTags ( Form )
 
-	set = new Array();
+	set = new Array ();
 	for each item in Form.TagsFilter do
-		if (item.Check) then
-			set.Add(item.Presentation);
+		if ( item.Check ) then
+			set.Add ( item.Presentation );
 		endif;
 	enddo;
-	return StrConcat(set, ", ");
+	return StrConcat ( set, ", " );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure OnOpen(Cancel)
+&atclient
+procedure OnOpen ( Cancel )
 
-	saveOldParent();
-	ScenariosPanel.Push(ThisObject);
-	initProperties();
-	Appearance.Apply(ThisObject);
-	setTitle();
+	saveOldParent ();
+	ScenariosPanel.Push ( ThisObject );
+	initProperties ();
+	Appearance.Apply ( ThisObject );
+	setTitle ();
 	if ( AdvancedEditor ) then
 		deployEditor ();
 	else
@@ -456,41 +456,41 @@ Procedure OnOpen(Cancel)
 		AttachIdleHandler ( "activateEditor", 0.1, true );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-async Procedure deployEditor ()
-	
-	#if not WebClient then
-		path = await TempFilesDirAsync () + "testerEditor" + PathSeparator + TesterVersion;
-		Editor = path + Pathseparator + "index.html";
-		folder = new File ( path );
-		extracted = await folder.ExistsAsync ();
-		if ( not extracted ) then
-			template = GetFromTempStorage ( EditorStorage );
-			zip = new ZipFileReader ( template.OpenStreamForRead () );
-			zip.ExtractAll ( path );
-		endif;
-		Editor = path + PathSeparator + "index.html";
-	#endif
+&atclient
+async procedure deployEditor ()
+
+#if not WebClient then
+	path = await TempFilesDirAsync () + "testerEditor" + PathSeparator + TesterVersion;
+	Editor = path + Pathseparator + "index.html";
+	folder = new File ( path );
+	extracted = await folder.ExistsAsync ();
+	if ( not extracted ) then
+		template = GetFromTempStorage ( EditorStorage );
+		zip = new ZipFileReader ( template.OpenStreamForRead () );
+		zip.ExtractAll ( path );
+	endif;
+	Editor = path + PathSeparator + "index.html";
+#endif
 	addToQueue ( "initEngine" );
 	addToQueue ( "updateEditorAsync" );
 	addToQueue ( "resetMetadata" );
 	addToQueue ( "activateEditor" );
-	
-EndProcedure
 
-&AtClient
-Procedure addToQueue ( Method, Parameter = undefined )
-	
+endprocedure
+
+&atclient
+procedure addToQueue ( Method, Parameter = undefined )
+
 	Queue.Add ( Parameter, Method );
 	proceedQueue ();
-	
-EndProcedure
 
-&AtClient
-Procedure proceedQueue () export
-	
+endprocedure
+
+&atclient
+procedure proceedQueue () export
+
 	try
 		engine = engine ();
 	except
@@ -505,256 +505,256 @@ Procedure proceedQueue () export
 	if ( Queue.Count () > 0 ) then
 		AttachIdleHandler ( "proceedQueue", 0.1, true );
 	endif;
-	
-EndProcedure
 
-&AtClient
-Function updateEditorAsync ()
-	
+endprocedure
+
+&atclient
+function updateEditorAsync ()
+
 	engine = engine ();
 	engine.setContent ( Object.Script );
 	engine.setReadOnly ( not Locked );
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure saveOldParent()
+endfunction
+
+&atclient
+procedure saveOldParent ()
 
 	OldParent = Object.Parent;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure initProperties()
+&atclient
+procedure initProperties ()
 
-	if (TestManager = true) then
+	if ( TestManager = true ) then
 		TestedMode = true;
 	else
 		TestedMode = false;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadScenario(val Scenario)
+&atserver
+procedure loadScenario ( val Scenario )
 
-	exists = (Scenario <> undefined);
-	if (exists) then
-		obj = Scenario.GetObject();
+	exists = ( Scenario <> undefined );
+	if ( exists ) then
+		obj = Scenario.GetObject ();
 	else
-		obj = Catalogs.Scenarios.CreateItem();
-		FillPropertyValues(obj, Object, "Parent, Application, Type, Creator");
+		obj = Catalogs.Scenarios.CreateItem ();
+		FillPropertyValues ( obj, Object, "Parent, Application, Type, Creator" );
 	endif;
-	ValueToFormAttribute(obj, "Object");
-	if (exists) then
-		restoreTemplate(obj);
+	ValueToFormAttribute ( obj, "Object" );
+	if ( exists ) then
+		restoreTemplate ( obj );
 	endif;
-	readStatus();
-	Appearance.Apply(ThisObject);
+	readStatus ();
+	Appearance.Apply ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure syncScenario()
+&atclient
+procedure syncScenario ()
 
 	Items.List.CurrentRow = Object.Ref;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function activateEditor() export
+&atclient
+function activateEditor () export
 
 	CurrentItem = ? ( AdvancedEditor, Items.Editor, Items.Script );
 	return undefined;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure setTitle()
+&atclient
+procedure setTitle ()
 
 	ref = Object.Ref;
-	if (ref.IsEmpty()) then
-		Title = Output.NewScenario();
+	if ( ref.IsEmpty () ) then
+		Title = Output.NewScenario ();
 	else
-		Title = ?(ref = SessionScenario, "►", "") + Object.Path;
+		Title = ? ( ref = SessionScenario, "►", "" ) + Object.Path;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure NotificationProcessing(EventName, Parameter, Source)
+&atclient
+procedure NotificationProcessing ( EventName, Parameter, Source )
 
-	if (EventName = Enum.MessageSaveAll()) then
-		if (Locked) then
-			if (isModified()) then
+	if ( EventName = Enum.MessageSaveAll () ) then
+		if ( Locked ) then
+			if ( isModified () ) then
 				saveScenario ();
 			endif;
 		endif;
-	elsif (EventName = Enum.MessageLocked()
-			or EventName = Enum.MessageApplicationChanged()
-			or EventName = Enum.MessageReload()) then
-		if (Parameter.Find(Object.Ref) <> undefined) then
-				reloadScenario ();
+	elsif ( EventName = Enum.MessageLocked ()
+		or EventName = Enum.MessageApplicationChanged ()
+		or EventName = Enum.MessageReload () ) then
+		if ( Parameter.Find ( Object.Ref ) <> undefined ) then
+			reloadScenario ();
 		endif;
-	elsif (EventName = Enum.MessageStored()) then
-		if (Parameter.Find(Object.Ref) <> undefined) then
-			unlockScenario();
+	elsif ( EventName = Enum.MessageStored () ) then
+		if ( Parameter.Find ( Object.Ref ) <> undefined ) then
+			unlockScenario ();
 		endif;
-	elsif (EventName = Enum.MessageSave()) then
-		if (Locked and Parameter.Find(Object.Ref) <> undefined) then
-			if (isModified()) then
+	elsif ( EventName = Enum.MessageSave () ) then
+		if ( Locked and Parameter.Find ( Object.Ref ) <> undefined ) then
+			if ( isModified () ) then
 				saveScenario ();
 			endif;
 		endif;
-	elsif (EventName = Enum.MessageActivateError()
-			or EventName = Enum.MessageDebugger()) then
-		if (Source = Object.Ref) then
-			activateEditor();
-			activateRow(Parameter);
+	elsif ( EventName = Enum.MessageActivateError ()
+		or EventName = Enum.MessageDebugger () ) then
+		if ( Source = Object.Ref ) then
+			activateEditor ();
+			activateRow ( Parameter );
 		endif;
-	elsif (EventName = Enum.MessageMainScenarioChanged()) then
-		setTitle();
-	elsif (EventName = Enum.MessageRunExternally()
-		and Parameter = Object.Ref) then
-		AttachIdleHandler("runExternally", 1, true);
+	elsif ( EventName = Enum.MessageMainScenarioChanged () ) then
+		setTitle ();
+	elsif ( EventName = Enum.MessageRunExternally ()
+		and Parameter = Object.Ref ) then
+		AttachIdleHandler ( "runExternally", 1, true );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure runExternally () export
-	
+&atclient
+procedure runExternally () export
+
 	RunScenarios.Go ( Object.Ref, false );
-	
-EndProcedure
 
-&AtClient
-Function isModified()
+endprocedure
+
+&atclient
+function isModified ()
 
 	if ( not AdvancedEditor ) then
 		// Modified flag will not appear unless editor box looses focus
 		field = Items.Script;
-		if (CurrentItem = field) then
+		if ( CurrentItem = field ) then
 			CurrentItem = Items.Description;
 			CurrentItem = field;
 		endif;
 	endif;
 	return Modified;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure saveScenario ()
-	
+&atclient
+procedure saveScenario ()
+
 	if ( not AdvancedEditor ) then
 		Write ();
 	else
 		addToQueue ( "Write" );
 	endif;
-	
-EndProcedure
 
-&AtClient
-Procedure reloadScenario ()
+endprocedure
 
-	reload();
-	setTitle();
+&atclient
+procedure reloadScenario ()
+
+	reload ();
+	setTitle ();
 	if ( AdvancedEditor ) then
 		addToQueue ( "updateEditorAsync" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure reload()
+&atserver
+procedure reload ()
 
-	if (Object.Ref.IsEmpty()) then
+	if ( Object.Ref.IsEmpty () ) then
 		return;
 	endif;
-	obj = Object.Ref.GetObject();
-	obj.Unlock();
-	ValueToFormAttribute(obj, "Object");
+	obj = Object.Ref.GetObject ();
+	obj.Unlock ();
+	ValueToFormAttribute ( obj, "Object" );
 	Modified = false;
-	readStatus();
-	restoreTemplate(obj);
-	applicationFixed(ThisObject);
-	filterByApplication();
-	showFilters(ThisObject);
-	Appearance.Apply(ThisObject);
+	readStatus ();
+	restoreTemplate ( obj );
+	applicationFixed ( ThisObject );
+	filterByApplication ();
+	showFilters ( ThisObject );
+	Appearance.Apply ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure unlockScenario ()
-	
+&atclient
+procedure unlockScenario ()
+
 	unlock ();
 	if ( AdvancedEditor ) then
 		addToQueue ( "updateEditorAsync" );
 	endif;
-	
-EndProcedure
 
-&AtServer
-Procedure unlock()
+endprocedure
 
-	readStatus();
-	if (not Locked) then
-		UnlockFormDataForEdit();
+&atserver
+procedure unlock ()
+
+	readStatus ();
+	if ( not Locked ) then
+		UnlockFormDataForEdit ();
 	endif;
-	Appearance.Apply(ThisObject, "Locked");
+	Appearance.Apply ( ThisObject, "Locked" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateRow(Line)
+&atclient
+procedure activateRow ( Line )
 
-	endOfLine = StrLen(StrGetLine(Object.Script, Line)) + 1;
+	endOfLine = StrLen ( StrGetLine ( Object.Script, Line ) ) + 1;
 	if ( not AdvancedEditor ) then
-		Items.Script.SetTextSelectionBounds(Line, 1, Line, endOfLine);
+		Items.Script.SetTextSelectionBounds ( Line, 1, Line, endOfLine );
 	else
 		addToQueue ( "activateRowAsync", new Structure ( "Line, EndOfLine", Line, endOfLine ) );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function activateRowAsync ()
-	
+&atclient
+function activateRowAsync ()
+
 	line = LambdaParameter.Line;
 	engine ().setSelection ( line, 1, line, LambdaParameter.endOfLine );
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure ChoiceProcessing(SelectedValue, ChoiceSource)
+endfunction
 
-	if (TypeOf(SelectedValue) = Type("String")) then
-		applyAssistant(SelectedValue, false, false);
+&atclient
+procedure ChoiceProcessing ( SelectedValue, ChoiceSource )
+
+	if ( TypeOf ( SelectedValue ) = Type ( "String" ) ) then
+		applyAssistant ( SelectedValue, false, false );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyAssistant(Replacement, Picking, Comment)
+&atclient
+procedure applyAssistant ( Replacement, Picking, Comment )
 
 	if ( not AdvancedEditor ) then
-		multiline = StrLineCount(Replacement) > 1;
-		if (multiline) then
-			getSelection();
-			if (ColumnStart = 1) then
+		multiline = StrLineCount ( Replacement ) > 1;
+		if ( multiline ) then
+			getSelection ();
+			if ( ColumnStart = 1 ) then
 				text = Replacement;
 			else
 				text = Chars.LF + Replacement;
 			endif;
-		else           
+		else
 			text = Replacement;
 		endif;
-		if (Picking) then
+		if ( Picking ) then
 			text = text + Chars.LF;
 		endif;
-		if (Comment) then
+		if ( Comment ) then
 			text = "//" + text;
 		endif;
 		Items.Script.SelectedText = text;
@@ -763,16 +763,16 @@ Procedure applyAssistant(Replacement, Picking, Comment)
 			Replacement, Picking, Comment ) );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function applyAssistantAsync ()
-	
+&atclient
+function applyAssistantAsync ()
+
 	replacement = LambdaParameter.Replacement;
-	multiline = StrLineCount(replacement) > 1;
-	if (multiline) then
-		getSelection();
-		if (ColumnStart = 1) then
+	multiline = StrLineCount ( replacement ) > 1;
+	if ( multiline ) then
+		getSelection ();
+		if ( ColumnStart = 1 ) then
 			text = replacement;
 		else
 			text = Chars.LF + replacement;
@@ -780,42 +780,42 @@ Function applyAssistantAsync ()
 	else
 		text = replacement;
 	endif;
-	if (LambdaParameter.Picking) then
+	if ( LambdaParameter.Picking ) then
 		text = text + Chars.LF;
 	endif;
-	if (LambdaParameter.Comment) then
+	if ( LambdaParameter.Comment ) then
 		text = "//" + text;
 	endif;
 	engine ().selectedText ( text );
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure NewWriteProcessing(NewObject, Source, StandardProcessing)
+endfunction
 
-	type = TypeOf(NewObject);
-	if (type = Type("CatalogRef.Tags")) then
-		insertTag(String(NewObject), Items.TagsList.ChoiceList);
-		initTagsFilter();
+&atclient
+procedure NewWriteProcessing ( NewObject, Source, StandardProcessing )
+
+	type = TypeOf ( NewObject );
+	if ( type = Type ( "CatalogRef.Tags" ) ) then
+		insertTag ( String ( NewObject ), Items.TagsList.ChoiceList );
+		initTagsFilter ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FillCheckProcessingAtServer(Cancel, CheckedAttributes)
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 
-	if (not ScenarioForm.CheckName(Object.Description)) then
+	if ( not ScenarioForm.CheckName ( Object.Description ) ) then
 		Output.ScenarioIDError ( , "Description" );
 		Cancel = true;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure BeforeWrite(Cancel, WriteParameters)
+&atclient
+procedure BeforeWrite ( Cancel, WriteParameters )
 
-	if (ScenarioForm.SaveParents(Object, OldParent)) then
+	if ( ScenarioForm.SaveParents ( Object, OldParent ) ) then
 		if ( AdvancedEditor ) then
 			uploadScript ();
 		endif;
@@ -823,99 +823,99 @@ Procedure BeforeWrite(Cancel, WriteParameters)
 		Cancel = true;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure BeforeWriteAtServer(Cancel, CurrentObject, WriteParameters)
+&atserver
+procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 
-	saveTags(CurrentObject);
-	if (TemplateChanged) then
-		prepareTempale();
-		saveTemplate(CurrentObject);
+	saveTags ( CurrentObject );
+	if ( TemplateChanged ) then
+		prepareTempale ();
+		saveTemplate ( CurrentObject );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure saveTags(CurrentObject)
+&atserver
+procedure saveTags ( CurrentObject )
 
-	CurrentObject.Tag = Catalogs.TagKeys.Pick(Items.TagsList.ChoiceList.UnloadValues());
+	CurrentObject.Tag = Catalogs.TagKeys.Pick ( Items.TagsList.ChoiceList.UnloadValues () );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure prepareTempale()
+&atserver
+procedure prepareTempale ()
 
 	begin = undefined;
 	end = undefined;
-	marker = getMarker();
-	while (true) do
-		begin = TabDoc.FindText("{", end);
-		if (begin = undefined) then
+	marker = getMarker ();
+	while ( true ) do
+		begin = TabDoc.FindText ( "{", end );
+		if ( begin = undefined ) then
 			break;
 		endif;
 		end = begin;
-		if (isTemplate(begin.Text)) then
+		if ( isTemplate ( begin.Text ) ) then
 			begin.TextColor = marker;
 		endif;
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Function getMarker()
+&atclientatservernocontext
+function getMarker ()
 
-	return new Color(255, 0, 255);
+	return new Color ( 255, 0, 255 );
 
-EndFunction
+endfunction
 
-&AtClientAtServerNoContext
-Function isTemplate(Text)
+&atclientatservernocontext
+function isTemplate ( Text )
 
-	s = TrimAll(Text);
-	return StrStartsWith(s, "{") and StrEndsWith(s, "}");
+	s = TrimAll ( Text );
+	return StrStartsWith ( s, "{" ) and StrEndsWith ( s, "}" );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure saveTemplate(CurrentObject)
+&atserver
+procedure saveTemplate ( CurrentObject )
 
-	restoreAreas();
-	CurrentObject.Template = new ValueStorage(TabDoc);
-	CurrentObject.Spreadsheet = (TabDoc.TableHeight + TabDoc.TableWidth) > 0;
+	restoreAreas ();
+	CurrentObject.Template = new ValueStorage ( TabDoc );
+	CurrentObject.Spreadsheet = ( TabDoc.TableHeight + TabDoc.TableWidth ) > 0;
 	TemplateChanged = false;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure AfterWriteAtServer(CurrentObject, WriteParameters)
+&atserver
+procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
 
-	markAreas();
-	if (tagsFiltered()) then
-		filterByTag();
+	markAreas ();
+	if ( tagsFiltered () ) then
+		filterByTag ();
 	endif;
-	Appearance.Apply(ThisObject, "Object.Ref");
+	Appearance.Apply ( ThisObject, "Object.Ref" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AfterWrite(WriteParameters)
+&atclient
+procedure AfterWrite ( WriteParameters )
 
-	ScenarioForm.RereadParents(Object, OldParent);
-	saveOldParent();
-	setTitle();
-	ScenariosPanel.Push(ThisObject);
-	RepositoryFiles.Sync();
+	ScenarioForm.RereadParents ( Object, OldParent );
+	saveOldParent ();
+	setTitle ();
+	ScenariosPanel.Push ( ThisObject );
+	RepositoryFiles.Sync ();
 	if ( not AdvancedEditor ) then
-		resetCursor();
+		resetCursor ();
 	else
 		AttachIdleHandler ( "activateEditor", 0.1, true );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure resetCursor()
+&atclient
+procedure resetCursor ()
 
 	// Bug workaround: the following actions try to avoid
 	// undefined behaviour of cursor position in Text Editor
@@ -923,80 +923,80 @@ Procedure resetCursor()
 	CurrentItem = Items.Description;
 	CurrentItem = OldCurrentItem;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnClose(Exit)
+&atclient
+procedure OnClose ( Exit )
 
-	ScenariosPanel.Pop(Object.Ref);
+	ScenariosPanel.Pop ( Object.Ref );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RereadScenario ( Command )
+&atclient
+procedure RereadScenario ( Command )
 
 	Reread ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Reread() export
+&atclient
+procedure Reread () export
 
-	rereadMyself();
-	saveOldParent();
+	rereadMyself ();
+	saveOldParent ();
 	if ( AdvancedEditor ) then
 		addToQueue ( "updateEditorAsync" );
 	endif;
-	setTitle();
+	setTitle ();
 	Modified = false;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure rereadMyself()
+&atserver
+procedure rereadMyself ()
 
-	obj = Object.Ref.GetObject();
-	ValueToFormAttribute(obj, "Object");
-	readMyself(obj);
+	obj = Object.Ref.GetObject ();
+	ValueToFormAttribute ( obj, "Object" );
+	readMyself ( obj );
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Restart(Command)
+&atclient
+procedure Restart ( Command )
 
-	OpenForm("Catalog.Scenarios.Form.Restart");
+	OpenForm ( "Catalog.Scenarios.Form.Restart" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RunSelected(Command)
+&atclient
+procedure RunSelected ( Command )
 
 	if ( not AdvancedEditor ) then
-		runCode();
+		runCode ();
 	else
 		addToQueue ( "runCodeAsync" );
 	endif;
-	activateEditor();
+	activateEditor ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure runCode()
+&atclient
+procedure runCode ()
 
-	getSelection();
-	ModuleCode = getBlock();
-	Test.Exec(Object.Ref, , ModuleCode, , SelectionStart);
+	getSelection ();
+	ModuleCode = getBlock ();
+	Test.Exec ( Object.Ref,, ModuleCode,, SelectionStart );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure getSelection()
+&atclient
+procedure getSelection ()
 
 	if ( not AdvancedEditor ) then
-		Items.Script.GetTextSelectionBounds(RowStart, ColumnStart, RowEnd, ColumnEnd);
+		Items.Script.GetTextSelectionBounds ( RowStart, ColumnStart, RowEnd, ColumnEnd );
 	else
 		info = engine ().getSelection ();
 		RowStart = info.startLineNumber;
@@ -1006,371 +1006,371 @@ Procedure getSelection()
 	endif;
 	SelectionStart = RowStart;
 	SelectionEnd = RowEnd;
-	if (ColumnStart = ColumnEnd and ColumnStart = 1) then
-		SelectionEnd = Max(SelectionStart, SelectionEnd - 1);
+	if ( ColumnStart = ColumnEnd and ColumnStart = 1 ) then
+		SelectionEnd = Max ( SelectionStart, SelectionEnd - 1 );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function getBlock()
+&atclient
+function getBlock ()
 
 	text = Object.Script;
-	rows = new Array();
+	rows = new Array ();
 	for i = SelectionStart to SelectionEnd do
-		rows.Add(StrGetLine(text, i));
+		rows.Add ( StrGetLine ( text, i ) );
 	enddo;
-	return StrConcat(rows, Chars.LF);
+	return StrConcat ( rows, Chars.LF );
 
-EndFunction 
+endfunction
 
-&AtClient
-Function runCodeAsync ()
-	
+&atclient
+function runCodeAsync ()
+
 	uploadScript ();
 	runCode ();
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure Comment(Command)
+endfunction
 
-	commentScript();
-	activateEditor();
+&atclient
+procedure Comment ( Command )
 
-EndProcedure
+	commentScript ();
+	activateEditor ();
 
-&AtClient
-Procedure commentScript()
+endprocedure
+
+&atclient
+procedure commentScript ()
 
 	if ( not AdvancedEditor ) then
-		getSelection();
-		insertComments();
-		restoreSelection();
+		getSelection ();
+		insertComments ();
+		restoreSelection ();
 	else
 		addToQueue ( "commentScriptAsync" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure insertComments()
-	
+&atclient
+procedure insertComments ()
+
 	text = Object.Script;
-	rows = new Array();
+	rows = new Array ();
 	for i = SelectionStart to SelectionEnd do
-		row = StrGetLine(text, i);
-		rows.Add("//" + row);
+		row = StrGetLine ( text, i );
+		rows.Add ( "//" + row );
 	enddo;
-	replaceSelection(rows);
+	replaceSelection ( rows );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure replaceSelection(Rows)
-
-	control = Items.Script;
-	control.SetTextSelectionBounds(SelectionStart, 1, SelectionEnd, 1
-		+ StrLen(StrGetLine(Object.Script, SelectionEnd)));
-	control.SelectedText = StrConcat(rows, Chars.LF);
-
-EndProcedure
-
-&AtClient
-Procedure restoreSelection()
+&atclient
+procedure replaceSelection ( Rows )
 
 	control = Items.Script;
-	control.SetTextSelectionBounds(RowStart, ColumnStart, RowEnd, ColumnEnd);
+	control.SetTextSelectionBounds ( SelectionStart, 1, SelectionEnd, 1
+		+StrLen ( StrGetLine ( Object.Script, SelectionEnd ) ) );
+	control.SelectedText = StrConcat ( rows, Chars.LF );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function commentScriptAsync ()
-	
+&atclient
+procedure restoreSelection ()
+
+	control = Items.Script;
+	control.SetTextSelectionBounds ( RowStart, ColumnStart, RowEnd, ColumnEnd );
+
+endprocedure
+
+&atclient
+function commentScriptAsync ()
+
 	engine ().addComment ();
 	return undefined;
-	
-	
-EndFunction
 
-&AtClient
-Procedure Uncomment(Command)
+
+endfunction
+
+&atclient
+procedure Uncomment ( Command )
 
 	if ( not AdvancedEditor ) then
-		uncommentScript();
-		activateEditor();
+		uncommentScript ();
+		activateEditor ();
 	else
 		addToQueue ( "uncommentScriptAsync" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function uncommentScriptAsync ()
-	
+&atclient
+function uncommentScriptAsync ()
+
 	engine ().removeComment ();
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure uncommentScript()
+endfunction
 
-	getSelection();
-	removeComments();
-	restoreSelection();
+&atclient
+procedure uncommentScript ()
 
-EndProcedure
+	getSelection ();
+	removeComments ();
+	restoreSelection ();
 
-&AtClient
-Procedure removeComments()
+endprocedure
+
+&atclient
+procedure removeComments ()
 
 	text = Object.Script;
-	rows = new Array();
+	rows = new Array ();
 	for i = SelectionStart to SelectionEnd do
-		row = StrGetLine(text, i);
-		if (Lexer.IsComment(row)) then
-			rows.Add(Mid(row, 3));
+		row = StrGetLine ( text, i );
+		if ( Lexer.IsComment ( row ) ) then
+			rows.Add ( Mid ( row, 3 ) );
 		else
-			rows.Add(row);
+			rows.Add ( row );
 		endif;
 	enddo;
-	replaceSelection(rows);
+	replaceSelection ( rows );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure GotoDefinition(Command)
+&atclient
+procedure GotoDefinition ( Command )
 
-	openSubScenario();
-	activateEditor();
+	openSubScenario ();
+	activateEditor ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openSubScenario()
+&atclient
+procedure openSubScenario ()
 
-	scenario = getScenario();
-	if (scenario = undefined) then
+	scenario = getScenario ();
+	if ( scenario = undefined ) then
 		return;
 	endif;
-	OpenForm("Catalog.Scenarios.ObjectForm", new Structure("Key", scenario), Items.List);
+	OpenForm ( "Catalog.Scenarios.ObjectForm", new Structure ( "Key", scenario ), Items.List );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function getScenario()
+&atclient
+function getScenario ()
 
-	getSelection();
-	s = StrGetLine(Object.Script, RowStart);
-	return findScenario(s, Object.Application, ?(Object.Tree, Object.Ref, Object.Parent));
+	getSelection ();
+	s = StrGetLine ( Object.Script, RowStart );
+	return findScenario ( s, Object.Application, ? ( Object.Tree, Object.Ref, Object.Parent ) );
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function findScenario(val Row, val Application, val Parent)
+&atservernocontext
+function findScenario ( val Row, val Application, val Parent )
 
-	variants = new Array();
-	variants.Add(getSignature("call|вызвать", 1, 3));
-	variants.Add(getSignature("run|позвать", 1, 3, Parent));
-	variants.Add(getSignature("test.start", 1, 2));
-	variants.Add(getSignature("callserver|вызватьсервер ", 2, 4));
-	variants.Add(getSignature("runserver|позватьсервер ", 2, 4, Parent));
+	variants = new Array ();
+	variants.Add ( getSignature ( "call|вызвать", 1, 3 ) );
+	variants.Add ( getSignature ( "run|позвать", 1, 3, Parent ) );
+	variants.Add ( getSignature ( "test.start", 1, 2 ) );
+	variants.Add ( getSignature ( "callserver|вызватьсервер ", 2, 4 ) );
+	variants.Add ( getSignature ( "runserver|позватьсервер ", 2, 4, Parent ) );
 	for each variant in variants do
-		p = extractParams(variant, Row);
-		if (p <> undefined) then
-			return RuntimeSrv.FindScenario(p.Scenario, Application, p.Application, variant.Parent, true);
+		p = extractParams ( variant, Row );
+		if ( p <> undefined ) then
+			return RuntimeSrv.FindScenario ( p.Scenario, Application, p.Application, variant.Parent, true );
 		endif;
 	enddo;
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getSignature(Names, Scenario, Application, Parent = undefined)
+&atservernocontext
+function getSignature ( Names, Scenario, Application, Parent = undefined )
 
-	return new Structure("Names, Scenario, Application, Parent", Names, Scenario, Application, Parent);
+	return new Structure ( "Names, Scenario, Application, Parent", Names, Scenario, Application, Parent );
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function extractParams(Variant, Row)
+&atservernocontext
+function extractParams ( Variant, Row )
 
-	params = getParams(Variant.Names, Row);
-	if (params = undefined) then
+	params = getParams ( Variant.Names, Row );
+	if ( params = undefined ) then
 		return undefined;
 	endif;
-	count = params.Count();
+	count = params.Count ();
 	i = Variant.Scenario;
-	if (count < i) then
+	if ( count < i ) then
 		return undefined;
 	endif;
-	scenario = params[i - 1];
+	scenario = params [ i - 1 ];
 	i = Variant.Application;
-	app = ?(count < i, undefined, params[i - 1]);
-	return new Structure("Scenario, Application", scenario, app);
+	app = ? ( count < i, undefined, params [ i - 1 ] );
+	return new Structure ( "Scenario, Application", scenario, app );
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getParams(Functions, Row)
+&atservernocontext
+function getParams ( Functions, Row )
 
 	pattern = "(" + Functions + ")(\(| +\()(.+)\)";
-	matches = Regexp.Select(Row, pattern);
-	if (matches.Count () = 0) then
+	matches = Regexp.Select ( Row, pattern );
+	if ( matches.Count () = 0 ) then
 		return undefined;
 	endif;
-	params = StrSplit(matches [ 0 ].Groups [ 2 ], ",");
-	for i = 0 to params.UBound() do
-		params[i] = TrimAll(StrReplace(params[i], """", ""));
+	params = StrSplit ( matches [ 0 ].Groups [ 2 ], "," );
+	for i = 0 to params.UBound () do
+		params [ i ] = TrimAll ( StrReplace ( params [ i ], """", "" ) );
 	enddo;
-	return ?(params.Count() = 0, undefined, params);
+	return ? ( params.Count () = 0, undefined, params );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure FindDefinition(Command)
+&atclient
+procedure FindDefinition ( Command )
 
-	scenario = getScenario();
-	if (scenario = undefined) then
+	scenario = getScenario ();
+	if ( scenario = undefined ) then
 		return;
 	endif;
 	Items.List.CurrentRow = scenario;
-	activateList();
+	activateList ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ActivateTree(Command)
+&atclient
+procedure ActivateTree ( Command )
 
-	activateList();
+	activateList ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateList()
+&atclient
+procedure activateList ()
 
 	CurrentItem = Items.List;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure NewScenario(Command)
+&atclient
+procedure NewScenario ( Command )
 
 	// Bug workaround 8.3.8.2088:
 	// I have to create special command because standard form command disables F5 shortcut
-	OpenForm("Catalog.Scenarios.ObjectForm");
+	OpenForm ( "Catalog.Scenarios.ObjectForm" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SyncTree(Command)
+&atclient
+procedure SyncTree ( Command )
 
 	if ( not AdvancedEditor ) then
 		synchronizeTree ();
 	else
 		addToQueue ( "synchronizeTree" );
 	endif;
-	
-EndProcedure
 
-&AtClient
-Function synchronizeTree ()
+endprocedure
 
-	if (Object.Ref.IsEmpty()) then
+&atclient
+function synchronizeTree ()
+
+	if ( Object.Ref.IsEmpty () ) then
 		saveScenario ();
 	endif;
-	applicationChanged = applicationFixed(ThisObject);
+	applicationChanged = applicationFixed ( ThisObject );
 	searchUsed = SearchString <> "";
-	if (applicationChanged or searchUsed) then
-		resetFilters(applicationChanged, searchUsed);
+	if ( applicationChanged or searchUsed ) then
+		resetFilters ( applicationChanged, searchUsed );
 	endif;
-	syncScenario();
-	activateList();
+	syncScenario ();
+	activateList ();
 	return undefined;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure resetFilters(val Application, val Search)
+&atserver
+procedure resetFilters ( val Application, val Search )
 
-	if (Application) then
-		filterByApplication();
-		showFilters(ThisObject);
+	if ( Application ) then
+		filterByApplication ();
+		showFilters ( ThisObject );
 	endif;
-	if (Search) then
+	if ( Search ) then
 		SearchString = "";
-		applySearch();
+		applySearch ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure CheckSyntax(Command)
+&atclient
+procedure CheckSyntax ( Command )
 
 	if ( not AdvancedEditor ) then
-		checkCode();
-		activateEditor();
+		checkCode ();
+		activateEditor ();
 	else
 		addToQueue ( "checkCodeAsync" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkCode()
+&atclient
+procedure checkCode ()
 
-	Test.CheckSyntax(Object.Script);
+	Test.CheckSyntax ( Object.Script );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function checkCodeAsync ()
-	
+&atclient
+function checkCodeAsync ()
+
 	uploadScript ();
 	checkCode ();
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure uploadScript ()
-	
+endfunction
+
+&atclient
+procedure uploadScript ()
+
 	Object.Script = engine ().getText ();
-	
-EndProcedure
 
-&AtClient
-Procedure Assist(Command)
+endprocedure
+
+&atclient
+procedure Assist ( Command )
 
 	openAssistant ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openAssistant ()
-	
+&atclient
+procedure openAssistant ()
+
 	Test.AttachApplication ( Object.Ref );
-	OpenForm ( "Catalog.Assistant.ChoiceForm", , ThisObject );
-	
-EndProcedure 
+	OpenForm ( "Catalog.Assistant.ChoiceForm",, ThisObject );
 
-&AtClient
-Procedure DescriptionOnChange(Item)
+endprocedure
 
-	Object.Description = TrimAll(Object.Description);
+&atclient
+procedure DescriptionOnChange ( Item )
 
-EndProcedure
+	Object.Description = TrimAll ( Object.Description );
 
-&AtClient
-Procedure InsertID(Command)
+endprocedure
 
-	insertIdentifier();
+&atclient
+procedure InsertID ( Command )
 
-EndProcedure
+	insertIdentifier ();
 
-&AtClient
-Procedure insertIdentifier()
+endprocedure
+
+&atclient
+procedure insertIdentifier ()
 
 	if ( not AdvancedEditor ) then
 		Items.Script.SelectedText = TestingID ();
@@ -1378,124 +1378,124 @@ Procedure insertIdentifier()
 		addToQueue ( "insertIdentifierAsync" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function insertIdentifierAsync ()
-	
+&atclient
+function insertIdentifierAsync ()
+
 	engine ().selectedText ( TestingID () );
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure StartRecording(Command)
+endfunction
 
-	if (SessionScenario.IsEmpty()) then
-		Output.SetupMainScenario(ThisObject, Object.Ref);
+&atclient
+procedure StartRecording ( Command )
+
+	if ( SessionScenario.IsEmpty () ) then
+		Output.SetupMainScenario ( ThisObject, Object.Ref );
 	else
-		openRecording();
+		openRecording ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Convert(Command)
+&atclient
+procedure Convert ( Command )
 
-	openConversion();
+	openConversion ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openConversion()
+&atclient
+procedure openConversion ()
 
-	OpenForm("Catalog.Scenarios.Form.Convert", , , , , , new NotifyDescription("Converting", ThisObject));
+	OpenForm ( "Catalog.Scenarios.Form.Convert",,,,,, new NotifyDescription ( "Converting", ThisObject ) );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SetupMainScenario(Answer, Scenario) export
+&atclient
+procedure SetupMainScenario ( Answer, Scenario ) export
 
-	if (Answer = DialogReturnCode.No) then
+	if ( Answer = DialogReturnCode.No ) then
 		return;
 	endif;
-	Environment.ChangeScenario(Scenario);
-	openRecording();
+	Environment.ChangeScenario ( Scenario );
+	openRecording ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openRecording()
+&atclient
+procedure openRecording ()
 
-	OpenForm("Catalog.Scenarios.Form.Record", , ThisObject, , , , new NotifyDescription("Converting", ThisObject));
+	OpenForm ( "Catalog.Scenarios.Form.Record",, ThisObject,,,, new NotifyDescription ( "Converting", ThisObject ) );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Converting(Data, Params) export
+&atclient
+procedure Converting ( Data, Params ) export
 
-	if (Data = undefined) then
+	if ( Data = undefined ) then
 		return;
 	endif;
 	Log = Data.Log;
 	if ( not AdvancedEditor ) then
-		Items.Script.SelectedText = transpile(Data, Object.Script);
+		Items.Script.SelectedText = transpile ( Data, Object.Script );
 	else
 		addToQueue ( "setRecorderScriptAsync", Data );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function setRecorderScriptAsync ()
-	
+&atclient
+function setRecorderScriptAsync ()
+
 	uploadScript ();
 	engine ().selectedText ( transpile ( LambdaParameter, Object.Script ) );
 	return undefined;
-	
-EndFunction
 
-&AtServerNoContext
-Function transpile(val Data, val Script)
+endfunction
+
+&atservernocontext
+function transpile ( val Data, val Script )
 
 	mode = Data.Mode;
-	if (mode = Enums.Recording.Tester) then
-		return DataProcessors.TranspilerTester.Perform(Data.Log, Data.Lang, findConnect(Script));
+	if ( mode = Enums.Recording.Tester ) then
+		return DataProcessors.TranspilerTester.Perform ( Data.Log, Data.Lang, findConnect ( Script ) );
 	else
-		return DataProcessors.TranspilerRaw.Perform(Data.Log, Data.Lang, mode = Enums.Recording.Smart, findConnect(Script));
+		return DataProcessors.TranspilerRaw.Perform ( Data.Log, Data.Lang, mode = Enums.Recording.Smart, findConnect ( Script ) );
 	endif;
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function findConnect(Script)
+&atservernocontext
+function findConnect ( Script )
 
 	pattern = "(^|\s+)(connect\W|подключить\W)";
-	return Regexp.Test(Script, pattern);
+	return Regexp.Test ( Script, pattern );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure PickAction(Command)
+&atclient
+procedure PickAction ( Command )
 
-	ScenarioForm.Picking(ThisObject, false);
+	ScenarioForm.Picking ( ThisObject, false );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FormatTable ( Command )
-	
+&atclient
+procedure FormatTable ( Command )
+
 	if ( not AdvancedEditor ) then
 		alignTable ();
 	else
 		addToQueue ( "alignTableAsync" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure alignTable ()
-	
+&atclient
+procedure alignTable ()
+
 	getSelection ();
 	evalRange = SelectionStart = SelectionEnd;
 	table = extractSelection ( evalRange );
@@ -1518,21 +1518,21 @@ Procedure alignTable ()
 			control.selectedText ( text + ? ( ColumnEnd = 1, Chars.LF, "" ) );
 		endif;
 	endif;
-	
-EndProcedure
 
-&AtClient
-Function alignTableAsync ()
-	
+endprocedure
+
+&atclient
+function alignTableAsync ()
+
 	uploadScript ();
 	alignTable ();
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Function extractSelection ( EvalRange )
-	
+endfunction
+
+&atclient
+function extractSelection ( EvalRange )
+
 	rows = new Array ();
 	indent = undefined;
 	if ( EvalRange ) then
@@ -1553,12 +1553,12 @@ Function extractSelection ( EvalRange )
 		rows.Add ( data.Text );
 	enddo;
 	return new Structure ( "Text, Indent, Start, Finish", StrConcat ( rows, Chars.LF ), indent, start, finish );
-	
-EndFunction
 
-&AtClient
-Function evalTableStart ()
-	
+endfunction
+
+&atclient
+function evalTableStart ()
+
 	script = Object.Script;
 	i = SelectionStart;
 	while ( i > 0 ) do
@@ -1573,11 +1573,11 @@ Function evalTableStart ()
 	enddo;
 	raise Output.TableDefinitionNotFound ();
 
-EndFunction
+endfunction
 
-&AtClient
-Function extractTablePart ( Row, Part )
-	
+&atclient
+function extractTablePart ( Row, Part )
+
 	result = new Structure ( "Indent, Text" );
 	if ( Part = 1 ) then
 		// Definition begins
@@ -1596,7 +1596,7 @@ Function extractTablePart ( Row, Part )
 			match = matches [ 0 ];
 			result.Indent = match.Groups [ 0 ];
 			result.Text = match.Groups [ 1 ];
-		endif; 
+		endif;
 	else
 		// Definition ends
 		// | text";
@@ -1605,12 +1605,12 @@ Function extractTablePart ( Row, Part )
 		return Regexp.Test ( Row, pattern );
 	endif;
 	return result;
-	
-EndFunction
 
-&AtClient
-Function evalTableEnd ()
-	
+endfunction
+
+&atclient
+function evalTableEnd ()
+
 	script = Object.Script;
 	eof = StrLineCount ( script );
 	for i = SelectionStart to eof do
@@ -1623,22 +1623,22 @@ Function evalTableEnd ()
 		endif;
 	enddo;
 	raise Output.TableDefinitionNotFound ();
-	
-EndFunction
 
-&AtClient
-Procedure AddBreakpoint(Command)
+endfunction
+
+&atclient
+procedure AddBreakpoint ( Command )
 
 	if ( not AdvancedEditor ) then
-		insertDebugger();
+		insertDebugger ();
 	else
 		addToQueue ( "insertDebugger" );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function insertDebugger()
+&atclient
+function insertDebugger ()
 
 	label = Output.DebuggerLabel () + Chars.LF;
 	if ( not AdvancedEditor ) then
@@ -1648,181 +1648,181 @@ Function insertDebugger()
 	endif;
 	return undefined;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure ShowScenarios(Command)
+&atclient
+procedure ShowScenarios ( Command )
 
-	togglePanel();
+	togglePanel ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure togglePanel()
+&atclient
+procedure togglePanel ()
 
 	HidePanel = not HidePanel;
-	Appearance.Apply(ThisObject, "HidePanel");
+	Appearance.Apply ( ThisObject, "HidePanel" );
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Filters
-&AtClient
-Procedure QuickFilterStartChoice(Item, ChoiceData, StandardProcessing)
+&atclient
+procedure QuickFilterStartChoice ( Item, ChoiceData, StandardProcessing )
 
 	StandardProcessing = false;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure QuickFilterClearing(Item, StandardProcessing)
+&atclient
+procedure QuickFilterClearing ( Item, StandardProcessing )
 
-	resetSearch();
-	activateList();
+	resetSearch ();
+	activateList ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure resetSearch()
+&atclient
+procedure resetSearch ()
 
 	SearchString = "";
-	filterScenario();
+	filterScenario ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure filterScenario() export
+&atclient
+procedure filterScenario () export
 
-	applySearch();
+	applySearch ();
 	OldScenario = undefined;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applySearch()
+&atserver
+procedure applySearch ()
 
-	setView();
-	refs = FullSearch.Refs(SearchString, Enums.Search.Scenarios);
-	DC.ChangeFilter(List, "Ref", refs, not IsBlankString(SearchString), DataCompositionComparisonType.InList);
+	setView ();
+	refs = FullSearch.Refs ( SearchString, Enums.Search.Scenarios );
+	DC.ChangeFilter ( List, "Ref", refs, not IsBlankString ( SearchString ), DataCompositionComparisonType.InList );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure QuickFilterEditTextChange(Item, Text, StandardProcessing)
+&atclient
+procedure QuickFilterEditTextChange ( Item, Text, StandardProcessing )
 
-	DetachIdleHandler("filterScenario");
+	DetachIdleHandler ( "filterScenario" );
 	SearchString = Text;
-	AttachIdleHandler("filterScenario", 0.4, true);
+	AttachIdleHandler ( "filterScenario", 0.4, true );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ShowOptionsLabelClick(Item)
+&atclient
+procedure ShowOptionsLabelClick ( Item )
 
 	ShowOptions = not ShowOptions;
-	Appearance.Apply(ThisObject, "ShowOptions");
-	showFilters(ThisObject);
+	Appearance.Apply ( ThisObject, "ShowOptions" );
+	showFilters ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ApplicationFilterOnChange(Item)
+&atclient
+procedure ApplicationFilterOnChange ( Item )
 
-	filterByApplication();
-	activateList();
+	filterByApplication ();
+	activateList ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure WorkplaceFilterOnChange(Item)
+&atclient
+procedure WorkplaceFilterOnChange ( Item )
 
-	applyWorkplace();
+	applyWorkplace ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyWorkplace()
+&atserver
+procedure applyWorkplace ()
 
-	Logins.SaveSettings(Enum.SettingsWorkplaceFilter(), , WorkplaceFilter);
-	filterByWorkplace();
+	Logins.SaveSettings ( Enum.SettingsWorkplaceFilter (),, WorkplaceFilter );
+	filterByWorkplace ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StatusFilterOnChange(Item)
+&atclient
+procedure StatusFilterOnChange ( Item )
 
-	applyStatusFilter();
-	activateList();
+	applyStatusFilter ();
+	activateList ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyStatusFilter()
+&atserver
+procedure applyStatusFilter ()
 
-	setView();
-	filterByStatus();
+	setView ();
+	filterByStatus ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByStatus()
+&atserver
+procedure filterByStatus ()
 
-	if (StatusFilter = 2) then
-		DC.ChangeFilter(List, "Locked", 1, true, DataCompositionComparisonType.NotEqual);
+	if ( StatusFilter = 2 ) then
+		DC.ChangeFilter ( List, "Locked", 1, true, DataCompositionComparisonType.NotEqual );
 	else
-		DC.ChangeFilter(List, "Locked", StatusFilter, StatusFilter <> 0);
+		DC.ChangeFilter ( List, "Locked", StatusFilter, StatusFilter <> 0 );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure DeletionFilterOnChange(Item)
+&atclient
+procedure DeletionFilterOnChange ( Item )
 
-	filterByDeletion();
+	filterByDeletion ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagsFilterOnChange(Item)
+&atclient
+procedure TagsFilterOnChange ( Item )
 
-	applyTagsFilter();
+	applyTagsFilter ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyTagsFilter()
+&atserver
+procedure applyTagsFilter ()
 
-	setView();
-	filterByTag();
+	setView ();
+	filterByTag ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByTag()
+&atserver
+procedure filterByTag ()
 
-	tags = gatherTags();
-	DC.ChangeFilter(List, "Tag", gatherKeys(Tags), tags.Count() > 0, DataCompositionComparisonType.InList);
+	tags = gatherTags ();
+	DC.ChangeFilter ( List, "Tag", gatherKeys ( Tags ), tags.Count () > 0, DataCompositionComparisonType.InList );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function gatherTags()
+&atserver
+function gatherTags ()
 
-	set = new Array();
+	set = new Array ();
 	for each item in TagsFilter do
-		if (item.Check) then
-			set.Add(item.Value);
+		if ( item.Check ) then
+			set.Add ( item.Value );
 		endif;
 	enddo;
 	return set;
 
-EndFunction
+endfunction
 
-&AtServer
-Function gatherKeys(Tags)
+&atserver
+function gatherKeys ( Tags )
 
-	if (Tags.Count() = 0) then
-		result = new Array();
+	if ( Tags.Count () = 0 ) then
+		result = new Array ();
 	else
 		s = "
 			|select Keys.Ref as Ref
@@ -1840,156 +1840,156 @@ Function gatherKeys(Tags)
 			|group by Keys.Ref
 			|having sum ( Keys.Selected ) = &TagsCount
 			|";
-		q = new Query(s);
-		q.SetParameter("Tags", Tags);
-		q.SetParameter("TagsCount", Tags.Count());
-		result = q.Execute().Unload().UnloadColumn("Ref");
+		q = new Query ( s );
+		q.SetParameter ( "Tags", Tags );
+		q.SetParameter ( "TagsCount", Tags.Count () );
+		result = q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	endif;
 	return result;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure TagsFilterBeforeRowChange(Item, Cancel)
+&atclient
+procedure TagsFilterBeforeRowChange ( Item, Cancel )
 
-	if (Item.CurrentItem.Name = "TagsFilterValue") then
+	if ( Item.CurrentItem.Name = "TagsFilterValue" ) then
 		Cancel = true;
-		toggleTagsFilter();
+		toggleTagsFilter ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure toggleTagsFilter()
+&atclient
+procedure toggleTagsFilter ()
 
 	row = Items.TagsFilter.CurrentData;
 	// The code does not work in 8.3.11.2924:
 	// row.Check = not row.Check;
 	//
 	// Workaround is used:
-	TagsFilter.FindByValue(row.Value).Check = not row.Check;
-	applyTagsFilter();
+	TagsFilter.FindByValue ( row.Value ).Check = not row.Check;
+	applyTagsFilter ();
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group List
 
-&AtClient
-Procedure SetCurrent(Command)
+&atclient
+procedure SetCurrent ( Command )
 
-	Environment.ChangeApplication(ApplicationFilter);
+	Environment.ChangeApplication ( ApplicationFilter );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OpenHere(Command)
+&atclient
+procedure OpenHere ( Command )
 
 	if ( not AdvancedEditor ) then
-		applyScenario(TableRow.Ref);
+		applyScenario ( TableRow.Ref );
 	else
 		addToQueue ( "applyScenarioAsync", TableRow.Ref );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyScenario(Scenario)
+&atclient
+procedure applyScenario ( Scenario )
 
-	if (Scenario = Object.Ref) then
+	if ( Scenario = Object.Ref ) then
 		return;
 	endif;
-	if (isModified ()) then
+	if ( isModified () ) then
 		saveScenario ();
 	endif;
-	ScenariosPanel.Pop(Object.Ref);
-	loadScenario(Scenario);
+	ScenariosPanel.Pop ( Object.Ref );
+	loadScenario ( Scenario );
 	if ( AdvancedEditor ) then
 		updateEditorAsync ();
 	endif;
-	ScenariosPanel.Push(ThisObject);
-	setTitle();
-	activateEditor();
+	ScenariosPanel.Push ( ThisObject );
+	setTitle ();
+	activateEditor ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function applyScenarioAsync ()
-	
-	applyScenario(LambdaParameter);
+&atclient
+function applyScenarioAsync ()
+
+	applyScenario ( LambdaParameter );
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Procedure FindMain(Command)
+endfunction
 
-	findHead();
+&atclient
+procedure FindMain ( Command )
 
-EndProcedure
+	findHead ();
 
-&AtClient
-Procedure findHead()
+endprocedure
 
-	if (SessionScenario.IsEmpty()) then
-		Output.MainScenarioUndefined();
+&atclient
+procedure findHead ()
+
+	if ( SessionScenario.IsEmpty () ) then
+		Output.MainScenarioUndefined ();
 	else
 		Items.List.CurrentRow = SessionScenario;
-		activateList();
+		activateList ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RefreshList(Command)
+&atclient
+procedure RefreshList ( Command )
 
-	Items.List.Refresh();
+	Items.List.Refresh ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListOnActivateRow(Item)
+&atclient
+procedure ListOnActivateRow ( Item )
 
 	TableRow = Item.CurrentData;
-	AttachIdleHandler("showCode", 0.1, true);
+	AttachIdleHandler ( "showCode", 0.1, true );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showCode() export
+&atclient
+procedure showCode () export
 
-	if (TableRow = undefined) then
+	if ( TableRow = undefined ) then
 		CodePreview = "";
 		return;
 	endif;
-	if (TableRow.Ref = OldScenario) then
+	if ( TableRow.Ref = OldScenario ) then
 		return;
 	endif;
 	OldScenario = TableRow.Ref;
-	CodePreview = preview(OldScenario, adjustText(Items.QuickFilter.EditText));
+	CodePreview = preview ( OldScenario, adjustText ( Items.QuickFilter.EditText ) );
 
-EndProcedure
+endprocedure
 
-&AtClientAtServerNoContext
-Function adjustText(Text)
+&atclientatservernocontext
+function adjustText ( Text )
 
-	if (IsBlankString(Text)) then
+	if ( IsBlankString ( Text ) ) then
 		return "";
 	endif;
-	parts = Conversion.StringToArray(Lower(Text), " ");
+	parts = Conversion.StringToArray ( Lower ( Text ), " " );
 	s = "";
 	for each part in parts do
-		if (part = "") then
+		if ( part = "" ) then
 			continue;
 		endif;
 		s = s + " " + part;
 	enddo;
-	return Mid(s, 2);
+	return Mid ( s, 2 );
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function preview(val Scenario, val Highlighting) export
+&atservernocontext
+function preview ( val Scenario, val Highlighting ) export
 
 	return "
 		|<html>
@@ -2002,10 +2002,10 @@ Function preview(val Scenario, val Highlighting) export
 		|</body>
 		|</html>";
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function styles()
+&atservernocontext
+function styles ()
 
 	s = "
 		|.yellow{
@@ -2015,10 +2015,10 @@ Function styles()
 		|";
 	return s;
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function scripts()
+&atservernocontext
+function scripts ()
 
 	s = "
 		|function highlightWord(searchString) {
@@ -2053,466 +2053,466 @@ Function scripts()
 		|";
 	return s;
 
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function body(val Scenario)
+&atservernocontext
+function body ( val Scenario )
 
-	body = DF.Pick(Scenario, "Script");
-	return Conversion.XMLToStandard(body);
+	body = DF.Pick ( Scenario, "Script" );
+	return Conversion.XMLToStandard ( body );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure ListSelection(Item, SelectedRow, Field, StandardProcessing)
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 
-	if (hierarchy()) then
+	if ( hierarchy () ) then
 		StandardProcessing = false;
-		processHierarchy();
+		processHierarchy ();
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function hierarchy()
+&atclient
+function hierarchy ()
 
 	type = TableRow.Type;
-	return TableRow.Tree and (type = PredefinedValue("Enum.Scenarios.Folder")
-		or type = PredefinedValue("Enum.Scenarios.Library"));
+	return TableRow.Tree and ( type = PredefinedValue ( "Enum.Scenarios.Folder" )
+		or type = PredefinedValue ( "Enum.Scenarios.Library" ) );
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure processHierarchy()
+&atclient
+procedure processHierarchy ()
 
 	tree = Items.List;
 	row = tree.CurrentRow;
-	if (tree.Expanded(row)) then
-		tree.Collapse(row);
+	if ( tree.Expanded ( row ) ) then
+		tree.Collapse ( row );
 	else
-		tree.Expand(row);
+		tree.Expand ( row );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListDrag(Item, DragParameters, StandardProcessing, Row, Field)
+&atclient
+procedure ListDrag ( Item, DragParameters, StandardProcessing, Row, Field )
 
-	ScenarioForm.ListDrag(ThisObject, DragParameters, StandardProcessing, Row);
+	ScenarioForm.ListDrag ( ThisObject, DragParameters, StandardProcessing, Row );
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Table FieldsTable
 
-&AtClient
-Procedure FetchFields(Command)
+&atclient
+procedure FetchFields ( Command )
 
-	fill(false);
-	expandTree();
+	fill ( false );
+	expandTree ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fill(ActiveOnly)
+&atclient
+procedure fill ( ActiveOnly )
 
 	scenario = Object.Ref;
-	Test.AttachApplication(scenario);
-	Test.ConnectClient(false);
-	initTree();
-	source = ?(ActiveOnly, App.GetActiveWindow(), App);
-	fillTree(FieldsTable.GetItems(), source.GetChildObjects());
+	Test.AttachApplication ( scenario );
+	Test.ConnectClient ( false );
+	initTree ();
+	source = ? ( ActiveOnly, App.GetActiveWindow (), App );
+	fillTree ( FieldsTable.GetItems (), source.GetChildObjects () );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure initTree()
+&atclient
+procedure initTree ()
 
-	rows = FieldsTable.GetItems();
-	rows.Clear();
-	FieldsMap = new Map();
+	rows = FieldsTable.GetItems ();
+	rows.Clear ();
+	FieldsMap = new Map ();
 	TestedForm = undefined;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fillTree(Rows, Objects)
+&atclient
+procedure fillTree ( Rows, Objects )
 
-	form = PredefinedValue("Enum.Controls.Form");
+	form = PredefinedValue ( "Enum.Controls.Form" );
 	for each obj in Objects do
 		try
-			next = obj.GetChildObjects(); // For some particular forms, testmanager gets error
+			next = obj.GetChildObjects (); // For some particular forms, testmanager gets error
 		except
 			continue;
 		endtry;
-		row = Rows.Add();
-		FillPropertyValues(row, obj);
-		type = ScenarioForm.FieldType(obj);
+		row = Rows.Add ();
+		FillPropertyValues ( row, obj );
+		type = ScenarioForm.FieldType ( obj );
 		row.Type = type;
-		row.Picture = ScenarioForm.GetPicture(type);
-		if (row.Name = "") then
-			row.Name = "<" + ?(row.FormName = "", type, row.FormName) + ">";
+		row.Picture = ScenarioForm.GetPicture ( type );
+		if ( row.Name = "" ) then
+			row.Name = "<" + ? ( row.FormName = "", type, row.FormName ) + ">";
 		endif;
-		id = row.GetID();
-		FieldsMap[id] = obj; // TestedField cannot be used as a key
-		if (next.Count() > 0) then
-			fillTree(row.GetItems(), next);
+		id = row.GetID ();
+		FieldsMap [ id ] = obj; // TestedField cannot be used as a key
+		if ( next.Count () > 0 ) then
+			fillTree ( row.GetItems (), next );
 		endif;
-		if (type = form) then
+		if ( type = form ) then
 			TestedForm = obj;
 		endif;
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FetchActive(Command)
+&atclient
+procedure FetchActive ( Command )
 
-	fill(true);
-	expandTree();
+	fill ( true );
+	expandTree ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Sync(Command)
+&atclient
+procedure Sync ( Command )
 
-	syncItem();
+	syncItem ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure syncItem()
+&atclient
+procedure syncItem ()
 
-	if (TestedForm = undefined) then
+	if ( TestedForm = undefined ) then
 		return;
 	endif;
 	try
-		item = TestedForm.GetCurrentItem();
+		item = TestedForm.GetCurrentItem ();
 	except
 		return;
 	endtry;
 	for each field in FieldsMap do
-		if (field.Value = item) then
+		if ( field.Value = item ) then
 			Items.FieldsTable.CurrentRow = field.Key;
 			break;
 		endif;
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Expand(Command)
+&atclient
+procedure Expand ( Command )
 
-	expandTree();
+	expandTree ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure expandTree()
+&atclient
+procedure expandTree ()
 
 	tree = Items.FieldsTable;
-	rows = FieldsTable.GetItems();
+	rows = FieldsTable.GetItems ();
 	for each row in rows do
-		tree.Expand(row.GetID(), true);
+		tree.Expand ( row.GetID (), true );
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Collapse(Command)
+&atclient
+procedure Collapse ( Command )
 
-	collapseTree(FieldsTable.GetItems());
+	collapseTree ( FieldsTable.GetItems () );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure collapseTree(Rows)
+&atclient
+procedure collapseTree ( Rows )
 
 	tree = Items.FieldsTable;
 	for each row in rows do
-		next = row.GetItems();
-		if (next.Count() > 0) then
-			collapseTree(next);
+		next = row.GetItems ();
+		if ( next.Count () > 0 ) then
+			collapseTree ( next );
 		endif;
-		tree.Collapse(row.GetID());
+		tree.Collapse ( row.GetID () );
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ExpressionOnChange(Item)
+&atclient
+procedure ExpressionOnChange ( Item )
 
-	calcResult();
+	calcResult ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure calcResult()
+&atclient
+procedure calcResult ()
 
-	if (FieldsRow = undefined or IsBlankString(Expression)) then
+	if ( FieldsRow = undefined or IsBlankString ( Expression ) ) then
 		ExpressionResult = "";
 	else
 		try
-			ExpressionResult = Eval("FieldsMap [ FieldsRow.GetID () ]." + Expression);
+			ExpressionResult = Eval ( "FieldsMap [ FieldsRow.GetID () ]." + Expression );
 		except
-			ExpressionResult = BriefErrorDescription(ErrorInfo());
+			ExpressionResult = ErrorProcessing.BriefErrorDescription ( ErrorInfo () );
 		endtry;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ExpressionStartChoice(Item, ChoiceData, StandardProcessing)
+&atclient
+procedure ExpressionStartChoice ( Item, ChoiceData, StandardProcessing )
 
 	StandardProcessing = false;
-	calcResult();
+	calcResult ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FieldsTableOnActivateRow(Item)
+&atclient
+procedure FieldsTableOnActivateRow ( Item )
 
 	FieldsRow = Item.CurrentData;
-	AttachIdleHandler("activateItem", 0.1, true);
+	AttachIdleHandler ( "activateItem", 0.1, true );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateItem() export
+&atclient
+procedure activateItem () export
 
-	if (App = undefined or FieldsRow = undefined) then
+	if ( App = undefined or FieldsRow = undefined ) then
 		return;
 	endif;
-	field = FieldsMap[FieldsRow.GetID()];
-	if (field <> undefined) then
+	field = FieldsMap [ FieldsRow.GetID () ];
+	if ( field <> undefined ) then
 		try
-			field.Activate();
+			field.Activate ();
 		except
 		endtry;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FieldsTableSelection(Item, SelectedRow, Field, StandardProcessing)
+&atclient
+procedure FieldsTableSelection ( Item, SelectedRow, Field, StandardProcessing )
 
 	StandardProcessing = false;
-	ScenarioForm.OpenAssistant(Items.FieldsTable, Items.FieldsTableName, true,
-		tableForm(), Object.Application);
+	ScenarioForm.OpenAssistant ( Items.FieldsTable, Items.FieldsTableName, true,
+		tableForm (), Object.Application );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function tableForm()
-	
+&atclient
+function tableForm ()
+
 	row = FieldsRow;
 	form = PredefinedValue ( "Enum.Controls.Form" );
-	while (true) do
-		row = row.GetParent();
-		if (row = undefined) then
+	while ( true ) do
+		row = row.GetParent ();
+		if ( row = undefined ) then
 			return "";
-		elsif (row.Type = form) then
+		elsif ( row.Type = form ) then
 			return row.TitleText;
 		endif;
 	enddo;
-	
-EndFunction
 
-&AtClient
-Procedure FieldsTableChoiceProcessing(Item, SelectedValue, StandardProcessing)
+endfunction
+
+&atclient
+procedure FieldsTableChoiceProcessing ( Item, SelectedValue, StandardProcessing )
 
 	StandardProcessing = false;
-	applyAction(SelectedValue);
+	applyAction ( SelectedValue );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyAction(Action)
+&atclient
+procedure applyAction ( Action )
 
-	withActiveForm();
-	if (TypeOf(Action) = Type("String")) then
-		applyAssistant(Action, true, false);
+	withActiveForm ();
+	if ( TypeOf ( Action ) = Type ( "String" ) ) then
+		applyAssistant ( Action, true, false );
 	else
-		error = not ScenarioForm.ApplyAction(Action);
-		applyAssistant(Action.Expression, true, error);
+		error = not ScenarioForm.ApplyAction ( Action );
+		applyAssistant ( Action.Expression, true, error );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure withActiveForm()
+&atclient
+procedure withActiveForm ()
 
-	#if ( ThinClient or ThickClientManagedApplication ) then
-		form = PredefinedValue("Enum.Controls.Form");
-		row = FieldsRow;
-		while (row <> undefined) do
-			if (row.Type = form) then
-				With(row.TitleText);
-				return;
-			endif;
-			row = row.GetParent();
-		enddo;
-	#endif
+#if ( ThinClient or ThickClientManagedApplication ) then
+	form = PredefinedValue ( "Enum.Controls.Form" );
+	row = FieldsRow;
+	while ( row <> undefined ) do
+		if ( row.Type = form ) then
+			With ( row.TitleText );
+			return;
+		endif;
+		row = row.GetParent ();
+	enddo;
+#endif
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Template
 
-&AtClient
-Procedure TabDocOnChange(Item)
+&atclient
+procedure TabDocOnChange ( Item )
 
 	TemplateChanged = true;
-	entitleTemplate(ThisObject);
-	restoreAreas();
-	markAreas();
+	entitleTemplate ( ThisObject );
+	restoreAreas ();
+	markAreas ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UseTemplate(Command)
+&atclient
+procedure UseTemplate ( Command )
 
-	openReplacement();
+	openReplacement ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openReplacement()
+&atclient
+procedure openReplacement ()
 
-	if (isPicture(TabDoc.CurrentArea)) then
+	if ( isPicture ( TabDoc.CurrentArea ) ) then
 		return;
 	endif;
 	text = TabDoc.CurrentArea.Text;
-	if (IsBlankString(text)) then
+	if ( IsBlankString ( text ) ) then
 		return;
 	endif;
-	p = new Structure("Text", text);
-	OpenForm("Catalog.Scenarios.Form.Template", p, Items.TabDoc, , , , new NotifyDescription("ApplyTemplate", ThisObject, text));
+	p = new Structure ( "Text", text );
+	OpenForm ( "Catalog.Scenarios.Form.Template", p, Items.TabDoc,,,, new NotifyDescription ( "ApplyTemplate", ThisObject, text ) );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function isPicture(Area)
+&atclient
+function isPicture ( Area )
 
 	try
-	//@skip-warning
+		//@skip-warning
 		text = Area.Text;
 	except
 		return true;
 	endtry;
 	return false;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure ApplyTemplate(Result, Text) export
+&atclient
+procedure ApplyTemplate ( Result, Text ) export
 
-	if (Result = undefined) then
+	if ( Result = undefined ) then
 		return;
 	endif;
 	template = Result.Template;
-	if (Lower(template) = Lower(Text)) then
+	if ( Lower ( template ) = Lower ( Text ) ) then
 		return;
 	endif;
 	Modified = true;
 	TemplateChanged = true;
-	marker = ?(isTemplate(template), getMarker(), undefined);
-	if (Result.Everywhere) then
-		while (true) do
-			area = TabDoc.FindText(Text, , , , true, , true);
-			if (area = undefined) then
+	marker = ? ( isTemplate ( template ), getMarker (), undefined );
+	if ( Result.Everywhere ) then
+		while ( true ) do
+			area = TabDoc.FindText ( Text,,,, true,, true );
+			if ( area = undefined ) then
 				break;
 			endif;
-			replaceValue(area, template, marker);
+			replaceValue ( area, template, marker );
 		enddo;
 	else
-		replaceValue(TabDoc.CurrentArea, template, marker);
+		replaceValue ( TabDoc.CurrentArea, template, marker );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure replaceValue(Area, Text, Marker)
+&atclient
+procedure replaceValue ( Area, Text, Marker )
 
 	Area.Text = Text;
-	if (Marker <> undefined) then
+	if ( Marker <> undefined ) then
 		Area.TextColor = Marker;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure CheckArea(Command)
+&atclient
+procedure CheckArea ( Command )
 
-	attachAreas();
+	attachAreas ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure attachAreas()
+&atclient
+procedure attachAreas ()
 
-	names = new Array();
+	names = new Array ();
 	for each area in TabDoc.SelectedAreas do
-		if (isPicture(area)) then
+		if ( isPicture ( area ) ) then
 			continue;
 		endif;
 		name = area.Name;
-		areas = Object.Areas.FindRows(new Structure("Name", name));
-		if (areas.Count() = 0) then
-			names.Add(name);
-			row = Object.Areas.Add();
+		areas = Object.Areas.FindRows ( new Structure ( "Name", name ) );
+		if ( areas.Count () = 0 ) then
+			names.Add ( name );
+			row = Object.Areas.Add ();
 			row.Name = name;
 			row.Top = area.Top;
-			row.Left = Max(area.Left, 1);
+			row.Left = Max ( area.Left, 1 );
 			row.Bottom = area.Bottom;
-			row.Right = ?(area.Right = 0, TabDoc.TableWidth, area.Right);
+			row.Right = ? ( area.Right = 0, TabDoc.TableWidth, area.Right );
 		endif;
 	enddo;
-	if (names.Count() > 0) then
-		markAreas(names);
+	if ( names.Count () > 0 ) then
+		markAreas ( names );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ClearAreas(Command)
+&atclient
+procedure ClearAreas ( Command )
 
-	restoreAreas();
-	Object.Areas.Clear();
+	restoreAreas ();
+	Object.Areas.Clear ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure restoreAreas(Name = undefined)
+&atserver
+procedure restoreAreas ( Name = undefined )
 
-	savedAreas = getSavedAreas();
-	if (savedAreas.Count() = 0) then
+	savedAreas = getSavedAreas ();
+	if ( savedAreas.Count () = 0 ) then
 		return;
 	endif;
-	if (Name = undefined) then
+	if ( Name = undefined ) then
 		for each area in savedAreas do
-			unmarkArea(area.Value, area.Key);
+			unmarkArea ( area.Value, area.Key );
 		enddo;
-		savedAreas.Clear();
-		saveAreas(savedAreas);
+		savedAreas.Clear ();
+		saveAreas ( savedAreas );
 	else
-		unmarkArea(savedAreas[Name], Name);
-		savedAreas.Delete(Name);
-		saveAreas(savedAreas);
+		unmarkArea ( savedAreas [ Name ], Name );
+		savedAreas.Delete ( Name );
+		saveAreas ( savedAreas );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure unmarkArea(Source, Name)
+&atserver
+procedure unmarkArea ( Source, Name )
 
-	receiver = TabDoc.Area(Name);
+	receiver = TabDoc.Area ( Name );
 	for i = 1 to source.TableHeight do
 		for j = 1 to source.TableWidth do
 			x = receiver.Top + i - 1;
 			y = receiver.Left + j - 1;
-			sourceCell = source.Area(i, j, i, j);
-			receiverCell = TabDoc.Area(x, y, x, y);
+			sourceCell = source.Area ( i, j, i, j );
+			receiverCell = TabDoc.Area ( x, y, x, y );
 			receiverCell.TopBorder = sourceCell.TopBorder;
 			receiverCell.LeftBorder = sourceCell.LeftBorder;
 			receiverCell.RightBorder = sourceCell.RightBorder;
@@ -2521,87 +2521,87 @@ Procedure unmarkArea(Source, Name)
 		enddo;
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RemoveArea(Command)
+&atclient
+procedure RemoveArea ( Command )
 
-	detachAreas();
+	detachAreas ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure detachAreas()
+&atclient
+procedure detachAreas ()
 
 	areas = Object.Areas;
 	for each area in TabDoc.SelectedAreas do
-		if (isPicture(area)) then
+		if ( isPicture ( area ) ) then
 			continue;
 		endif;
 		for i = area.Top to area.Bottom do
 			for j = area.Left to area.Right do
-				k = areas.Count();
-				while (k > 0) do
+				k = areas.Count ();
+				while ( k > 0 ) do
 					k = k - 1;
-					row = areas[k];
-					if (row.Top <= i and i <= row.Bottom and row.Left <= j
-							and j <= row.Right) then
-						restoreAreas(row.Name);
-						areas.Delete(k);
+					row = areas [ k ];
+					if ( row.Top <= i and i <= row.Bottom and row.Left <= j
+						and j <= row.Right ) then
+						restoreAreas ( row.Name );
+						areas.Delete ( k );
 					endif;
 				enddo;
 			enddo;
 		enddo;
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ClearTabDoc(Command)
+&atclient
+procedure ClearTabDoc ( Command )
 
-	deleteTabDoc();
+	deleteTabDoc ();
 	TemplateChanged = true;
-	entitleTemplate(ThisObject);
+	entitleTemplate ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure deleteTabDoc()
+&atserver
+procedure deleteTabDoc ()
 
-	Object.Areas.Clear();
-	TabDoc.Clear();
+	Object.Areas.Clear ();
+	TabDoc.Clear ();
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Tags
 
-&AtClient
-Procedure AddTag(Command)
+&atclient
+procedure AddTag ( Command )
 
-	selectTag();
+	selectTag ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure selectTag()
+&atclient
+procedure selectTag ()
 
-	callback = new NotifyDescription("TagSelected", ThisObject);
-	tags = getTags(Items.TagsList.ChoiceList.UnloadValues());
-	menu = tags.Count();
-	if (menu = 0) then
-		Output.TagsListEmpty();
+	callback = new NotifyDescription ( "TagSelected", ThisObject );
+	tags = getTags ( Items.TagsList.ChoiceList.UnloadValues () );
+	menu = tags.Count ();
+	if ( menu = 0 ) then
+		Output.TagsListEmpty ();
 		return;
-	elsif (menu > 15) then
-		ShowChooseFromList(callback, tags);
+	elsif ( menu > 15 ) then
+		ShowChooseFromList ( callback, tags );
 	else
-		ShowChooseFromMenu(callback, tags);
+		ShowChooseFromMenu ( callback, tags );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function getTags(val SelectedTags)
+&atservernocontext
+function getTags ( val SelectedTags )
 
 	s = "
 		|select Tags.Description as Description
@@ -2610,121 +2610,121 @@ Function getTags(val SelectedTags)
 		|and Tags.Description not in ( &Tags )
 		|order by Description
 		|";
-	q = new Query(s);
-	q.SetParameter("Tags", SelectedTags);
-	tags = q.Execute().Unload().UnloadColumn("Description");
-	list = new ValueList();
-	list.LoadValues(tags);
-	if (AccessRight("Edit", Metadata.Catalogs.Tags)) then
-		list.Add(, Output.NewTag(), , PictureLib.CreateListItem);
+	q = new Query ( s );
+	q.SetParameter ( "Tags", SelectedTags );
+	tags = q.Execute ().Unload ().UnloadColumn ( "Description" );
+	list = new ValueList ();
+	list.LoadValues ( tags );
+	if ( AccessRight ( "Edit", Metadata.Catalogs.Tags ) ) then
+		list.Add ( , Output.NewTag (),, PictureLib.CreateListItem );
 	endif;
 	return list;
 
-EndFunction
+endfunction
 
-&AtClient
-Procedure newTag()
+&atclient
+procedure newTag ()
 
-	callback = new NotifyDescription("TagCreated", ThisObject);
-	OpenForm("Catalog.Tags.ObjectForm", , ThisObject, , , , callback);
+	callback = new NotifyDescription ( "TagCreated", ThisObject );
+	OpenForm ( "Catalog.Tags.ObjectForm",, ThisObject,,,, callback );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagCreated(Tag, Params) export
+&atclient
+procedure TagCreated ( Tag, Params ) export
 
 	// For backward compatibility with versions < 8.3.11
 	//@skip-warning
 	noerrorshere = true;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagSelected(Tag, Params) export
+&atclient
+procedure TagSelected ( Tag, Params ) export
 
-	if (Tag = undefined) then
+	if ( Tag = undefined ) then
 		return;
 	endif;
 	value = Tag.Value;
-	if (value = undefined) then
-		newTag();
+	if ( value = undefined ) then
+		newTag ();
 	else
-		insertTag(value, Items.TagsList.ChoiceList);
+		insertTag ( value, Items.TagsList.ChoiceList );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagsListOnChange(Item)
+&atclient
+procedure TagsListOnChange ( Item )
 
-	Output.TagRemovingConfirmation(ThisObject);
+	Output.TagRemovingConfirmation ( ThisObject );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagRemovingConfirmation(Answer, Params) export
+&atclient
+procedure TagRemovingConfirmation ( Answer, Params ) export
 
-	if (Answer = DialogReturnCode.Yes) then
-		removeTag();
+	if ( Answer = DialogReturnCode.Yes ) then
+		removeTag ();
 	endif;
 	TagsList = "";
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure removeTag()
+&atclient
+procedure removeTag ()
 
 	set = Items.TagsList.ChoiceList;
-	set.Delete(set.FindByValue(TagsList));
+	set.Delete ( set.FindByValue ( TagsList ) );
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Access
 
-&AtClient
-Procedure AccessOnChange(Item)
+&atclient
+procedure AccessOnChange ( Item )
 
-	applyAccess();
+	applyAccess ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyAccess()
+&atclient
+procedure applyAccess ()
 
-	if (Object.Access) then
-		defaultAccess();
+	if ( Object.Access ) then
+		defaultAccess ();
 	else
-		Object.Users.Clear();
+		Object.Users.Clear ();
 	endif;
-	Appearance.Apply(ThisObject, "Object.Access");
+	Appearance.Apply ( ThisObject, "Object.Access" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure defaultAccess()
+&atclient
+procedure defaultAccess ()
 
 	table = Object.Users;
-	if (table.Count() <> 0) then
+	if ( table.Count () <> 0 ) then
 		return;
 	endif;
 	creator = Object.Creator;
-	row = table.Add();
+	row = table.Add ();
 	row.User = creator;
-	user = EnvironmentSrv.User();
-	if (user <> creator) then
-		row = table.Add();
+	user = EnvironmentSrv.User ();
+	if ( user <> creator ) then
+		row = table.Add ();
 		row.User = user;
 	endif;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Editor
 
-&AtClient
-Function initEngine ()
-	
+&atclient
+function initEngine ()
+
 	engine = engine ();
 	info = new SystemInfo ();
 	engine.init ( info.AppVersion );
@@ -2739,38 +2739,38 @@ Function initEngine ()
 	engine.hideScrollX ();
 	engine.hideScrollY ();
 	return undefined;
-	
-EndFunction
 
-&AtClient
-Function engine ()
-	
+endfunction
+
+&atclient
+function engine ()
+
 	view = Items.Editor.Document.defaultView;
 	view.getCurrentLine ();
 	return view;
-	
-EndFunction
 
-&AtClient
-Function resetMetadata ()
-	
+endfunction
+
+&atclient
+function resetMetadata ()
+
 	engine ().clearMetadata ();
 	//refreshCommonModules();
-	
-EndFunction
 
-&AtClient
-Procedure EditorOnClick ( Item, EventData, StandardProcessing )
+endfunction
+
+&atclient
+procedure EditorOnClick ( Item, EventData, StandardProcessing )
 
 	if ( Locked ) then
 		proceedEditorEvent ( EventData.Event.eventData1C );
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure proceedEditorEvent ( Event )
-	
+&atclient
+procedure proceedEditorEvent ( Event )
+
 	if ( Event = undefined ) then
 		return;
 	endif;
@@ -2782,7 +2782,7 @@ Procedure proceedEditorEvent ( Event )
 			GotoURL ( Event.params.href );
 		endif;
 	elsif ( id = "EVENT_GET_DEFINITION" ) then
-		openSubScenario();
+		openSubScenario ();
 	endif;
-	
-EndProcedure
+
+endprocedure

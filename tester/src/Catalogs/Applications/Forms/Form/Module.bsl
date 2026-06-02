@@ -1,18 +1,18 @@
-&AtClient
+&atclient
 var SetAsDefault;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		setResponsible ();
@@ -23,10 +23,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -36,44 +36,44 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initVersions ()
+&atserver
+procedure initVersions ()
 	
 	Session = SessionParameters.Session;
 	DC.SetParameter ( Versions, "User", SessionParameters.User );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterVersions ()
+&atserver
+procedure filterVersions ()
 	
 	ref = Object.Ref;
 	DC.SetFilter ( Versions, "Owner", ref );
 	DC.SetParameter ( Versions, "Owner", ref );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterPorts ()
+&atserver
+procedure filterPorts ()
 	
 	DC.SetFilter ( Ports, "Application", Object.Ref );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setResponsible ()
+&atserver
+procedure setResponsible ()
 	
 	if ( not Parameters.CopyingValue.IsEmpty () ) then
 		return;
 	endif; 
 	Object.Responsible = SessionParameters.User;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure BeforeWrite ( Cancel, WriteParameters )
+&atclient
+procedure BeforeWrite ( Cancel, WriteParameters )
 	
 	if ( updateMeta () ) then
 		SetAsDefault = Object.Ref.IsEmpty () and theFirstApp ();
@@ -81,18 +81,18 @@ Procedure BeforeWrite ( Cancel, WriteParameters )
 		Cancel = true;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function theFirstApp ()
+&atservernocontext
+function theFirstApp ()
 	
 	q = new Query ( "select allowed top 1 1 from Catalog.Applications where not DeletionMark" );
 	return q.Execute ().IsEmpty ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function updateMeta ()
+&atclient
+function updateMeta ()
 	
 	try
 		Runtime.UpdateMeta ( Object.Metadata );
@@ -103,45 +103,45 @@ Function updateMeta ()
 	endtry;
 	return true;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
+&atserver
+procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
 	
 	filterVersions ();
 	filterPorts ();
 	Appearance.Apply ( ThisObject, "Object.Ref" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AfterWrite ( WriteParameters )
+&atclient
+procedure AfterWrite ( WriteParameters )
 	
 	if ( SetAsDefault ) then
 		Environment.ChangeApplication ( Object.Ref );
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure DescriptionOnChange ( Item )
+&atclient
+procedure DescriptionOnChange ( Item )
 	
 	Object.Code = Conversion.NameToCode ( Object.Description, 4 );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure DialogsTitleOnChange ( Item )
+&atclient
+procedure DialogsTitleOnChange ( Item )
 	
 	setScreenshotsLocator ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setScreenshotsLocator ()
+&atclient
+procedure setScreenshotsLocator ()
 	
 	s = Object.DialogsTitle;
 	if ( s = "" ) then
@@ -149,4 +149,4 @@ Procedure setScreenshotsLocator ()
 	endif; 
 	Object.ScreenshotsLocator = ".+" + s + ".+";
 	
-EndProcedure 
+endprocedure 

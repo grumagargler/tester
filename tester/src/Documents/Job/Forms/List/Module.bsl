@@ -2,23 +2,23 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	setFilter ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	ScenarioFilter = Parameters.Scenario;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setFilter ()
+&atserver
+procedure setFilter ()
 	
 	if ( ScenarioFilter = undefined ) then
 		CreatorFilter = SessionParameters.User;
@@ -27,90 +27,90 @@ Procedure setFilter ()
 		filterByScenario ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByCreator ()
+&atserver
+procedure filterByCreator ()
 	
 	DC.ChangeFilter ( List, "Creator", CreatorFilter, not CreatorFilter.IsEmpty () );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByScenario ()
+&atserver
+procedure filterByScenario ()
 	
 	DC.ChangeFilter ( List, "Scenario", ScenarioFilter, not ScenarioFilter.IsEmpty () );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Refresh(Command)
+&atclient
+procedure Refresh(Command)
 	
 	Items.List.Refresh ();
 	Items.Agents.Refresh ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure CreatorFilterOnChange ( Item )
+&atclient
+procedure CreatorFilterOnChange ( Item )
 	
 	filterByCreator ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScenarioFilterOnChange ( Item )
+&atclient
+procedure ScenarioFilterOnChange ( Item )
 	
 	filterByScenario ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AgentFilterOnChange ( Item )
+&atclient
+procedure AgentFilterOnChange ( Item )
 	
 	filterByAgent ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByAgent ()
+&atserver
+procedure filterByAgent ()
 	
 	DC.ChangeFilter ( List, "Agent", AgentFilter, not AgentFilter.IsEmpty () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ModeFilterOnChange ( Item )
+&atclient
+procedure ModeFilterOnChange ( Item )
 	
 	filterByMode ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByMode ()
+&atserver
+procedure filterByMode ()
 	
 	DC.ChangeFilter ( List, "Mode", ModeFilter, not ModeFilter.IsEmpty () );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** List
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	if ( Field.Name = "Job" ) then
 		StandardProcessing = false;
 		ShowValue ( , Item.CurrentData.Job );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Procedure ListOnGetDataAtServer ( ItemName, Settings, Rows )
+&atservernocontext
+procedure ListOnGetDataAtServer ( ItemName, Settings, Rows )
 	
 	for each item in Rows do
 		data = item.Value.Data;
@@ -118,4 +118,4 @@ Procedure ListOnGetDataAtServer ( ItemName, Settings, Rows )
 		data.Duration = Conversion.PeriodToDuration ( data.Start, end );
 	enddo;
 	
-EndProcedure
+endprocedure

@@ -1,4 +1,4 @@
-Procedure UpdateStack ( Error, Stack ) export
+procedure UpdateStack ( Error, Stack ) export
 	
 	Stack.Clear ();
 	table = getStack ( Error );
@@ -10,9 +10,9 @@ Procedure UpdateStack ( Error, Stack ) export
 		newRow.Area = row.Area;
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Function getStack ( Error )
+function getStack ( Error )
 	
 	s = "
 	|select Stack.Row as Row, Stack.Scenario as Ref, presentation ( Stack.Scenario ) as Scenario,
@@ -25,4 +25,4 @@ Function getStack ( Error )
 	q.SetParameter ( "Ref", Error );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction

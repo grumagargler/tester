@@ -1,5 +1,5 @@
 
-Procedure Exec ( Scenario, Application = undefined, ProgramCode = undefined, Debugging = false, Offset = 0,
+procedure Exec ( Scenario, Application = undefined, ProgramCode = undefined, Debugging = false, Offset = 0,
 	Filming = false, Params = undefined ) export
 	
 	LastScenarioResult = undefined;
@@ -8,9 +8,9 @@ Procedure Exec ( Scenario, Application = undefined, ProgramCode = undefined, Deb
 	program = ? ( data.Application.IsEmpty (), SessionApplication, data.Application );
 	Runtime.Exec ( program, ProgramCode, true, Debugging, Offset, Filming, , Params );
 	
-EndProcedure
+endprocedure
 
-Function FindScenario ( Scenario, Application = undefined, IgnoreLocking = false ) export
+function FindScenario ( Scenario, Application = undefined, IgnoreLocking = false ) export
 	
 	if ( TypeOf ( Scenario ) = Type ( "String" ) ) then
 		if ( Application = undefined ) then
@@ -30,16 +30,16 @@ Function FindScenario ( Scenario, Application = undefined, IgnoreLocking = false
 	result.Insert ( "Application", DF.Pick ( ref, "Application" ) );
 	return result;
 	
-EndFunction 
+endfunction 
 
-Procedure AttachApplication ( Scenario ) export
+procedure AttachApplication ( Scenario ) export
 	
 	AppData = TestSrv.Data ( Scenario );
 	СвойстваПриложения = AppData;
 	
-EndProcedure
+endprocedure
 	
-Procedure DisconnectClient ( Close = false ) export
+procedure DisconnectClient ( Close = false ) export
 	
 	if ( Close and ( MainWindow <> undefined ) ) then
 		MainWindow.Close ();
@@ -57,9 +57,9 @@ Procedure DisconnectClient ( Close = false ) export
 	MainWindow = undefined;
 	ГлавноеОкно = undefined;
 	
-EndProcedure 
+endprocedure 
 
-Procedure ConnectClient ( ClearErrors = true, Port = undefined, Computer = undefined ) export
+procedure ConnectClient ( ClearErrors = true, Port = undefined, Computer = undefined ) export
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		try
@@ -73,9 +73,9 @@ Procedure ConnectClient ( ClearErrors = true, Port = undefined, Computer = undef
 		endtry;
 	#endif
 
-EndProcedure 
+endprocedure 
 
-Procedure tryConnect ( ClearErrors, Port, Computer )
+procedure tryConnect ( ClearErrors, Port, Computer )
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		host = ? ( Computer = undefined, AppData.Computer, Computer );
@@ -88,7 +88,7 @@ Procedure tryConnect ( ClearErrors, Port, Computer )
 			App = Eval ( "new TestedApplication ( host, hostPort, AppData.ClientID )" );
 			App.Connect ();
 		except
-			raise BriefErrorDescription ( ErrorInfo () );
+			raise ErrorProcessing.BriefErrorDescription ( ErrorInfo () );
 		endtry;
 		Приложение = App;
 		AppData.Connected = true;
@@ -107,9 +107,9 @@ Procedure tryConnect ( ClearErrors, Port, Computer )
 		endif; 
 	#endif
 	
-EndProcedure
+endprocedure
 
-Procedure initMainWindow ()
+procedure initMainWindow ()
 	
 	frames = App.FindObjects ( Type ( "TestedClientApplicationWindow" ) );
 	for each item in frames do
@@ -123,9 +123,9 @@ Procedure initMainWindow ()
 		MainWindow.Activate ();
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-Procedure CheckSyntax ( ProgramCode ) export
+procedure CheckSyntax ( ProgramCode ) export
 	
 	error = Runtime.CheckSyntax ( ProgramCode );
 	if ( error = undefined ) then
@@ -134,9 +134,9 @@ Procedure CheckSyntax ( ProgramCode ) export
 		Output.SyntaxError ( undefined, new Structure ( "Error", error ) );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure Start ( Scenario, Application = undefined, IgnoreLocking = false ) export
+procedure Start ( Scenario, Application = undefined, IgnoreLocking = false ) export
 	
 	data = Test.FindScenario ( Scenario, Application );
 	Test.AttachApplication ( data.Scenario );
@@ -144,32 +144,32 @@ Procedure Start ( Scenario, Application = undefined, IgnoreLocking = false ) exp
 	Runtime.Exec ( , , false );
 	Runtime.PreviousLevel ( Debug );
 	
-EndProcedure
+endprocedure
 
-Procedure Attach ( Port = undefined ) export
+procedure Attach ( Port = undefined ) export
 	
 	Test.AttachApplication ( SessionScenario );
 	Test.ConnectClient ( false, Port );
 
-EndProcedure
+endprocedure
 
-Procedure CheckConnection () export
+procedure CheckConnection () export
 	
 	if ( App = undefined
 		or MainWindow = undefined ) then
 		raise Output.TestedApplicationOffline ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure PauseExecution ( Seconds ) export
+procedure PauseExecution ( Seconds ) export
 	
 	ExternalLibrary.Pause ( Seconds );
 	
-EndProcedure
+endprocedure
 
-Procedure GotoSystemConsole () export
+procedure GotoSystemConsole () export
 	
 	ExternalLibrary.GotoConsole ();
 	
-EndProcedure
+endprocedure

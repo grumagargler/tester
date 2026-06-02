@@ -1,6 +1,6 @@
-#if ( Server or ExternalConnection ) then
+#if ( server or externalconnection ) then
 
-Function Pick(Tags) export
+function Pick(Tags) export
 
 	BeginTransaction();
 	lockTags();
@@ -8,18 +8,18 @@ Function Pick(Tags) export
 	CommitTransaction();
 	return tag;
 
-EndFunction
+endfunction
 
-Procedure lockTags()
+procedure lockTags()
 
 	lock = new DataLock();
 	item = lock.Add("Catalog.TagKeys");
 	item.Mode = DataLockMode.Exclusive;
 	lock.Lock();
 
-EndProcedure
+endprocedure
 
-Function tagsToKey(Tags)
+function tagsToKey(Tags)
 
 	values = update(Tags);
 	ref = findKey(Tags);
@@ -35,9 +35,9 @@ Function tagsToKey(Tags)
 	obj.Write();
 	return obj.Ref;
 
-EndFunction
+endfunction
 
-Function update(Tags)
+function update(Tags)
 
 	list = existedTags(Tags);
 	for each tag in Tags do
@@ -49,9 +49,9 @@ Function update(Tags)
 	enddo;
 	return list;
 
-EndFunction
+endfunction
 
-Function existedTags(Tags)
+function existedTags(Tags)
 	
 	s = "
 	|select Tags.Ref as Tag, Tags.Description as Name
@@ -63,18 +63,18 @@ Function existedTags(Tags)
 	q.SetParameter("Tags", Tags);
 	return q.Execute().Unload();
 	
-EndFunction
+endfunction
 
-Function newTag(Name)
+function newTag(Name)
 	
 	obj = Catalogs.Tags.CreateItem();
 	obj.Description = Name;
 	obj.Write();
 	return obj.Ref;
 	
-EndFunction
+endfunction
 
-Function findKey(Tags)
+function findKey(Tags)
 
 	s = "
 	|select top 1 Keys.Ref as Ref
@@ -104,6 +104,6 @@ Function findKey(Tags)
 	table = q.Execute().Unload();
 	return ?(table.Count() = 0, undefined, table[0].Ref);
 
-EndFunction
+endfunction
 
 #endif

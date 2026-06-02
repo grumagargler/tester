@@ -1,12 +1,12 @@
-Procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
+procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
 	
 	StandardProcessing = false;
 	Fields.Add ( "Number" );
 	Fields.Add ( "Memo" );
 
-EndProcedure
+endprocedure
 
-Procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
+procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
 	
 	StandardProcessing = false;
 	parts = new Array ();
@@ -19,4 +19,4 @@ Procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
 	parts.Add ( " #" + Data.Number );
 	Presentation = StrConcat ( parts, " " );
 	
-EndProcedure
+endprocedure

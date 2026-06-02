@@ -1,10 +1,10 @@
-Procedure Init () export
+procedure Init () export
 	
 	OpenedScenarios = new Map ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure Push ( Form ) export
+procedure Push ( Form ) export
 	
 	ref = Form.Object.Ref;
 	if ( ref.IsEmpty () ) then
@@ -12,9 +12,9 @@ Procedure Push ( Form ) export
 	endif; 
 	OpenedScenarios [ ref ] = Form;
 	
-EndProcedure 
+endprocedure 
 
-Procedure Pop ( Scenario ) export
+procedure Pop ( Scenario ) export
 	
 	form = OpenedScenarios [ Scenario ];
 	if ( form = undefined ) then
@@ -22,9 +22,9 @@ Procedure Pop ( Scenario ) export
 	endif; 
 	OpenedScenarios.Delete ( Scenario );
 	
-EndProcedure 
+endprocedure 
 
-Function TryActivate ( Scenario ) export
+function TryActivate ( Scenario ) export
 	
 	form = OpenedScenarios [ Scenario ];
 	if ( form = undefined ) then
@@ -33,9 +33,9 @@ Function TryActivate ( Scenario ) export
 	form.Activate ();
 	return true;
 	
-EndFunction 
+endfunction 
 
-Procedure Save ( Scenario ) export
+procedure Save ( Scenario ) export
 	
 	form = OpenedScenarios [ Scenario ];
 	if ( form <> undefined
@@ -43,9 +43,9 @@ Procedure Save ( Scenario ) export
 		form.Write ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure Reread ( Scenario ) export
+procedure Reread ( Scenario ) export
 	
 	form = OpenedScenarios [ Scenario ];
 	if ( form <> undefined
@@ -53,4 +53,4 @@ Procedure Reread ( Scenario ) export
 		form.Reread ();
 	endif;
 	
-EndProcedure
+endprocedure

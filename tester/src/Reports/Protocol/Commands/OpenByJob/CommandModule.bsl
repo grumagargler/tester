@@ -1,13 +1,13 @@
 
-&AtClient
-Procedure CommandProcessing ( Jobs, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Jobs, ExecuteParameters )
 	
 	openReport ( Jobs, ExecuteParameters );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openReport ( Jobs, ExecuteParameters )
+&atclient
+procedure openReport ( Jobs, ExecuteParameters )
 	
 	parameter = Jobs [ 0 ];
 	p = ReportsSystem.GetParams ( "Protocol" );
@@ -25,4 +25,4 @@ Procedure openReport ( Jobs, ExecuteParameters )
 	p.GenerateOnOpen = true;
 	ReportsSystem.Open ( p, ExecuteParameters.Source, true, ExecuteParameters.Window );
 	
-EndProcedure 
+endprocedure 

@@ -1,44 +1,44 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	init ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	MySession = SessionParameters.Session;
 	DC.SetParameter ( List, "Scenario", Parameters.Scenario );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** List
 
-&AtClient
-Procedure SessionFilterOnChange ( Item )
+&atclient
+procedure SessionFilterOnChange ( Item )
 	
 	filterBySession ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterBySession ()
+&atserver
+procedure filterBySession ()
 	
 	DC.ChangeFilter ( List, "Session", SessionFilter, not SessionFilter.IsEmpty () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListValueChoice ( Item, Value, StandardProcessing )
+&atclient
+procedure ListValueChoice ( Item, Value, StandardProcessing )
 	
 	if ( Framework.VersionLess ( "8.3.14" ) ) then
 		StandardProcessing = false;
 		Close ( Item.CurrentData );
 	endif;
 
-EndProcedure
+endprocedure

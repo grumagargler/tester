@@ -1,5 +1,5 @@
 
-Procedure SessionParametersSetting ( Params )
+procedure SessionParametersSetting ( Params )
 	
 	if ( Params = undefined ) then
 		return;
@@ -18,34 +18,34 @@ Procedure SessionParametersSetting ( Params )
 		endif;
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Procedure setUser ()
+procedure setUser ()
 	
 	currentUser = Catalogs.Users.FindByDescription ( UserName (), true );
 	SessionParameters.User = currentUser;
 	
-EndProcedure 
+endprocedure 
 
-Procedure setSession ()
+procedure setSession ()
 	
 	EnvironmentSrv.SetSession ( ComputerName () );
 	
-EndProcedure 
+endprocedure 
 
-Procedure setConnection ()
+procedure setConnection ()
 	
 	EnvironmentSrv.SetConnection ( false, false, false, false );
 	
-EndProcedure 
+endprocedure 
 
-Procedure setApplicationsAccess ()
+procedure setApplicationsAccess ()
 	
 	SessionParameters.ApplicationsAccess = DF.Pick ( SessionParameters.User, "ApplicationsAccess" );
 	
-EndProcedure 
+endprocedure 
 
-Procedure setApplicationsList ()
+procedure setApplicationsList ()
 	
 	s = "
 	|select distinct Access.Application as Application
@@ -56,10 +56,10 @@ Procedure setApplicationsList ()
 	q.SetParameter ( "User", SessionParameters.User );
 	SessionParameters.ApplicationsList = new FixedArray ( q.Execute ().Unload ().UnloadColumn ( "Application" ) );
 	
-EndProcedure 
+endprocedure 
 
-Function module ()
+function module ()
 	
 	return CoreExtension;
 	
-EndFunction
+endfunction

@@ -1,86 +1,86 @@
-&AtClient
-Procedure Connect ( ClearErrors = true, Port = undefined, Computer = undefined ) export
+&atclient
+procedure Connect ( ClearErrors = true, Port = undefined, Computer = undefined ) export
 	
 	Test.ConnectClient ( ClearErrors, Port, Computer );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Подключить ( ClearErrors = true, Port = undefined, Computer = undefined ) export
+&atclient
+procedure Подключить ( ClearErrors = true, Port = undefined, Computer = undefined ) export
 	
 	Connect ( ClearErrors, Port, Computer );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Disconnect ( Close = false ) export
+&atclient
+procedure Disconnect ( Close = false ) export
 	
 	Test.DisconnectClient ( Close );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Отключить ( Close = false ) export
+&atclient
+procedure Отключить ( Close = false ) export
 	
 	Disconnect ( Close );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CloseAll () export
+&atclient
+procedure CloseAll () export
 	
 	Test.CheckConnection ();
 	Forms.CloseWindows ();
 	Forms.ResetBaseline ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ЗакрытьВсе () export
+&atclient
+procedure ЗакрытьВсе () export
 	
 	CloseAll ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ЗакрытьВсё () export
+&atclient
+procedure ЗакрытьВсё () export
 	
 	CloseAll ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function Get ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Get ( Name, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.GetControl ( Name, Forms.FindSource ( Source ), Type ).Field;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function FindForm ( Name ) export
+&atclient
+function FindForm ( Name ) export
 	
 	Test.CheckConnection ();
 	return Forms.SearchForm ( Name );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function НайтиФорму ( Name ) export
+&atclient
+function НайтиФорму ( Name ) export
 	
 	return FindForm ( Name );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Получить ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Получить ( Name, Source = undefined, Type = undefined ) export
 	
 	return Get ( Name, Source, Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Clear ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Clear ( Name, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	target = Forms.FindSource ( Source );
@@ -89,33 +89,33 @@ Function Clear ( Name, Source = undefined, Type = undefined ) export
 	enddo; 
 	return data.Field;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Очистить ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Очистить ( Name, Source = undefined, Type = undefined ) export
 	
 	return Clear ( Name, Source, Type );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Fetch ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Fetch ( Name, Source = undefined, Type = undefined ) export
 	
 	return callFetch ( Name, Source, Type, "Fetch" );
 
-EndFunction
+endfunction
 
-&AtClient
-Function callFetch ( Name, Source = undefined, Type = undefined, FunctionName )
+&atclient
+function callFetch ( Name, Source = undefined, Type = undefined, FunctionName )
 
 	Test.CheckConnection ();
 	testParameter ( "1", Name, "String, TestedFormField", FunctionName );
 	return Fields.FetchValue ( Name, Forms.FindSource ( Source ), Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure testParameter ( Parameter, Value, Types, FunctionName )
+&atclient
+procedure testParameter ( Parameter, Value, Types, FunctionName )
 
 	parameterType = TypeOf ( Value );
 	for each name in Conversion.StringToArray ( Types ) do
@@ -126,199 +126,199 @@ Procedure testParameter ( Parameter, Value, Types, FunctionName )
 	raise Output.WrongParameterType ( new Structure ( "Parameter, Function",
 		Parameter, FunctionName ) );
 
-EndProcedure
+endprocedure
 
 
-&AtClient
-Function Взять ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Взять ( Name, Source = undefined, Type = undefined ) export
 	
 	return callFetch ( Name, Source, Type, "Взять" );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Set ( Name, Value, Source = undefined, Type = undefined ) export
+&atclient
+function Set ( Name, Value, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.SetValue ( Name, Value, Forms.FindSource ( Source ), Type );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Установить ( Name, Value, Source = undefined, Type = undefined ) export
+&atclient
+function Установить ( Name, Value, Source = undefined, Type = undefined ) export
 	
 	return Set ( Name, Value, Source, Type );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Put ( Name, Value, Source = undefined, Type = undefined, TestValue = false ) export
+&atclient
+function Put ( Name, Value, Source = undefined, Type = undefined, TestValue = false ) export
 	
 	Test.CheckConnection ();
 	return Fields.SetValue ( Name, Value, Forms.FindSource ( Source ), Type, true, TestValue );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Ввести ( Name, Value, Source = undefined, Type = undefined, TestValue = false ) export
+&atclient
+function Ввести ( Name, Value, Source = undefined, Type = undefined, TestValue = false ) export
 	
 	return Put ( Name, Value, Source, Type, TestValue );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Pick ( Name, Value, Source = undefined, Type = undefined ) export
+&atclient
+procedure Pick ( Name, Value, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	Fields.Select ( Name, Value, Forms.FindSource ( Source ), Type );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Подобрать ( Name, Value, Source = undefined, Type = undefined ) export
+&atclient
+procedure Подобрать ( Name, Value, Source = undefined, Type = undefined ) export
 	
 	Pick ( Name, Value, Source, Type );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function Activate ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Activate ( Name, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.Focus ( Name, Forms.FindSource ( Source ), Type ).Field;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Фокус ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Фокус ( Name, Source = undefined, Type = undefined ) export
 	
 	return Activate ( Name, Source, Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Click ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Click ( Name, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.ClickField ( Name, Source, Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Нажать ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Нажать ( Name, Source = undefined, Type = undefined ) export
 	
 	return Click ( Name, Source, Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Call ( Scenario, Params = undefined, Application = undefined ) export
+&atclient
+function Call ( Scenario, Params = undefined, Application = undefined ) export
 	
 	return Runtime.Perform ( Scenario, Params, Application, false );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Вызвать ( Scenario, Params = undefined, Application = undefined ) export
+&atclient
+function Вызвать ( Scenario, Params = undefined, Application = undefined ) export
 	
 	return Call ( Scenario, Params, Application );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Run ( Scenario, Params = undefined, Application = undefined ) export
+&atclient
+function Run ( Scenario, Params = undefined, Application = undefined ) export
 	
 	return Runtime.Perform ( Scenario, Params, Application, true );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Позвать ( Scenario, Params = undefined, Application = undefined ) export
+&atclient
+function Позвать ( Scenario, Params = undefined, Application = undefined ) export
 	
 	return Run ( Scenario, Params, Application );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure OpenMenu ( Path ) export
+&atclient
+procedure OpenMenu ( Path ) export
 	
 	Test.CheckConnection ();
 	Forms.ClickMenu ( Path );
 	Forms.ResetBaseline ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Меню ( Path ) export
+&atclient
+procedure Меню ( Path ) export
 	
 	OpenMenu ( Path );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function With ( Name = undefined, Activate = true ) export
+&atclient
+function With ( Name = undefined, Activate = true ) export
 	
 	Test.CheckConnection ();
 	current = Forms.SetCurrent ( Name, Activate );
 	Forms.ResetBaseline ( false );
 	return current;
 
-EndFunction
+endfunction
 
-&AtClient
-Function Здесь ( Name = undefined, Activate = true ) export
+&atclient
+function Здесь ( Name = undefined, Activate = true ) export
 	
 	return With ( Name, Activate );
 
-EndFunction
+endfunction
 
-&AtClient
-Function Choose ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Choose ( Name, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.StartChoosing ( Name, Source, Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Выбрать ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function Выбрать ( Name, Source = undefined, Type = undefined ) export
 	
 	return Choose ( Name, Source, Type );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Check ( Name, Value, Source = undefined, Type = undefined ) export
+&atclient
+procedure Check ( Name, Value, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	Fields.CheckValue ( Name, Value, Forms.FindSource ( Source ), Type );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Проверить ( Name, Value, Source = undefined, Type = undefined ) export
+&atclient
+procedure Проверить ( Name, Value, Source = undefined, Type = undefined ) export
 	
 	Check ( Name, Value, Source, Type );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CheckTable ( Table, Params = undefined, Options = undefined, Source = undefined ) export
+&atclient
+procedure CheckTable ( Table, Params = undefined, Options = undefined, Source = undefined ) export
 	
 	Test.CheckConnection ();
 	Fields.CheckTableContent ( Table, Params, Options, Forms.FindSource ( Source ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ПроверитьТаблицу ( Table, Params = undefined, Options = undefined, Source = undefined ) export
+&atclient
+procedure ПроверитьТаблицу ( Table, Params = undefined, Options = undefined, Source = undefined ) export
 	
 	CheckTable ( Table, Params, Options, Source );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CheckState ( Name, Value, Flag = true, Source = undefined, Type = undefined ) export
+&atclient
+procedure CheckState ( Name, Value, Flag = true, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	parts = StrSplit ( Name, "," );
@@ -326,80 +326,77 @@ Procedure CheckState ( Name, Value, Flag = true, Source = undefined, Type = unde
 		Fields.CheckAppearance ( TrimAll ( part ), Value, Flag, Forms.FindSource ( Source ), Type );
 	enddo; 
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ПроверитьСтатус ( Name, Value, Flag = true, Source = undefined, Type = undefined ) export
+&atclient
+procedure ПроверитьСтатус ( Name, Value, Flag = true, Source = undefined, Type = undefined ) export
 	
 	CheckState ( Name, Value, Flag, Source, Type );
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CheckTemplate ( Name, Source = undefined, Type = undefined, Template = undefined ) export
+&atclient
+procedure CheckTemplate ( Name, Source = undefined, Type = undefined, Template = undefined ) export
 	
 	Test.CheckConnection ();
 	Fields.CheckSpreadsheet ( Name, Forms.FindSource ( Source ), Type, Template );
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ПроверитьШаблон ( Name, Source = undefined, Type = undefined, Template = undefined ) export
+&atclient
+procedure ПроверитьШаблон ( Name, Source = undefined, Type = undefined, Template = undefined ) export
 	
 	CheckTemplate ( Name, Source, Type, Template );
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CheckErrors () export
+&atclient
+procedure CheckErrors () export
 	
 	Test.CheckConnection ();
-	errors = Runtime.GetErrors ();
-	if ( errors.Count () > 0 ) then
-		raise errors [ 0 ];
-	endif; 
+	Forms.ThrowErrors ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ПроверитьОшибки () export
+&atclient
+procedure ПроверитьОшибки () export
 	
 	CheckErrors (); 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function GetMessages () export
+&atclient
+function GetMessages () export
 	
 	Test.CheckConnection ();
 	return Runtime.GetErrors ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьСообщения () export
+&atclient
+function ПолучитьСообщения () export
 	
 	return GetMessages ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function FindMessages ( Template ) export
+&atclient
+function FindMessages ( Template ) export
 	
 	Test.CheckConnection ();
 	return Runtime.FindErrors ( Template );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function НайтиСообщения ( Template ) export
+&atclient
+function НайтиСообщения ( Template ) export
 	
 	return FindMessages ( Template );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure Stop ( Reason = undefined ) export
+&atclient
+procedure Stop ( Reason = undefined ) export
 	
 	if ( Reason = undefined ) then
 		raise Output.StopMessage ();
@@ -407,138 +404,138 @@ Procedure Stop ( Reason = undefined ) export
 		raise String ( Reason );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Стоп ( Reason = undefined ) export
+&atclient
+procedure Стоп ( Reason = undefined ) export
 	
 	Stop ( Reason );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Close ( Form = undefined ) export
+&atclient
+procedure Close ( Form = undefined ) export
 	
 	Test.CheckConnection ();
 	Forms.CloseForm ( Form );
 	Forms.ResetBaseline ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Закрыть ( Form = undefined ) export
+&atclient
+procedure Закрыть ( Form = undefined ) export
 	
 	Close ( Form );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function Waiting ( Name, Timeout = 3, Type = undefined ) export
+&atclient
+function Waiting ( Name, Timeout = 3, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	return Forms.Wait ( Name, Timeout, Type );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Дождаться ( Name, Timeout = 3, Type = undefined ) export
+&atclient
+function Дождаться ( Name, Timeout = 3, Type = undefined ) export
 	
 	return Waiting ( Name, Timeout, Type );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function GetWindow ( Form = undefined ) export
+&atclient
+function GetWindow ( Form = undefined ) export
 	
 	Test.CheckConnection ();
 	return Forms.GetFrame ( Form );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ПолучитьОкно ( Form = undefined ) export
+&atclient
+function ПолучитьОкно ( Form = undefined ) export
 	
 	return GetWindow ( Form );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function GetLinks ( Form = undefined ) export
+&atclient
+function GetLinks ( Form = undefined ) export
 	
 	Test.CheckConnection ();
 	return Forms.GetFrame ( Form ).GetCommandInterface ();
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ПолучитьСсылки ( Form = undefined ) export
+&atclient
+function ПолучитьСсылки ( Form = undefined ) export
 	
 	return GetLinks ( Form );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Pause ( Seconds ) export
+&atclient
+procedure Pause ( Seconds ) export
 	
 	Test.PauseExecution ( Seconds );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Пауза ( Seconds ) export
+&atclient
+procedure Пауза ( Seconds ) export
 	
 	Pause ( Seconds ); 
 
-EndProcedure
+endprocedure
 
-&AtClient
-Function CurrentTab ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function CurrentTab ( Name, Source = undefined, Type = undefined ) export
 	
 	Test.CheckConnection ();
 	tab = Fields.GetControl ( Name, Forms.FindSource ( Source ), Type ).Field;
 	return tab.GetCurrentPage ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ТекущаяВкладка ( Name, Source = undefined, Type = undefined ) export
+&atclient
+function ТекущаяВкладка ( Name, Source = undefined, Type = undefined ) export
 	
 	return CurrentTab ( Name, Source, Type );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure Next () export
+&atclient
+procedure Next () export
 	
 	Test.CheckConnection ();
 	Fields.NextField ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Далее () export
+&atclient
+procedure Далее () export
 	
 	Next ();
 	
-EndProcedure 
+endprocedure 
          
-&AtClient
-Function GotoRow ( Table, Column, Value, FromStart = true, Source = undefined ) export
+&atclient
+function GotoRow ( Table, Column, Value, FromStart = true, Source = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.NavigateToRow ( Table, Column, Value, FromStart, Source );
 	
-EndFunction
+endfunction
          
-&AtClient
-Function КСтроке ( Table, Column, Value, FromStart = true, Source = undefined ) export
+&atclient
+function КСтроке ( Table, Column, Value, FromStart = true, Source = undefined ) export
 	
 	return GotoRow ( Table, Column, Value, FromStart, Source );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function Commando ( Action, Activate = true ) export
+&atclient
+function Commando ( Action, Activate = true ) export
 	
 	Test.CheckConnection ();
 	Forms.DoCommand ( Action );
@@ -547,196 +544,196 @@ Function Commando ( Action, Activate = true ) export
 		return Forms.SetCurrent ( undefined, Activate );
 	endif;
 
-EndFunction
+endfunction
 
-&AtClient
-Function Коммандос ( Action, Activate = true ) export
+&atclient
+function Коммандос ( Action, Activate = true ) export
 	
 	return Commando ( Action, Activate );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure LogError ( Text ) export
+&atclient
+procedure LogError ( Text ) export
 	
 	Runtime.WriteError ( Text );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ЗаписатьОшибку ( Text ) export
+&atclient
+procedure ЗаписатьОшибку ( Text ) export
 	
 	LogError ( Text );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function MyVersion ( Expression ) export
+&atclient
+function MyVersion ( Expression ) export
 	
 	return TestSrv.Version ( Expression );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function МояВерсия ( Expression ) export
+&atclient
+function МояВерсия ( Expression ) export
 	
 	return MyVersion ( Expression );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure DebugStart () export
+&atclient
+procedure DebugStart () export
 	
 	Debugger.Toggle ( true );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ОтладкаСтарт () export
+&atclient
+procedure ОтладкаСтарт () export
 	
 	DebugStart ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function EnvironmentExists ( ID ) export
+&atclient
+function EnvironmentExists ( ID ) export
 	
 	return Environment.FindByID ( ID );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function СозданоОкружение ( ID ) export
+&atclient
+function СозданоОкружение ( ID ) export
 	
 	return EnvironmentExists ( ID );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function EnvironmentData ( ID ) export
+&atclient
+function EnvironmentData ( ID ) export
 	
 	return Environment.GetData ( ID );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function ДанныеОкружения ( ID ) export
+&atclient
+function ДанныеОкружения ( ID ) export
 	
 	return EnvironmentData ( ID );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure RegisterEnvironment ( ID, Data = undefined ) export
+&atclient
+procedure RegisterEnvironment ( ID, Data = undefined ) export
 	
 	Environment.Register ( ID, Data );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure СохранитьОкружение ( ID, Data = undefined ) export
+&atclient
+procedure СохранитьОкружение ( ID, Data = undefined ) export
 	
 	RegisterEnvironment ( ID, Data );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function Screenshot ( Pattern = "", Compressed = undefined ) export
+&atclient
+function Screenshot ( Pattern = "", Compressed = undefined ) export
 	
 	return Forms.Shoot ( Pattern, Compressed );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Снимок ( Pattern = "", Compressed = undefined ) export
+&atclient
+function Снимок ( Pattern = "", Compressed = undefined ) export
 	
 	return Screenshot ( Pattern, Compressed );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure VStudio ( Text ) export
+&atclient
+procedure VStudio ( Text ) export
 	
 	Forms.BroadcastMessage ( Text );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ВСтудию ( Text ) export
+&atclient
+procedure ВСтудию ( Text ) export
 	
 	VStudio ( Text );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure PinApplication ( Name ) export
+&atclient
+procedure PinApplication ( Name ) export
 	
 	Environment.ChangeApplication ( Name );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure УстановитьПриложение ( Name ) export
+&atclient
+procedure УстановитьПриложение ( Name ) export
 	
 	PinApplication ( Name );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SetVersion ( Version, Application = undefined ) export
+&atclient
+procedure SetVersion ( Version, Application = undefined ) export
 	
 	Environment.SetApplicationVersion ( Version, Application );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure УстановитьВерсию ( Version, Application = undefined ) export
+&atclient
+procedure УстановитьВерсию ( Version, Application = undefined ) export
 	
 	SetVersion ( Version, Application );
 	
-EndProcedure 
+endprocedure 
 
-Function ParametersSpace () export
+function ParametersSpace () export
 	
 	return ParametersService;
 	
-EndFunction
+endfunction
 
-Function ЗонаПараметров () export
+function ЗонаПараметров () export
 	
 	return ParametersService;
 	
-EndFunction
+endfunction
 
-Procedure NewJob ( Agent, Scenario, Application = undefined, Parameters = undefined, Computer = undefined,
+procedure NewJob ( Agent, Scenario, Application = undefined, Parameters = undefined, Computer = undefined,
 	Memo = undefined, Schedule = undefined, Parent = undefined ) export
 	
 	TesterAgent.CreateJob ( Agent, Scenario, Application, Parameters, Computer, Memo, Schedule, Parent );
 	
-EndProcedure
+endprocedure
 
-Procedure СоздатьЗадание ( Agent, Scenario, Application = undefined, Parameters = undefined, Computer = undefined,
+procedure СоздатьЗадание ( Agent, Scenario, Application = undefined, Parameters = undefined, Computer = undefined,
 	Memo = undefined, Schedule = undefined, Parent = undefined ) export
 	
 	NewJob ( Agent, Scenario, Application, Parameters, Computer, Memo, Schedule, Parent );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure GotoConsole () export
+&atclient
+procedure GotoConsole () export
 	
 	Test.GotoSystemConsole ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ПерейтиВКонсоль () export
+&atclient
+procedure ПерейтиВКонсоль () export
 	
 	GotoConsole (); 
 
-EndProcedure
+endprocedure
 
-Function Assert ( Value, Details = "" ) export 
+function Assert ( Value, Details = "" ) export 
 	
 	#if ( Server ) then
 		obj = DataProcessors.Assertions.Create ();
@@ -746,275 +743,275 @@ Function Assert ( Value, Details = "" ) export
 	obj.That ( Value, Details );	
 	return obj;
 	
-EndFunction
+endfunction
 
-Function Заявить ( Value, Details = "" ) export
+function Заявить ( Value, Details = "" ) export
 	
 	return Assert ( Value, Details );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure RecorderStart () export
+&atclient
+procedure RecorderStart () export
 	
 	Debugger.Recording ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ХронографСтарт () export
+&atclient
+procedure ХронографСтарт () export
 	
 	RecorderStart ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RecorderStop () export
+&atclient
+procedure RecorderStop () export
 	
 	Debugger.Recording ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ХронографСтоп () export
+&atclient
+procedure ХронографСтоп () export
 	
 	RecorderStop ();
 	
-EndProcedure
+endprocedure
 
-Procedure RecorderClean ( Scenario = undefined, DateTo = undefined, Session = undefined ) export
+procedure RecorderClean ( Scenario = undefined, DateTo = undefined, Session = undefined ) export
 	
 	Maintenance.CleanTimelapse ( Session, Scenario, DateTo );
 	
-EndProcedure
+endprocedure
 
-Procedure ХронографОчистить ( Scenario = undefined, DateTo = undefined, Session = undefined ) export
+procedure ХронографОчистить ( Scenario = undefined, DateTo = undefined, Session = undefined ) export
 	
 	RecorderClean ( Session, Scenario, DateTo );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ProgressShow () export
+&atclient
+procedure ProgressShow () export
 	
 	Debugger.EnableProgress ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ПрогрессПоказать () export
+&atclient
+procedure ПрогрессПоказать () export
 	
 	ProgressShow ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ProgressHide () export
+&atclient
+procedure ProgressHide () export
 	
 	Debugger.DisableProgress ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ПрогрессСкрыть () export
+&atclient
+procedure ПрогрессСкрыть () export
 	
 	ProgressHide ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function SystemVariable ( Name ) export
+&atclient
+function SystemVariable ( Name ) export
 	
 	return Environment.GetVariable ( Name );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПеременнаяСреды ( Name ) export
+&atclient
+function ПеременнаяСреды ( Name ) export
 
 	return SystemVariable ( Name );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure MaximizeWindow ( Pattern = "" ) export
+&atclient
+procedure MaximizeWindow ( Pattern = "" ) export
 	
 	Forms.ToggleWindow ( Pattern, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure МаксимизироватьОкно ( Pattern = "" ) export
+&atclient
+procedure МаксимизироватьОкно ( Pattern = "" ) export
 	
 	MaximizeWindow ( Pattern );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure MinimizeWindow ( Pattern = "" ) export
+&atclient
+procedure MinimizeWindow ( Pattern = "" ) export
 	
 	Forms.ToggleWindow ( Pattern, false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure МинимизироватьОкно ( Pattern = "" ) export
+&atclient
+procedure МинимизироватьОкно ( Pattern = "" ) export
 	
 	MinimizeWindow ( Pattern );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StoreScenarios ( Memo = "" ) export
+&atclient
+procedure StoreScenarios ( Memo = "" ) export
 
 	p = new Structure ( "Silent, Memo", true, Memo );
 	OpenForm ( "Catalog.Scenarios.Form.Store", p, , true );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ПоместитьСценарии ( Memo = "" ) export
+&atclient
+procedure ПоместитьСценарии ( Memo = "" ) export
 
 	StoreScenarios ( Memo );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RunTest ( Scenario, Application = undefined, IgnoreLocking = false ) export
+&atclient
+procedure RunTest ( Scenario, Application = undefined, IgnoreLocking = false ) export
 	
 	Test.Start( Scenario, Application, IgnoreLocking );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ЗапуститьТест ( Scenario, Application = undefined, IgnoreLocking = false ) export
+&atclient
+procedure ЗапуститьТест ( Scenario, Application = undefined, IgnoreLocking = false ) export
 	
 	RunTest ( Scenario, Application, IgnoreLocking );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function TestingID () export
+&atclient
+function TestingID () export
 	
 	return EnvironmentSrv.TestingID ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ИДОкружения () export
+&atclient
+function ИДОкружения () export
 	
 	return TestingID ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьСодержимоеТаблицы ( Name, Source = undefined ) export
+&atclient
+function ПолучитьСодержимоеТаблицы ( Name, Source = undefined ) export
 	
 	return GetTableContent ( Name, Source );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function GetTableContent ( Name, Source = undefined ) export
+&atclient
+function GetTableContent ( Name, Source = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.FetchTableContent ( Name, Forms.FindSource ( Source ) );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьСодержимоеТабличногоДокумента ( Name, Source = undefined ) export
+&atclient
+function ПолучитьСодержимоеТабличногоДокумента ( Name, Source = undefined ) export
 	
 	return GetSpreadsheetContent ( Name, Source );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function GetSpreadsheetContent ( Name, Source = undefined ) export
+&atclient
+function GetSpreadsheetContent ( Name, Source = undefined ) export
 	
 	Test.CheckConnection ();
 	return Fields.FetchSpreadsheetContent ( Name, Forms.FindSource ( Source ) );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function GetActiveWindowControls () export
+&atclient
+function GetActiveWindowControls () export
 	
 	Test.CheckConnection ();
 	data = Fields.GetWindowControls ();
 	return ? ( data = undefined, undefined, data.Elements );
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьЭлементыАктивногоОкна () export
+&atclient
+function ПолучитьЭлементыАктивногоОкна () export
 	
 	return GetActiveWindowControls ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function GetActiveWindowChanges () export
+&atclient
+function GetActiveWindowChanges () export
 	
 	Test.CheckConnection ();
 	return Forms.GetChanges ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьИзмененияОкна () export
+&atclient
+function ПолучитьИзмененияОкна () export
 	
 	return GetActiveWindowChanges ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function GetMainMenu () export
+&atclient
+function GetMainMenu () export
 	
 	Test.CheckConnection ();
 	return Fields.FetchMainMenu ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьГлавноеМеню () export
+&atclient
+function ПолучитьГлавноеМеню () export
 	
 	return GetMainMenu ();
 	
-EndFunction
+endfunction
 
-&AtClient
-Function EnterValue ( Name, Value ) export
+&atclient
+function EnterValue ( Name, Value ) export
 
 	Test.CheckConnection ();
 	return Fields.SetValue ( Name, Value, , , true, true );
 
-EndFunction
+endfunction
 
-&AtClient
-Function ВнестиЗначение ( Name, Value ) export
+&atclient
+function ВнестиЗначение ( Name, Value ) export
 
 	return EnterValue ( Name, Value );
 
-EndFunction
+endfunction
 
-#if ( not WebClient ) then
+#if ( not webclient ) then
 
-&AtClient
-Function GetScreenshot () export
+&atclient
+function GetScreenshot () export
 
 	data = Screenshot ();
 	file = GetTempFileName ( "png" );
 	data.Write ( file );
 	return file;
 
-EndFunction
+endfunction
 
-&AtClient
-Function ПолучитьСнимок () export
+&atclient
+function ПолучитьСнимок () export
 
 	return GetScreenshot ();
 
-EndFunction
+endfunction
 
 #endif

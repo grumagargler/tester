@@ -1,5 +1,5 @@
 
-Procedure AssembleTemplate ( Data, Scenario ) export
+procedure AssembleTemplate ( Data, Scenario ) export
 	
 	error = "";
 	tabDoc = getSpreadsheet ( Data, error );
@@ -26,9 +26,9 @@ Procedure AssembleTemplate ( Data, Scenario ) export
 	Scenario.Template = new ValueStorage ( tabDoc );
 	Scenario.Spreadsheet = true;
 	
-EndProcedure
+endprocedure
 
-Function getSpreadsheet ( Data, Error )
+function getSpreadsheet ( Data, Error )
 	
 	storage = ? ( TypeOf ( Data ) = Type ( "BinaryData" ), Data, GetFromTempStorage ( Data ) );
 	stream = storage.OpenStreamForRead ();
@@ -42,17 +42,17 @@ Function getSpreadsheet ( Data, Error )
 	stream.Close ();
 	return tabDoc;
 	
-EndFunction 
+endfunction 
 
-Procedure ResetTemplate ( Scenario ) export
+procedure ResetTemplate ( Scenario ) export
 	
 	Scenario.Template = new ValueStorage ( new SpreadsheetDocument () );
 	Scenario.Areas.Clear ();
 	Scenario.Spreadsheet = false;
 
-EndProcedure
+endprocedure
 
-Procedure Properties ( Data, Scenario ) export
+procedure Properties ( Data, Scenario ) export
 	
 	params = parseProperties ( Data );
 	checkRequiredFields ( params );
@@ -67,9 +67,9 @@ Procedure Properties ( Data, Scenario ) export
 	Scenario.Tag = Catalogs.TagKeys.Pick ( params.Tags );
 	Scenario.Memo = params.Memo;
 	
-EndProcedure
+endprocedure
 
-Function parseProperties ( Data )
+function parseProperties ( Data )
 	
 	try
 		params = Conversion.FromJSON ( Data );
@@ -82,9 +82,9 @@ Function parseProperties ( Data )
 	endif;
 	return params;
 	
-EndFunction
+endfunction
 
-Procedure checkRequiredFields ( Params )
+procedure checkRequiredFields ( Params )
 	
 	var value;
 	missing = new Array ();
@@ -101,23 +101,23 @@ Procedure checkRequiredFields ( Params )
 			new Structure ( "Fields", StrConcat ( missing, ", " ) ) );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function requiredFields ()
+function requiredFields ()
 	
 	return "Tree, Creator, LastCreator, Tags, Type, Severity, Memo";
 	
-EndFunction
+endfunction
 
-Procedure validateTree ( Value )
+procedure validateTree ( Value )
 	
 	if ( TypeOf ( Value ) <> Type ( "Boolean" ) ) then
 		raise Output.ScenarioPropertiesTreeMustBeBoolean ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function parseType ( Value )
+function parseType ( Value )
 	
 	try
 		result = Enums.Scenarios [ Value ];
@@ -130,9 +130,9 @@ Function parseType ( Value )
 	endif;
 	return result;
 	
-EndFunction
+endfunction
 
-Function parseSeverity ( Value )
+function parseSeverity ( Value )
 	
 	if ( not ValueIsFilled ( Value ) ) then
 		return Enums.Severity.EmptyRef ();
@@ -145,9 +145,9 @@ Function parseSeverity ( Value )
 	endtry;
 	return result;
 	
-EndFunction
+endfunction
 
-Function getCreator ( User )
+function getCreator ( User )
 	
 	ref = Catalogs.Users.FindByDescription ( User, true );
 	if ( ref.IsEmpty () ) then
@@ -160,4 +160,4 @@ Function getCreator ( User )
 	endif;
 	return ref;
 	
-EndFunction
+endfunction

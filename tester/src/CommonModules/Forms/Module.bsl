@@ -1,6 +1,6 @@
-#if ( ThinClient or ThickClientManagedApplication ) then
+#if ( thinclient or thickclientmanagedapplication ) then
 
-Procedure CloseWindows () export
+procedure CloseWindows () export
 	
 	stuck = false;
 	rest = undefined;
@@ -29,9 +29,9 @@ Procedure CloseWindows () export
 	CurrentSource = undefined;
 	ТекущийОбъект = undefined;
 	
-EndProcedure 
+endprocedure 
 
-Procedure clickNo ()
+procedure clickNo ()
 	
 	fieldType = Type ( "TestedFormField" );
 	labels = App.FindObjects ( fieldType, "*Сохранить изменения?" );
@@ -47,9 +47,9 @@ Procedure clickNo ()
 		enddo; 
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure pressNo ( Dialog )
+procedure pressNo ( Dialog )
 	
 	buttonType = Type ( "TestedFormButton" );
 	button = Dialog.FindObject ( buttonType, "Нет" );
@@ -60,16 +60,16 @@ Procedure pressNo ( Dialog )
 		button.Click ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function standard ( Window )
+function standard ( Window )
 	
 	return Window.IsMain
 	or Window.HomePage;
 	
-EndFunction 
+endfunction 
 
-Procedure tryClose ( Window )
+procedure tryClose ( Window )
 	
 	closeWindow ( Window );
 	stillHere = App.GetChildObjects ().Find ( Window ) <> undefined;
@@ -79,18 +79,18 @@ Procedure tryClose ( Window )
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure closeWindow ( Window )
+procedure closeWindow ( Window )
 	
 	try
 		Window.Close ();
 	except
 	endtry;
 	
-EndProcedure 
+endprocedure 
 
-Function cancelInput ( Window )
+function cancelInput ( Window )
 	
 	try
 		input = Window.GetObject ().GetCurrentItem ();
@@ -129,9 +129,9 @@ Function cancelInput ( Window )
 	endif; 
 	return false;
 	
-EndFunction
+endfunction
 
-Function closingComplete ( Windows )
+function closingComplete ( Windows )
 	
 	currentWindows = new Array ( App.GetChildObjects () );
 	if ( currentWindows.Count () > Windows.Count () ) then
@@ -157,9 +157,9 @@ Function closingComplete ( Windows )
 	enddo; 
 	return true;
 	
-EndFunction 
+endfunction 
 
-Function Get1C ( TimeOut = 0 ) export
+function Get1C ( TimeOut = 0 ) export
 
 	formType = Type ( "TestedForm" );
 	try
@@ -169,9 +169,9 @@ Function Get1C ( TimeOut = 0 ) export
 	endtry;
 	return form;
 	
-EndFunction 
+endfunction 
 
-Function SetCurrent ( Source, Activate ) export
+function SetCurrent ( Source, Activate ) export
 	
 	activeWindow = App.GetActiveWindow ();
 	target = ? ( Source = undefined, activeWindow.Caption, Source );
@@ -200,9 +200,9 @@ Function SetCurrent ( Source, Activate ) export
 	endif; 
 	return CurrentSource;
 	
-EndFunction
+endfunction
 
-Procedure ClickMenu ( Path ) export
+procedure ClickMenu ( Path ) export
 	
 	commands = MainWindow.GetCommandInterface ();
 	place = commands;
@@ -227,9 +227,9 @@ Procedure ClickMenu ( Path ) export
 	enddo; 
 	place.Click ();
 
-EndProcedure 
+endprocedure 
 
-Procedure CloseForm ( Form ) export
+procedure CloseForm ( Form ) export
 
 	if ( Form = undefined
 			and CurrentSource = undefined
@@ -239,9 +239,9 @@ Procedure CloseForm ( Form ) export
 	target = Forms.GetFrame ( Form );
 	target.Close ();
 
-EndProcedure
+endprocedure
 
-Function noWindows ()
+function noWindows ()
 
 	windows = App.GetChildObjects ();
 	for each window in windows do
@@ -251,9 +251,9 @@ Function noWindows ()
 	enddo;
 	return true;
 
-EndFunction
+endfunction
 
-Function GetFrame ( Form = undefined ) export
+function GetFrame ( Form = undefined ) export
 	
 	windowType = Type ( "TestedClientApplicationWindow" );
 	if ( Form = undefined ) then
@@ -291,9 +291,9 @@ Function GetFrame ( Form = undefined ) export
 	enddo;
 	return undefined;
 	
-EndFunction
+endfunction
 
-Function SearchForm ( Name ) export
+function SearchForm ( Name ) export
 	
 	window = App.FindObject ( Type ( "TestedClientApplicationWindow" ), Name );
 	if ( window = undefined ) then
@@ -302,9 +302,9 @@ Function SearchForm ( Name ) export
 		return window.GetObject ();
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Function Wait ( Name, Timeout, Type ) export
+function Wait ( Name, Timeout, Type ) export
 	
 	target = ? ( Type = undefined, Type ( "TestedForm" ), Type );
 	sign = Left ( Name, 1 );
@@ -318,15 +318,18 @@ Function Wait ( Name, Timeout, Type ) export
 	endif;
 	return App.WaitForObjectDisplayed ( target, title, id, Timeout );
 	
-EndFunction 
+endfunction 
 
-Procedure DoCommand ( Action ) export
+procedure DoCommand ( Action ) export
 	
 	MainWindow.ExecuteCommand ( Action );
+	if ( MCPRequestProcessing = true ) then
+		ThrowErrors ();
+	endif;
 	
-EndProcedure 
+endprocedure 
 
-Function Shoot ( Pattern, Compressed ) export
+function Shoot ( Pattern, Compressed ) export
 	
 	title = ? ( Pattern = "", ScreenshotsLocator, Pattern );
 	if ( title = "" ) then
@@ -336,18 +339,18 @@ Function Shoot ( Pattern, Compressed ) export
 		return ExternalLibrary.Shoot ( title, quality );
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Procedure BroadcastMessage ( Text ) export
+procedure BroadcastMessage ( Text ) export
 	
 	Message ( Text );
 	if ( TesterServerMode ) then
 		Watcher.AddMessage ( Text, Enum.MessageTypesHint () );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function FindSource ( Source ) export
+function FindSource ( Source ) export
 	
 	if ( TypeOf ( Source ) = Type ( "String" ) ) then
 		return FindForm ( Source );
@@ -355,9 +358,9 @@ Function FindSource ( Source ) export
 		return Source;
 	endif; 
 	
-EndFunction
+endfunction
 
-Procedure ToggleWindow ( Pattern, Maximize ) export
+procedure ToggleWindow ( Pattern, Maximize ) export
 	
 	title = ? ( Pattern = "", ScreenshotsLocator, Pattern );
 	if ( title = "" ) then
@@ -370,9 +373,9 @@ Procedure ToggleWindow ( Pattern, Maximize ) export
 		endif;
 	endif; 
 	 
-EndProcedure
+endprocedure
 
-Function GetChanges () export
+function GetChanges () export
 
 	old = LastActiveWindowControls;
 	data = Fields.GetWindowControls ();
@@ -386,9 +389,9 @@ Function GetChanges () export
 		return Conversion.FromJSON ( ExternalLibrary.CompareJSON ( old, LastActiveWindowControls ) );
 	endif;
 
-EndFunction
+endfunction
 
-Procedure ResetBaseline ( Hard = true ) export
+procedure ResetBaseline ( Hard = true ) export
 
 	var type, name;
 	hardReset = Hard or ( TypeOf ( CurrentSource ) <> Type ( "TestedForm" ) );
@@ -409,6 +412,15 @@ Procedure ResetBaseline ( Hard = true ) export
 		enddo;
 	endif;
 
-EndProcedure
+endprocedure
+
+procedure ThrowErrors () export
+	
+	errors = Runtime.GetErrors ();
+	if ( errors.Count () > 0 ) then
+		raise errors [ 0 ];
+	endif; 
+
+endprocedure
 
 #endif 

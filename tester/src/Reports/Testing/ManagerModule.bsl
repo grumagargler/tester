@@ -1,6 +1,6 @@
-#if ( Server or ThickClientOrdinaryApplication or ExternalConnection ) then
+#if ( server or thickclientordinaryapplication or externalconnection ) then
 
-Function Events () export
+function Events () export
 	
 	p = Reporter.Events ();
 	p.OnDetail = true;
@@ -8,9 +8,9 @@ Function Events () export
 	p.AfterOutput = true;
 	return p;
 	
-EndFunction 
+endfunction 
 
-Procedure OnDetail ( Menu, StandardMenu, UseMainAction, Filters ) export
+procedure OnDetail ( Menu, StandardMenu, UseMainAction, Filters ) export
 	
 	UseMainAction = true;
 	filters = GetFromTempStorage ( Filters );
@@ -20,9 +20,9 @@ Procedure OnDetail ( Menu, StandardMenu, UseMainAction, Filters ) export
 		Reporter.AddCommand ( Menu, Enum.ReportCommandsOpenModule (), info );
 	endif;
 
-EndProcedure
+endprocedure
 
-Function moduleInfo ( Filters ) export
+function moduleInfo ( Filters ) export
 	
 	line = getValue ( "ModuleLine", Filters );
 	if ( line <> undefined ) then
@@ -31,9 +31,9 @@ Function moduleInfo ( Filters ) export
 		return new Structure ( "Scenario, Line, Error", scenario, line, error );
 	endif;
 
-EndFunction
+endfunction
 
-Function getValue ( Name, Filters )
+function getValue ( Name, Filters )
 	
 	for each item in Filters do
 		if ( item.Name = Name ) then
@@ -41,6 +41,6 @@ Function getValue ( Name, Filters )
 		endif;
 	enddo;
 	
-EndFunction
+endfunction
 
 #endif

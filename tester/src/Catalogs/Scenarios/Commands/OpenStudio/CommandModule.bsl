@@ -1,7 +1,7 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenario, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenario, ExecuteParameters )
 	
 	WorkspaceForm.RunStudio ( Scenario );
 	
-EndProcedure
+endprocedure

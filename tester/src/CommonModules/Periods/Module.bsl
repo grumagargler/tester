@@ -1,4 +1,4 @@
-Function GetBalanceDate ( Object ) export
+function GetBalanceDate ( Object ) export
 	
 	if ( Object.Date = Date ( 1, 1, 1 ) ) then
 		return undefined;
@@ -17,9 +17,9 @@ Function GetBalanceDate ( Object ) export
 		return Object.Date;
 	endif; 
 	
-EndFunction
+endfunction
 
-Function GetDocumentDate ( Object ) export
+function GetDocumentDate ( Object ) export
 	
 	if ( Object.Date = Date ( 1, 1, 1 ) ) then
 		return PeriodsSrv.GetCurrentSessionDate ();
@@ -34,10 +34,10 @@ Function GetDocumentDate ( Object ) export
 		return Object.Date;
 	endif; 
 	
-EndFunction
+endfunction
 
-&AtServer
-Function GetOperationalDate ( Date ) export
+&atserver
+function GetOperationalDate ( Date ) export
 	
 	if ( Date = undefined ) then
 		return undefined;
@@ -49,10 +49,10 @@ Function GetOperationalDate ( Date ) export
 		return Date;
 	endif; 
 
-EndFunction
+endfunction
 
-&AtServer
-Function Ok ( DateStart, DateEnd ) export
+&atserver
+function Ok ( DateStart, DateEnd ) export
 	
 	if ( DateStart = Date ( 1, 1, 1 ) ) or ( DateEnd = Date ( 1, 1, 1 ) ) then
 		return true;
@@ -62,9 +62,9 @@ Function Ok ( DateStart, DateEnd ) export
 	endif; 
 	return false;
 	
-EndFunction
+endfunction
 
-Function Presentation ( DateStart, DateEnd ) export
+function Presentation ( DateStart, DateEnd ) export
 	
 	try
 		presentation = PeriodPresentation ( DateStart, DateEnd, "FP=true" );
@@ -73,4 +73,4 @@ Function Presentation ( DateStart, DateEnd ) export
 	endtry;
 	return presentation;
 
-EndFunction
+endfunction

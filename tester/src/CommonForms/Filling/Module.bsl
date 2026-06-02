@@ -1,11 +1,11 @@
-&AtServer
+&atserver
 var Presentation;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 
 	loadParams ();
 	init ();
@@ -15,10 +15,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -26,10 +26,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	filling = Parameters.Filling;
 	Report = filling.Report;
@@ -40,10 +40,10 @@ Procedure loadParams ()
 	CloseOnErrors = filling.CloseOnErrors;
 	ClearTable = filling.ClearTable;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	SetPrivilegedMode ( true );
 	schema = Reporter.GetSchema ( Report );
@@ -56,10 +56,10 @@ Procedure init ()
 	Reporter.ApplyFilters ( Composer, Parameters.Filling );
 	Items.UserSettings.ViewMode = DataCompositionSettingsViewMode.QuickAccess;
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure fetchHiddenSettings ()
+&atserver
+procedure fetchHiddenSettings ()
 
 	filters = undefined;
 	Parameters.Filling.Property ( "Filters", filters );
@@ -85,37 +85,37 @@ Procedure fetchHiddenSettings ()
 		HiddenSettings.Add ( name, item.UserSettingID );
 	enddo; 
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure hideSettings ()
+&atserver
+procedure hideSettings ()
 
 	settings = Composer.Settings;
 	for each setting in HiddenSettings do
 		DC.FindSetting ( settings, setting.Value ).UserSettingID = "";
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setTitle ()
+&atserver
+procedure setTitle ()
 	
 	Title = Presentation;
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	Caller = FormOwner.UUID;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Fill ( Command )
+&atclient
+procedure Fill ( Command )
 	
 	perform ( Background );
 	if ( Background ) then
@@ -124,10 +124,10 @@ Procedure Fill ( Command )
 		Close ( getResult ( true ) );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure perform ( Background )
+&atserver
+procedure perform ( Background )
 	
 	schema = GetFromTempStorage ( SchemaAddress );
 	args = new Array ();
@@ -140,10 +140,10 @@ Procedure perform ( Background )
 	args.Add ( ClearTable );
 	Jobs.Run ( "FillerSrv.Perform", args, UUID, , not Background );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function getSettings ()
+&atserver
+function getSettings ()
 
 	loadHiddenSettings ();
 	settings = Composer.GetSettings ();
@@ -151,29 +151,29 @@ Function getSettings ()
 	FillerSrv.ExtractTables ( settings );
 	return settings;
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure loadHiddenSettings ()
+&atserver
+procedure loadHiddenSettings ()
 
 	settings = Composer.Settings;
 	for each setting in HiddenSettings do
 		DC.FindSetting ( settings, setting.Value ).UserSettingID = setting.Presentation;
 	enddo;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Complete ( Completed, Params ) export
+&atclient
+procedure Complete ( Completed, Params ) export
 	
 	if ( Completed or CloseOnErrors ) then
 		Close ( getResult ( Completed ) );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function getResult ( Completed )
+&atclient
+function getResult ( Completed )
 	
 	result = Filler.Result ();
 	result.ClearTable = ClearTable;
@@ -181,24 +181,24 @@ Function getResult ( Completed )
 	result.Completed = Completed;
 	return result;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure MarkAll ( Command )
+&atclient
+procedure MarkAll ( Command )
 	
 	mark ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnmarkAll ( Command )
+&atclient
+procedure UnmarkAll ( Command )
 	
 	mark ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure mark ( Flag )
+&atclient
+procedure mark ( Flag )
 	
 	for each item in Composer.UserSettings.Items do
 		if ( TypeOf ( item ) = Type ( "DataCompositionFilterItem" )
@@ -208,17 +208,17 @@ Procedure mark ( Flag )
 		endif; 
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OpenSettings ( Command )
+&atclient
+procedure OpenSettings ( Command )
 	
 	switchSettings ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure switchSettings ()
+&atserver
+procedure switchSettings ()
 	
 	if ( Items.UserSettings.ViewMode = DataCompositionSettingsViewMode.QuickAccess ) then
 		Items.OpenSettings.Check = true;
@@ -228,4 +228,4 @@ Procedure switchSettings ()
 		Items.UserSettings.ViewMode = DataCompositionSettingsViewMode.QuickAccess;
 	endif;
 	
-EndProcedure
+endprocedure

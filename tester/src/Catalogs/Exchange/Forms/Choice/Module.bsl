@@ -1,8 +1,8 @@
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	Appearance.Read ( ThisObject );
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure

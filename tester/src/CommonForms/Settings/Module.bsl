@@ -2,15 +2,15 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 
 	readAppearance ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -20,43 +20,43 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AfterWrite ( WriteParameters )
+&atclient
+procedure AfterWrite ( WriteParameters )
 	
 	Notify ( Enum.MessageApplicationSettingsSaved () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	checkMCP ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkMCP ()
+&atclient
+procedure checkMCP ()
 
 	MCPWorking = MCPD <> undefined;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Form
 
-&AtClient
-Procedure IDOnChange ( Item )
+&atclient
+procedure IDOnChange ( Item )
 
 	adjustID ();
 
-EndProcedure
+endprocedure
 
 // Server is used to make WebClient possible to use
-&AtServer
-Procedure adjustID ()
+&atserver
+procedure adjustID ()
 	
 	id = Upper ( TrimAll ( ConstantsSet.ID ) );
 	matches = Regexp.Select ( id, "[\d,[A-Z]+" );
@@ -66,19 +66,19 @@ Procedure adjustID ()
 		ConstantsSet.ID = matches [ 0 ].Value;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure MCPServerOnChange ( Item )
+&atclient
+procedure MCPServerOnChange ( Item )
 
 	applyMCPServer ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyMCPServer ()
+&atclient
+procedure applyMCPServer ()
 
 	MCPRestartRequired = true;
 	Appearance.Apply ( ThisForm, "MCPRestartRequired" );
 
-EndProcedure
+endprocedure

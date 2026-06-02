@@ -1,12 +1,12 @@
-Function GetScheduled ( Key ) export
+function GetScheduled ( Key ) export
 	
 	SetPrivilegedMode ( true );
 	result = ScheduledJobs.GetScheduledJobs ( new Structure ( "Key", Key ) );
 	return ? ( result.Count () = 0, undefined, result [ 0 ] );
 	
-EndFunction 
+endfunction 
 
-Procedure Remove ( Ref ) export
+procedure Remove ( Ref ) export
 	
 	SetPrivilegedMode ( true );
 	job = Jobs.GetScheduled ( Ref.UUID () );
@@ -14,9 +14,9 @@ Procedure Remove ( Ref ) export
 		job.Delete ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Function GetBackground ( Key, ActiveOnly = true ) export
+function GetBackground ( Key, ActiveOnly = true ) export
 	
 	SetPrivilegedMode ( true );
 	filter = new Structure ( "Key", Key );
@@ -26,9 +26,9 @@ Function GetBackground ( Key, ActiveOnly = true ) export
 	result = BackgroundJobs.GetBackgroundJobs ( filter );
 	return ? ( result.Count () = 0, undefined, result [ 0 ] );
 	
-EndFunction 
+endfunction 
 
-Function GetByID ( ID, ActiveOnly = true ) export
+function GetByID ( ID, ActiveOnly = true ) export
 	
 	SetPrivilegedMode ( true );
 	job = BackgroundJobs.FindByUUID ( ID );
@@ -43,9 +43,9 @@ Function GetByID ( ID, ActiveOnly = true ) export
 		return job;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Function Run ( EntryPoint, val Params = undefined, Key = undefined, Description = undefined, TestingMode = false ) export
+function Run ( EntryPoint, val Params = undefined, Key = undefined, Description = undefined, TestingMode = false ) export
 	
 	if ( Key <> undefined ) then
 		cleanLog ( Key );
@@ -60,23 +60,23 @@ Function Run ( EntryPoint, val Params = undefined, Key = undefined, Description 
 		return BackgroundJobs.Execute ( EntryPoint, Params, Key, Description );
 	endif;
 	
-EndFunction
+endfunction
 
-Procedure cleanLog ( Key )
+procedure cleanLog ( Key )
 	
 	r = InformationRegisters.Jobs.CreateRecordManager ();
 	r.JobKey = Key;
 	r.Delete ();
 	
-EndProcedure 
+endprocedure 
 
-Function runningProcessor ( EntryPoint )
+function runningProcessor ( EntryPoint )
 	
 	return EntryPoint = "Jobs.ExecProcessor";
 	
-EndFunction
+endfunction
 
-Procedure runHere ( EntryPoint, Params, Key )
+procedure runHere ( EntryPoint, Params, Key )
 	
 	if ( Params = undefined ) then
 		execute EntryPoint + " ();";
@@ -91,9 +91,9 @@ Procedure runHere ( EntryPoint, Params, Key )
 		execute EntryPoint + "( " + StrConcat ( parts, ", " ) + " );";
 	endif;
 		
-EndProcedure
+endprocedure
 
-Procedure augment ( Params, Key )
+procedure augment ( Params, Key )
 	
 	count = Params.Count ();
 	if ( count = 1 ) then
@@ -103,15 +103,15 @@ Procedure augment ( Params, Key )
 		Params.Add ( Key );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure ExecProcessor ( DataProcessor, Params = undefined, Key = undefined ) export
+procedure ExecProcessor ( DataProcessor, Params = undefined, Key = undefined ) export
 	
 	DataProcessors [ DataProcessor ].Exec ( Params, Key );
 	
-EndProcedure 
+endprocedure 
 
-Function CheckFilling ( Object ) export
+function CheckFilling ( Object ) export
 	
 	GetUserMessages ( true );
 	if ( Object.CheckFilling () ) then
@@ -128,4 +128,4 @@ Function CheckFilling ( Object ) export
 	endif;
 	return false;
 	
-EndFunction
+endfunction

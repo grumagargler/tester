@@ -1,21 +1,21 @@
-&AtClient
+&atclient
 var ListRow;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	setFilter ();
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -26,18 +26,18 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	ScenarioFilter = Parameters.Scenario;
 	JobFilter = Parameters.Job;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setFilter ()
+&atserver
+procedure setFilter ()
 	
 	defaultFilter = true;
 	if ( not JobFilter.IsEmpty () ) then
@@ -56,24 +56,24 @@ Procedure setFilter ()
 		filterByUser ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByJob ()
+&atserver
+procedure filterByJob ()
 	
 	DC.ChangeFilter ( List, "Job", JobFilter, not JobFilter.IsEmpty () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByUser ()
+&atserver
+procedure filterByUser ()
 	
 	DC.ChangeFilter ( List, "User", UserFilter, not UserFilter.IsEmpty () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByScenario ()
+&atserver
+procedure filterByScenario ()
 	
 	filter = ScenarioFilter <> undefined;
 	if ( filter ) then
@@ -82,20 +82,20 @@ Procedure filterByScenario ()
 		DC.SetParameter ( List, "Scenario", undefined, false );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure ClearLog ( Command )
+&atclient
+procedure ClearLog ( Command )
 	
 	Output.ClearLogConfirmation ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ClearLogConfirmation ( Answer, Params ) export
+&atclient
+procedure ClearLogConfirmation ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
@@ -103,10 +103,10 @@ Procedure ClearLogConfirmation ( Answer, Params ) export
 	clearErrors ();
 	Items.List.Refresh ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure clearErrors ()
+&atserver
+procedure clearErrors ()
 	
 	data = getRecords ();
 	SetPrivilegedMode ( true );
@@ -123,10 +123,10 @@ Procedure clearErrors ()
 	enddo; 
 	CommitTransaction ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getRecords ()
+&atserver
+function getRecords ()
 	
 	s = "
 	|select allowed ErrorLog.Ref as Ref
@@ -147,17 +147,17 @@ Function getRecords ()
 	result.Insert ( "Log", data [ 2 ] );
 	return result;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure UserFilterOnChange ( Item )
+&atclient
+procedure UserFilterOnChange ( Item )
 	
 	applyUserFilter ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyUserFilter ()
+&atserver
+procedure applyUserFilter ()
 	
 	if ( not UserFilter.IsEmpty () ) then
 		JobFilter = undefined;
@@ -167,24 +167,24 @@ Procedure applyUserFilter ()
 	filterByUser ();
 	Appearance.Apply ( ThisObject, "UserFilter" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ScenarioFilterOnChange ( Item )
+&atclient
+procedure ScenarioFilterOnChange ( Item )
 	
 	filterByScenario ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure JobFilterOnChange ( Item )
+&atclient
+procedure JobFilterOnChange ( Item )
 	
 	applyJobFilter ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyJobFilter ()
+&atserver
+procedure applyJobFilter ()
 	
 	if ( not JobFilter.IsEmpty () ) then
 		UserFilter = undefined;
@@ -194,51 +194,51 @@ Procedure applyJobFilter ()
 	filterByJob ();
 	Appearance.Apply ( ThisObject, "JobFilter" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SeverityFilterOnChange ( Item )
+&atclient
+procedure SeverityFilterOnChange ( Item )
 	
 	filterBySeverity ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterBySeverity ()
+&atserver
+procedure filterBySeverity ()
 	
 	DC.ChangeFilter ( List, "Severity", SeverityFilter, not SeverityFilter.IsEmpty () );
 	Appearance.Apply ( ThisObject, "SeverityFilter" );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure AreaFilterOnChange ( Item )
+&atclient
+procedure AreaFilterOnChange ( Item )
 	
 	filterByArea ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByArea ()
+&atserver
+procedure filterByArea ()
 	
 	DC.ChangeFilter ( List, "Area", AreaFilter, not AreaFilter.IsEmpty () );
 	Appearance.Apply ( ThisObject, "AreaFilter" );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** List
 
-&AtClient
-Procedure ListOnActivateRow ( Item )
+&atclient
+procedure ListOnActivateRow ( Item )
 	
 	ListRow = Item.CurrentData;
 	AttachIdleHandler ( "fill", 0.1, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fill () export
+&atclient
+procedure fill () export
 	
 	if ( ListRow = undefined ) then
 		Screenshot = "";
@@ -252,18 +252,18 @@ Procedure fill () export
 	endif; 
 	displayInfo ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure updateInfo ()
+&atserver
+procedure updateInfo ()
 	
 	ErrorLogForm.UpdateStack ( OldRecord, Stack );
 	updateScreenshot ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure updateScreenshot ()
+&atserver
+procedure updateScreenshot ()
 	
 	if ( DF.Pick ( OldRecord, "ScreenshotExists" ) ) then
 		Screenshot = GetURL ( OldRecord, "Screenshot" );
@@ -271,10 +271,10 @@ Procedure updateScreenshot ()
 		Screenshot = "";
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure displayInfo ()
+&atclient
+procedure displayInfo ()
 	
 	if ( Screenshot = "" ) then
 		if ( ListRow = undefined ) then
@@ -286,10 +286,10 @@ Procedure displayInfo ()
 		Items.Pages.CurrentPage = Items.ScreenshotPage;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	if ( Field.Name = "Job" ) then
@@ -298,33 +298,33 @@ Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 		ShowValue ( , ListRow.Ref );
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Table Stack
 
-&AtClient
-Procedure StackSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure StackSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	data = Item.CurrentData;
 	ScenarioForm.GotoLine ( data.Ref, data.Row, ListRow.Ref );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Screenshot Field
 
-&AtClient
-Procedure ScreenshotClick ( Item, StandardProcessing )
+&atclient
+procedure ScreenshotClick ( Item, StandardProcessing )
 	
 	StandardProcessing = false;
 	showPicture ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showPicture ()
+&atclient
+procedure showPicture ()
 	
 	if ( Screenshot = "" ) then
 		return;
@@ -334,4 +334,4 @@ Procedure showPicture ()
 	p.Insert ( "URL", Screenshot );
 	OpenForm ( "CommonForm.Screenshot", p );
 	
-EndProcedure 
+endprocedure 

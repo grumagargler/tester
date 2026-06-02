@@ -1,17 +1,17 @@
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	openRecord ( Item, SelectedRow );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openRecord ( Item, RecordKey )
+&atclient
+procedure openRecord ( Item, RecordKey )
 	
 	OpenForm ( "InformationRegister.ScheduledReports.RecordForm", new Structure ( "Key", RecordKey ), Item );
 	
-EndProcedure 
+endprocedure 

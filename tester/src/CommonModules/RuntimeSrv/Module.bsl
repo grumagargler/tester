@@ -1,4 +1,4 @@
-Function StartSession ( val Application, val Job ) export
+function StartSession ( val Application, val Job ) export
 	
 	r = InformationRegisters.Sessions.CreateRecordManager ();
 	r.Session = SessionParameters.Session;
@@ -9,9 +9,9 @@ Function StartSession ( val Application, val Job ) export
 	ExchangeKillers.Write ( r );
 	return started;
 	
-EndFunction 
+endfunction 
 
-Procedure StopSession ( val Started ) export
+procedure StopSession ( val Started ) export
 	
 	r = InformationRegisters.Sessions.CreateRecordManager ();
 	r.Session = SessionParameters.Session;;
@@ -20,9 +20,9 @@ Procedure StopSession ( val Started ) export
 	r.Finished = CurrentSessionDate ();
 	ExchangeKillers.Write ( r );
 	
-EndProcedure 
+endprocedure 
 
-Function FindScenario ( val Scenario, val DefaultApplication, val Application, val Parent, val EvenLocked = false, val EvenRemoved = false ) export
+function FindScenario ( val Scenario, val DefaultApplication, val Application, val Parent, val EvenLocked = false, val EvenRemoved = false ) export
 	
 	s = "
 	|select allowed top 1 1 as Priority, Scenarios.Ref as Ref
@@ -91,9 +91,9 @@ Function FindScenario ( val Scenario, val DefaultApplication, val Application, v
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Ref );
 	
-EndFunction 
+endfunction 
 
-Function ActualScenario ( val Scenario ) export
+function ActualScenario ( val Scenario ) export
 	
 	s = "
 	|select case when isnull ( Editing.User, &User ) = &User then Main.Ref else isnull ( Versions.Version, &Scenario ) end as Ref
@@ -114,16 +114,16 @@ Function ActualScenario ( val Scenario ) export
 	q.SetParameter ( "Scenario", Scenario );
 	return q.Execute ().Unload () [ 0 ].Ref;
 	
-EndFunction 
+endfunction 
 
-Function LogError ( val Debug, val Error, val Screenshot ) export
+function LogError ( val Debug, val Error, val Screenshot ) export
 	
 	SetPrivilegedMode ( true );
 	return Catalogs.ErrorLog.Add ( Debug, Error, Screenshot );
 
-EndFunction
+endfunction
 
-Function Stack ( Debug ) export
+function Stack ( Debug ) export
 	
 	stack = Debug.Stack;
 	s = new Array ();
@@ -144,9 +144,9 @@ Function Stack ( Debug ) export
 	data.Calls = calls;
 	return data;
 	
-EndFunction 
+endfunction 
 
-Function getModule ( Stack )
+function getModule ( Stack )
 	
 	source = ? ( Stack.IsVersion, "Catalog.Versions", "Catalog.Scenarios" );
 	s = "
@@ -158,9 +158,9 @@ Function getModule ( Stack )
 	q.SetParameter ( "Module", Stack.Module );
 	return q.Execute ().Unload () [ 0 ];
 
-EndFunction 
+endfunction 
 
-Function GetSource ( Scenario ) export
+function GetSource ( Scenario ) export
 	
 	result = new Structure ( "Application, Scenario" );
 	if ( TypeOf ( Scenario ) = Type ( "CatalogRef.Versions" ) ) then
@@ -173,9 +173,9 @@ Function GetSource ( Scenario ) export
 	endif;
 	return result;
 	
-EndFunction
+endfunction
 
-Procedure WriteError ( Source, Scenario, Date, Error, Level, Job ) export
+procedure WriteError ( Source, Scenario, Date, Error, Level, Job ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.Log.CreateRecordManager ();
@@ -195,16 +195,16 @@ Procedure WriteError ( Source, Scenario, Date, Error, Level, Job ) export
 	ExchangeKillers.Write ( r );
 	CommitTransaction ();
 	
-EndProcedure
+endprocedure
 
-Function errorArea ( Error, Level )
+function errorArea ( Error, Level )
 	
 	stack = Error.Stack; // Error object had been created and cached
 	return stack [ Max ( 0, stack.Count () - ( Level + 1 ) ) ].Area;
 	
-EndFunction
+endfunction
 
-Procedure completeRunning ( Record )
+procedure completeRunning ( Record )
 	
 	completed = CurrentUniversalDateInMilliseconds ();
 	session = SessionParameters.Session;
@@ -221,9 +221,9 @@ Procedure completeRunning ( Record )
 		endif; 
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure AssignJob ( Record, Job ) export
+procedure AssignJob ( Record, Job ) export
 	
 	if ( Job <> undefined ) then
 		ref = Job.Job;
@@ -233,9 +233,9 @@ Procedure AssignJob ( Record, Job ) export
 		Record.Row = Job.Row;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure LogRunning ( val Scenario, val Level, val Job ) export
+procedure LogRunning ( val Scenario, val Level, val Job ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.Log.CreateRecordManager ();
@@ -251,9 +251,9 @@ Procedure LogRunning ( val Scenario, val Level, val Job ) export
 	RuntimeSrv.AssignJob ( r, Job );
 	ExchangeKillers.Write ( r );
 	
-EndProcedure 
+endprocedure 
 
-Procedure LogSuccess ( val Scenario, val Level, val Job ) export
+procedure LogSuccess ( val Scenario, val Level, val Job ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.Log.CreateRecordManager ();
@@ -272,9 +272,9 @@ Procedure LogSuccess ( val Scenario, val Level, val Job ) export
 	ExchangeKillers.Write ( r );
 	CommitTransaction ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure LogFailing ( val Debug ) export
+procedure LogFailing ( val Debug ) export
 	
 	SetPrivilegedMode ( true );
 	stack = stack ( Debug );
@@ -285,9 +285,9 @@ Procedure LogFailing ( val Debug ) export
 	source = RuntimeSrv.GetSource ( scenario );
 	RuntimeSrv.WriteError ( source, scenario, CurrentSessionDate (), Debug.ErrorLog, Debug.Level, Debug.Job );
 	
-EndProcedure
+endprocedure
 
-Function GetSpreadsheet ( Module, IsVersion ) export
+function GetSpreadsheet ( Module, IsVersion ) export
 	
 	data = spreadsheetData ( Module, IsVersion );
 	t = data.Template;
@@ -313,9 +313,9 @@ Function GetSpreadsheet ( Module, IsVersion ) export
 	endif; 
 	return new Structure ( "Template, Areas", tabDoc, Collections.Serialize ( areas ) );
 
-EndFunction 
+endfunction 
 
-Function spreadsheetData ( Module, IsVersion )
+function spreadsheetData ( Module, IsVersion )
 	
 	source = ? ( IsVersion, "Catalog.Versions", "Catalog.Scenarios" );
 	s = "
@@ -334,9 +334,9 @@ Function spreadsheetData ( Module, IsVersion )
 	areas = data [ 1 ].Unload ();
 	return new Structure ( "Template, Areas", template, areas );
 	
-EndFunction 
+endfunction 
 
-Function FindErrors ( val Template, val Messages ) export
+function FindErrors ( val Template, val Messages ) export
 	
 	pattern = prepareTemplate ( Template );
 	result = new Array ();
@@ -347,26 +347,26 @@ Function FindErrors ( val Template, val Messages ) export
 	enddo; 
 	return result;
 	
-EndFunction 
+endfunction 
 
-Function prepareTemplate ( Template )
+function prepareTemplate ( Template )
 	
 	s = Template;
 	s = StrReplace ( s, "*", ".+" );
 	s = StrReplace ( s, "?", "." );
 	return s;
 	
-EndFunction 
+endfunction 
 
-Procedure CheckSyntax ( val Code ) export
+procedure CheckSyntax ( val Code ) export
 	
 	//@skip-warning
 	var Debug, _procedures, this, тут, Chronograph, Хронограф;
 	Execute ( Code );
 
-EndProcedure 
+endprocedure 
 
-Function DeepFunction ( This, Chronograph, Debug, val _Procedures, _Name, _P1 = undefined, _P2 = undefined, _P3 = undefined, _P4 = undefined, _P5 = undefined, _P6 = undefined, _P7 = undefined, _P8 = undefined, _P9 = undefined, _P10 = undefined, _P11 = undefined, _P12 = undefined, _P13 = undefined, _P14 = undefined, _P15 = undefined, _P16 = undefined, _P17 = undefined, _P18 = undefined, _P19 = undefined, _P20 = undefined ) export
+function DeepFunction ( This, Chronograph, Debug, val _Procedures, _Name, _P1 = undefined, _P2 = undefined, _P3 = undefined, _P4 = undefined, _P5 = undefined, _P6 = undefined, _P7 = undefined, _P8 = undefined, _P9 = undefined, _P10 = undefined, _P11 = undefined, _P12 = undefined, _P13 = undefined, _P14 = undefined, _P15 = undefined, _P16 = undefined, _P17 = undefined, _P18 = undefined, _P19 = undefined, _P20 = undefined ) export
 	
 	initDebugStorage ();
 	_script = _Procedures [ _Name ];
@@ -389,21 +389,21 @@ Function DeepFunction ( This, Chronograph, Debug, val _Procedures, _Name, _P1 = 
 		Runtime.PreviousLevel ( Debug );
 		return result;
 	else
-		Runtime.ThrowError ( BriefErrorDescription ( _errorInfo ), Debug );
+		Runtime.ThrowError ( ErrorProcessing.BriefErrorDescription ( _errorInfo ), Debug );
 	endif; 
 	#endregion
 	
-EndFunction 
+endfunction 
 
-Procedure initDebugStorage ()
+procedure initDebugStorage ()
 	
 	r = InformationRegisters.ServerDebug.CreateRecordManager ();
 	r.Session = SessionParameters.Session;
 	r.Delete ();
 	
-EndProcedure
+endprocedure
 
-Procedure DeepProcedure ( This, Chronograph, Debug, val _Procedures, _Name, _P1 = undefined, _P2 = undefined, _P3 = undefined, _P4 = undefined, _P5 = undefined, _P6 = undefined, _P7 = undefined, _P8 = undefined, _P9 = undefined, _P10 = undefined, _P11 = undefined, _P12 = undefined, _P13 = undefined, _P14 = undefined, _P15 = undefined, _P16 = undefined, _P17 = undefined, _P18 = undefined, _P19 = undefined, _P20 = undefined ) export
+procedure DeepProcedure ( This, Chronograph, Debug, val _Procedures, _Name, _P1 = undefined, _P2 = undefined, _P3 = undefined, _P4 = undefined, _P5 = undefined, _P6 = undefined, _P7 = undefined, _P8 = undefined, _P9 = undefined, _P10 = undefined, _P11 = undefined, _P12 = undefined, _P13 = undefined, _P14 = undefined, _P15 = undefined, _P16 = undefined, _P17 = undefined, _P18 = undefined, _P19 = undefined, _P20 = undefined ) export
 	
 	initDebugStorage ();
 	_script = _Procedures [ _Name ];
@@ -424,13 +424,13 @@ Procedure DeepProcedure ( This, Chronograph, Debug, val _Procedures, _Name, _P1 
 	if ( _errorInfo = undefined ) then
 		Runtime.PreviousLevel ( Debug );
 	else
-		Runtime.ThrowError ( BriefErrorDescription ( _errorInfo ), Debug );
+		Runtime.ThrowError ( ErrorProcessing.BriefErrorDescription ( _errorInfo ), Debug );
 	endif; 
 	#endregion
 
-EndProcedure
+endprocedure
 
-Function RecordingContext ( val Code, val IsVersion ) export
+function RecordingContext ( val Code, val IsVersion ) export
 	
 	SetPrivilegedMode ( true );
 	BeginTransaction ();
@@ -453,9 +453,9 @@ Function RecordingContext ( val Code, val IsVersion ) export
 	CommitTransaction ();
 	return result;
 	
-EndFunction
+endfunction
 
-Function scenarioAndModule ( Code, IsVersion )
+function scenarioAndModule ( Code, IsVersion )
 	
 	source = "Catalog." + ? ( IsVersion, "Versions", "Scenarios" );
 	lock = new DataLock ();
@@ -478,9 +478,9 @@ Function scenarioAndModule ( Code, IsVersion )
 	q.SetParameter ( "Code", Code );
 	return Conversion.RowToStructure ( q.Execute ().Unload () );
 	
-EndFunction
+endfunction
 
-Function scenarioData ( Scenario, IsVersion )
+function scenarioData ( Scenario, IsVersion )
 	
 	s = "
 	|select Scenarios.Description as Description, Scenarios.Path as Path,
@@ -497,9 +497,9 @@ Function scenarioData ( Scenario, IsVersion )
 	q.SetParameter ( "Ref", Scenario );
 	return q.Execute ().Unload () [ 0 ];
 	
-EndFunction
+endfunction
 
-Procedure Recording ( val Params ) export
+procedure Recording ( val Params ) export
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.Timelapse.CreateRecordManager ();
@@ -512,9 +512,9 @@ Procedure Recording ( val Params ) export
 	r.Screenshot = new ValueStorage ( Params.Screenshot );
 	r.Write ();	
 	
-EndProcedure
+endprocedure
 
-Procedure FetchServerDebug ( Debug ) export
+procedure FetchServerDebug ( Debug ) export
 	
 	r = InformationRegisters.ServerDebug.CreateRecordManager ();
 	r.Session = SessionParameters.Session;
@@ -527,11 +527,11 @@ Procedure FetchServerDebug ( Debug ) export
 	endif;
 	r.Delete ();
 	
-EndProcedure
+endprocedure
 
-Procedure LogException ( val Subsystem, val Exception, val Level = undefined ) export
+procedure LogException ( val Subsystem, val Exception, val Level = undefined ) export
 	
 	logLevel = ? ( Level = undefined, EventLogLevel.Information, EventLogLevel [ Level ] );
 	WriteLogEvent ( "ExternalMeta", logLevel, , , Exception );
 
-EndProcedure
+endprocedure

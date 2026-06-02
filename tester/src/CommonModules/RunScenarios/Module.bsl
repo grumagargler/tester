@@ -1,5 +1,5 @@
 
-Procedure Go ( Scenario, Debugging ) export
+procedure Go ( Scenario, Debugging ) export
 	
 	if ( SessionScenario.IsEmpty () ) then
 		if ( Scenario = undefined ) then
@@ -11,9 +11,9 @@ Procedure Go ( Scenario, Debugging ) export
 		runScenario ( Debugging );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Procedure SetupMainScenario ( Answer, Params ) export
+procedure SetupMainScenario ( Answer, Params ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
@@ -21,9 +21,9 @@ Procedure SetupMainScenario ( Answer, Params ) export
 	Environment.ChangeScenario ( Params.Scenario );
 	runScenario ( Params.Debugging );
 	
-EndProcedure 
+endprocedure 
 
-Procedure runScenario ( Debugging )
+procedure runScenario ( Debugging )
 	
 	saveAll ();
 	ClearMessages ();
@@ -33,10 +33,10 @@ Procedure runScenario ( Debugging )
 		Watcher.AddMessage ( Output.TestComleteMessage () );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure saveAll ()
+procedure saveAll ()
 	
 	Notify ( Enum.MessageSaveAll () );
 	
-EndProcedure 
+endprocedure 

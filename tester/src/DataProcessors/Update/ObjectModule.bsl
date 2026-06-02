@@ -1,9 +1,9 @@
   
-#if ( Server or ThickClientOrdinaryApplication or ExternalConnection ) then 
+#if ( server or thickclientordinaryapplication or externalconnection ) then 
 
 var UpdaterFolder;
 
-Procedure Update ( ID ) export
+procedure Update ( ID ) export
 	
 	cancel = checkingExistence ();
 	if ( cancel ) then
@@ -16,17 +16,17 @@ Procedure Update ( ID ) export
 	saveUpdater ( ID );
 	runUpdater ( ID );  
 		
-EndProcedure
+endprocedure
 
-Function checkingExistence ()
+function checkingExistence ()
 	
 	exeFile = BinDir () + "1cv8.exe";  
 	file = new File ( exeFile );
 	return not file.Exist (); 
 	
-EndFunction 
+endfunction 
 
-Procedure saveUpdater ( ID )
+procedure saveUpdater ( ID )
 	
 	name = updaterName ();
 	tempDir = Exchange.GetTempDir ( ID ); 
@@ -38,31 +38,31 @@ Procedure saveUpdater ( ID )
 	zip.ExtractAll ( UpdaterFolder );
 	zip.Close (); 
 	
-EndProcedure
+endprocedure
 
-Function updaterName ()
+function updaterName ()
 	
 	return Metadata.DataProcessors.Update.Templates [ 0 ].Name;
 	
-EndFunction
+endfunction
 
-Function getUpdater ( Name )
+function getUpdater ( Name )
 	
 	archive = DataProcessors.Update.GetTemplate ( Name );
 	return archive;
 	
-EndFunction
+endfunction
 
-Procedure runUpdater ( ID )
+procedure runUpdater ( ID )
 	
 	p = getParameters ( ID );
 	params = Conversion.ToJSON ( p );
 	app = """" + BinDir () + "1cv8c.exe"" ENTERPRISE /F """ + UpdaterFolder + "" + """ /N ""admin""" + " /C """ + StrReplace ( params, """", """""" ) + """";
 	RunApp ( app );
 	
-EndProcedure
+endprocedure
 
-Function getParameters ( ID )
+function getParameters ( ID )
 	
 	credentials = Connections.GetCredentials ();
 	p = new Structure ();
@@ -73,9 +73,9 @@ Function getParameters ( ID )
 	p.Insert ( "Connection", getConnection () );
 	return p; 
 	
-EndFunction 
+endfunction 
 
-Function getConnection ()
+function getConnection ()
 	
 	connectDB = InfoBaseConnectionString ();
 	if ( Find ( connectDB, "File=" ) = 1 ) then
@@ -85,6 +85,6 @@ Function getConnection ()
 	endif;
 	return s;	        
 
-EndFunction
+endfunction
 
 #endif

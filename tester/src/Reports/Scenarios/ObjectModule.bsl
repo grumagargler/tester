@@ -1,12 +1,12 @@
 var Params export;
 
-Procedure OnCompose () export
+procedure OnCompose () export
 	
 	filterByStatus ();
 	
-EndProcedure
+endprocedure
 
-Procedure filterByStatus ()
+procedure filterByStatus ()
 	
 	settings = Params.Settings;
 	filter = DC.GetParameter ( settings, "Status" );
@@ -14,4 +14,4 @@ Procedure filterByStatus ()
 		DC.ChangeFilter ( settings, "Status", filter.Value, true );
 	endif; 
 	
-EndProcedure 
+endprocedure 

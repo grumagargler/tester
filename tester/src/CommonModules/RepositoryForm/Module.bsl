@@ -1,5 +1,5 @@
-&AtClient
-Procedure SetFocus ( Form ) export
+&atclient
+procedure SetFocus ( Form ) export
 	
 	items = Form.Items;
 	object = Form.Object;
@@ -10,10 +10,10 @@ Procedure SetFocus ( Form ) export
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function CheckSelection ( Object ) export
+&atserver
+function CheckSelection ( Object ) export
 	
 	found = Object.Repositories.FindRows ( new Structure ( "Use", true ) );
 	if ( found.Count () = 0 ) then
@@ -22,10 +22,10 @@ Function CheckSelection ( Object ) export
 	endif; 
 	return true;
 
-EndFunction 
+endfunction 
 
-&AtServer
-Function CheckFolders ( Object ) export
+&atserver
+function CheckFolders ( Object ) export
 	
 	error = false;
 	msg = new Structure ();
@@ -39,18 +39,18 @@ Function CheckFolders ( Object ) export
 	enddo; 
 	return not error;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure ChooseFolder ( Form ) export
+&atclient
+procedure ChooseFolder ( Form ) export
 	
 	dialog = new FileDialog ( FileDialogMode.ChooseDirectory );
 	dialog.Show ( new NotifyDescription ( "SelectFolder", ThisObject, Form ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure SelectFolder ( Folder, Form ) export
+&atclient
+procedure SelectFolder ( Folder, Form ) export
 	
 	if ( Folder = undefined ) then
 		return;
@@ -58,28 +58,28 @@ Procedure SelectFolder ( Folder, Form ) export
 	Form.TableRow.Folder = Folder [ 0 ];
 	Form.TableRow.Use = true;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ApplyFolder ( Form ) export
+&atclient
+procedure ApplyFolder ( Form ) export
 	
 	adjustPath ( Form );
 	markUsage ( Form );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure adjustPath ( Form )
+&atclient
+procedure adjustPath ( Form )
 	
 	row = Form.TableRow;
 	row.Folder = FileSystem.RemoveSlash ( row.Folder );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure markUsage ( Form )
+&atclient
+procedure markUsage ( Form )
 	
 	row = Form.TableRow;
 	row.Use = row.Folder <> "";
 	
-EndProcedure 
+endprocedure 

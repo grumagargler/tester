@@ -1,11 +1,11 @@
 
-Procedure Prepare ( Callback = undefined ) export
+procedure Prepare ( Callback = undefined ) export
 	
 	BeginAttachingFileSystemExtension ( new NotifyDescription ( "AttachingFileSystemExtension", ThisObject, Callback ) );
 	
-EndProcedure 
+endprocedure 
 
-Procedure AttachingFileSystemExtension ( Connected, Callback ) export
+procedure AttachingFileSystemExtension ( Connected, Callback ) export
 	
 	if ( Connected ) then
 		if ( Callback <> undefined ) then
@@ -15,60 +15,60 @@ Procedure AttachingFileSystemExtension ( Connected, Callback ) export
 		BeginInstallFileSystemExtension ( new NotifyDescription ( "InstallingFileSystemExtension", ThisObject, Callback ) );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure InstallingFileSystemExtension ( Callback ) export
+procedure InstallingFileSystemExtension ( Callback ) export
 	
 	Prepare ( Callback );
 	
-EndProcedure 
+endprocedure 
 
-Procedure SetDocumentsFolder ( Callback = undefined ) export
+procedure SetDocumentsFolder ( Callback = undefined ) export
 	
 	p = new NotifyDescription ( "StartSetDocumentsFolder", ThisObject, Callback );
 	LocalFiles.Prepare ( p );
 
-EndProcedure
+endprocedure
 
-Procedure StartSetDocumentsFolder ( Result, Callback ) export
+procedure StartSetDocumentsFolder ( Result, Callback ) export
 	
 	BeginGettingDocumentsDir ( new NotifyDescription ( "GettingDocumentsFilesDir", ThisObject, Callback ) );
 	
-EndProcedure 
+endprocedure 
 
-Procedure GettingDocumentsFilesDir ( Result, Callback ) export
+procedure GettingDocumentsFilesDir ( Result, Callback ) export
 	
 	UserDocumentsFolder = Result;
 	if ( Callback <> undefined ) then
 		ExecuteNotifyProcessing ( Callback );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure CheckExistence ( Path, Callback ) export
+procedure CheckExistence ( Path, Callback ) export
 	
 	p = new Structure ( "Path, Callback", Path, Callback );
 	bridge = new NotifyDescription ( "StartCheckExistence", ThisObject, p );
 	LocalFiles.Prepare ( bridge );
 	
-EndProcedure 
+endprocedure 
 
-Procedure StartCheckExistence ( Result, Params ) export
+procedure StartCheckExistence ( Result, Params ) export
 	
 	file = new File ( Params.Path );
 	file.BeginCheckingExistence ( Params.Callback );
 	
-EndProcedure 
+endprocedure 
 
-Procedure CreateFolder ( Folder, Callback = undefined ) export
+procedure CreateFolder ( Folder, Callback = undefined ) export
 	
 	p = new Structure ( "Folder, Callback", Folder, Callback );
 	bridge = new NotifyDescription ( "FolderExists", ThisObject, p );
 	LocalFiles.CheckExistence ( Folder, bridge );
 	
-EndProcedure 
+endprocedure 
 
-Procedure FolderExists ( Exists, Params ) export
+procedure FolderExists ( Exists, Params ) export
 	
 	if ( Exists ) then
 		if ( Params.Callback <> undefined ) then
@@ -79,25 +79,25 @@ Procedure FolderExists ( Exists, Params ) export
 		BeginCreatingDirectory ( bridge, Params.Folder );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure BeginCreatingFolder ( Result, Callback ) export
+procedure BeginCreatingFolder ( Result, Callback ) export
 	
 	if ( Callback <> undefined ) then
 		ExecuteNotifyProcessing ( Callback, Result <> undefined );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure Modification ( Path, Callback ) export
+procedure Modification ( Path, Callback ) export
 	
 	p = new Structure ( "Path, Callback", Path, Callback );
 	bridge = new NotifyDescription ( "StartModification", ThisObject, p );
 	LocalFiles.CheckExistence ( Path, bridge );
 	
-EndProcedure 
+endprocedure 
 
-Procedure StartModification ( Exists, Params ) export
+procedure StartModification ( Exists, Params ) export
 	
 	if ( Exists ) then
 		file = new File ( Params.Path );
@@ -106,18 +106,18 @@ Procedure StartModification ( Exists, Params ) export
 		ExecuteNotifyProcessing ( Params.Callback, undefined );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure Rename ( Path, NewPath, Callback ) export
+procedure Rename ( Path, NewPath, Callback ) export
 	
 	p = new Structure ( "Path, NewPath, Callback", Path, NewPath, Callback );
 	bridge = new NotifyDescription ( "StartRenaming", ThisObject, p );
 	LocalFiles.Prepare ( bridge );
 	
-EndProcedure 
+endprocedure 
 
-Procedure StartRenaming ( Result, Params ) export
+procedure StartRenaming ( Result, Params ) export
 	
 	BeginMovingFile ( Params.Callback, Params.Path, Params.NewPath );
 	
-EndProcedure 
+endprocedure 

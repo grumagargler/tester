@@ -1,20 +1,20 @@
-&AtClient
-Procedure Toggle ( On ) export
+&atclient
+procedure Toggle ( On ) export
 	
 	Debug.Debugging = On;
 	stopSteppingOver ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure stopSteppingOver ()
+&atclient
+procedure stopSteppingOver ()
 	
 	Debug.SteppingOver = false;
 	Debug.SteppingOverPoint = undefined;
 	
-EndProcedure 
+endprocedure 
 
-Function Line ( Chronograph, DebugInfo, Module, Row, IsVersion, Scenario = undefined, Progressing = undefined ) export
+function Line ( Chronograph, DebugInfo, Module, Row, IsVersion, Scenario = undefined, Progressing = undefined ) export
 	
 	Debugger.ShowProgress ( DebugInfo, Scenario, Progressing );
 	noerrors ( DebugInfo );
@@ -42,9 +42,9 @@ Function Line ( Chronograph, DebugInfo, Module, Row, IsVersion, Scenario = undef
 	DebugInfo.Pointer = DebugInfo.Pointer + 1;
 	return undefined;
 	
-EndFunction
+endfunction
 
-Procedure ShowProgress ( DebugInfo, Scenario, Progressing ) export
+procedure ShowProgress ( DebugInfo, Scenario, Progressing ) export
 	
 	// Do not exclude the procedure from server
 	// because it is used in compilation module
@@ -55,9 +55,9 @@ Procedure ShowProgress ( DebugInfo, Scenario, Progressing ) export
 		endif;
 	#endif
 	
-EndProcedure
+endprocedure
 
-Procedure noerrors ( DebugInfo )
+procedure noerrors ( DebugInfo )
 	
 	if ( DebugInfo.Error ) then
 		DebugInfo.Error = false;
@@ -67,9 +67,9 @@ Procedure noerrors ( DebugInfo )
 		DebugInfo.ApplicationStack = undefined;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure logging ( Chronograph, DebugInfo, Module, Row, IsVersion )
+procedure logging ( Chronograph, DebugInfo, Module, Row, IsVersion )
 	
 	if ( not DebugInfo.Recording ) then
 		return;
@@ -85,9 +85,9 @@ Procedure logging ( Chronograph, DebugInfo, Module, Row, IsVersion )
 	#endif
 	RuntimeSrv.Recording ( p );
 	
-EndProcedure
+endprocedure
 
-Procedure recordingContext ( Chronograph, Module, IsVersion )
+procedure recordingContext ( Chronograph, Module, IsVersion )
 	
 	if ( Chronograph.Scenario = undefined ) then
 		data = RuntimeSrv.RecordingContext ( Module, IsVersion );
@@ -99,9 +99,9 @@ Procedure recordingContext ( Chronograph, Module, IsVersion )
 		Chronograph.Модуль = value;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure checkCancelation ( DebugInfo )
+procedure checkCancelation ( DebugInfo )
 	
 	job = DebugInfo.Job;
 	if ( job = undefined ) then
@@ -120,10 +120,10 @@ Procedure checkCancelation ( DebugInfo )
 		DebugInfo.CancelationCheck = now;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function debugging ( Module, Row, IsVersion )
+&atclient
+function debugging ( Module, Row, IsVersion )
 
 	if ( Debug.SteppingOver ) then
 		point = Debug.SteppingOverPoint;
@@ -156,21 +156,21 @@ Function debugging ( Module, Row, IsVersion )
 	endif; 
 	return command;
 	
-EndFunction 
+endfunction 
 
 //@skip-warning
-&AtClient
-Function askUser ( Module, Row, IsVersion )
+&atclient
+function askUser ( Module, Row, IsVersion )
 	
 	#if ( not WebClient ) then
 		p = new Structure ( "Module, Row, IsVersion", Module, Row, IsVersion );
 		return OpenFormModal ( "CommonForm.Debugger", p );
 	#endif
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure startSteppingOver ( Module, Row, IsVersion )
+&atclient
+procedure startSteppingOver ( Module, Row, IsVersion )
 	
 	p = steppingPoint ();
 	p.Level = Debug.Level;
@@ -180,18 +180,18 @@ Procedure startSteppingOver ( Module, Row, IsVersion )
 	Debug.SteppingOverPoint = p;
 	Debug.SteppingOver = true;
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure stopDebugging ()
+&atclient
+procedure stopDebugging ()
 	
 	Debug.DebuggingStopped = true;
 	raise Output.StopDebugging ();
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function steppingPoint ()
+&atclient
+function steppingPoint ()
 	
 	p = new Structure ();
 	p.Insert ( "Level" );
@@ -200,10 +200,10 @@ Function steppingPoint ()
 	p.Insert ( "IsVersion" );
 	return p;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure openScenario ( Scenario )
+&atclient
+procedure openScenario ( Scenario )
 	
 	p = new Structure ( "Key", Scenario );
 	if ( TypeOf ( Scenario ) = Type ( "CatalogRef.Versions" ) ) then
@@ -212,10 +212,10 @@ Procedure openScenario ( Scenario )
 		OpenForm ( "Catalog.Scenarios.ObjectForm", p );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure delay ()
+&atclient
+procedure delay ()
 	
 	delay = Debug.Delay;
 	if ( delay = 0 ) then
@@ -228,9 +228,9 @@ Procedure delay ()
 		#endif
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure ErrorCheck ( DebugInfo ) export
+procedure ErrorCheck ( DebugInfo ) export
 	
 	if ( DebugInfo.JobCanceled ) then
 		raise Output.JobCanceled ();
@@ -269,26 +269,26 @@ Procedure ErrorCheck ( DebugInfo ) export
 		endif; 
 	#endif
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Recording ( Start ) export
+&atclient
+procedure Recording ( Start ) export
 	
 	Debug.Recording = Start;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure EnableProgress () export
+&atclient
+procedure EnableProgress () export
 	
 	Debug.ShowProgress = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure DisableProgress () export
+&atclient
+procedure DisableProgress () export
 	
 	Status ();
 	Debug.ShowProgress = false;
 	
-EndProcedure
+endprocedure

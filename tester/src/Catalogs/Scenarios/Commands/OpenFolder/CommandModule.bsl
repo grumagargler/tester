@@ -1,13 +1,13 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenario, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenario, ExecuteParameters )
 	
 	runExplorer ( Scenario );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure runExplorer ( Scenario )
+&atclient
+procedure runExplorer ( Scenario )
 	
 	var error;
 	file = RepositoryFiles.ScenarioFile ( Scenario, error );
@@ -21,4 +21,4 @@ Procedure runExplorer ( Scenario )
 		RunApp ( FileSystem.GetParent ( file ) );
 	#endif
 	
-EndProcedure
+endprocedure

@@ -1,13 +1,13 @@
-Procedure FillCheckProcessing ( Cancel, CheckedAttributes )
+procedure FillCheckProcessing ( Cancel, CheckedAttributes )
 	
 	checkFolder ( CheckedAttributes );
 	
-EndProcedure
+endprocedure
 
-Procedure checkFolder ( CheckedAttributes )
+procedure checkFolder ( CheckedAttributes )
 	
 	if ( Mapping ) then
 		CheckedAttributes.Add ( "Folder" );
 	endif;
 	
-EndProcedure
+endprocedure

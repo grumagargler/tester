@@ -1,5 +1,5 @@
-&AtClient
-Procedure Open ( JobKey, FormOwner = undefined, Notification = undefined, ShowStatus = false, ShowMessages = 0 ) export
+&atclient
+procedure Open ( JobKey, FormOwner = undefined, Notification = undefined, ShowStatus = false, ShowMessages = 0 ) export
 	
 	p = new Structure ();
 	p.Insert ( "JobKey", JobKey );
@@ -22,10 +22,10 @@ Procedure Open ( JobKey, FormOwner = undefined, Notification = undefined, ShowSt
 	p.Insert ( "MessageReceiver", receiver );
 	OpenForm ( "CommonForm.Progress", p, FormOwner, , , , Notification, mode );
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure Put ( Status, JobKey, Error = false ) export
+&atserver
+procedure Put ( Status, JobKey, Error = false ) export
 	
 	r = InformationRegisters.Jobs.CreateRecordManager ();
 	r.JobKey = JobKey;
@@ -33,4 +33,4 @@ Procedure Put ( Status, JobKey, Error = false ) export
 	r.Error = Error;
 	r.Write ();
 	
-EndProcedure 
+endprocedure 

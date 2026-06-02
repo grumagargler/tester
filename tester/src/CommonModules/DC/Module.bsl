@@ -1,4 +1,4 @@
-Function CreateFilter ( LeftValue, RightValue = undefined, ComparisonType = undefined, Use = true, ViewMode = undefined, Hide = false ) export
+function CreateFilter ( LeftValue, RightValue = undefined, ComparisonType = undefined, Use = true, ViewMode = undefined, Hide = false ) export
 	
 	filter = new Structure ( "LeftValue, ComparisonType, RightValue, ViewMode, Use, Hide",
 		new DataCompositionField ( LeftValue ),
@@ -8,9 +8,9 @@ Function CreateFilter ( LeftValue, RightValue = undefined, ComparisonType = unde
 	applyFilter ( filter, ComparisonType, RightValue );
 	return filter; 
 	
-EndFunction
+endfunction
 
-Procedure applyFilter ( Filter, ComparisonType, Value )
+procedure applyFilter ( Filter, ComparisonType, Value )
 	
 	if ( ComparisonType = undefined ) then
 		if ( TypeOf ( Value ) = Type ( "Array" ) ) then
@@ -32,9 +32,9 @@ Procedure applyFilter ( Filter, ComparisonType, Value )
 		Filter.RightValue = Value;
 	endif;
 	
-EndProcedure
+endprocedure
  
-Function CreateParameter ( Parameter, Value = undefined, Use = true, ViewMode = undefined, Hide = false ) export
+function CreateParameter ( Parameter, Value = undefined, Use = true, ViewMode = undefined, Hide = false ) export
 	
 	return new Structure ( "Parameter, Value, ViewMode, Use, Hide",
 		new DataCompositionParameter ( Parameter ),
@@ -43,9 +43,9 @@ Function CreateParameter ( Parameter, Value = undefined, Use = true, ViewMode = 
 		Use,
 		Hide );
 	
-EndFunction
+endfunction
 
-Procedure DeleteFilter ( Source, Name ) export
+procedure DeleteFilter ( Source, Name ) export
 	
 	while ( true ) do
 		filter = DC.FindFilter ( Source, Name );
@@ -59,9 +59,9 @@ Procedure DeleteFilter ( Source, Name ) export
 		endif; 
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Function FindFilter ( Source, Name, Deeply = true ) export
+function FindFilter ( Source, Name, Deeply = true ) export
 	
 	composer = ( TypeOf ( Source ) = Type ( "DataCompositionSettingsComposer" ) );
 	settings = ? ( composer, Source.Settings, Source );
@@ -74,9 +74,9 @@ Function FindFilter ( Source, Name, Deeply = true ) export
 	endif; 
 	return filter;
 	
-EndFunction
+endfunction
 
-Function filterItem ( Name, Items, Deeply )
+function filterItem ( Name, Items, Deeply )
 	
 	field = new DataCompositionField ( Name );
 	group = Type ( "DataCompositionFilterItemGroup" );
@@ -96,18 +96,18 @@ Function filterItem ( Name, Items, Deeply )
 	enddo;
 	return undefined;
 	
-EndFunction
+endfunction
 
-Procedure ChangeFilter ( Source, Name, Value, Setup, ComparisonType = undefined ) export
+procedure ChangeFilter ( Source, Name, Value, Setup, ComparisonType = undefined ) export
 	
 	DC.DeleteFilter ( Source, Name );
 	if ( Setup ) then
 		DC.SetFilter ( Source, Name, Value, ComparisonType );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure SetFilter ( Source, Name, Value, ComparisonType = undefined, ViewMode = undefined ) export
+procedure SetFilter ( Source, Name, Value, ComparisonType = undefined, ViewMode = undefined ) export
 	
 	item = DC.FindFilter ( Source, Name );
 	if ( item = undefined ) then
@@ -132,9 +132,9 @@ Procedure SetFilter ( Source, Name, Value, ComparisonType = undefined, ViewMode 
 	item.Use = true;
 	item.ViewMode = ? ( ViewMode = undefined, DataCompositionSettingsItemViewMode.Inaccessible, ViewMode );
 	
-EndProcedure
+endprocedure
 
-Procedure AddFilter ( Source, Name, Value, ComparisonType = undefined, ViewMode = undefined ) export
+procedure AddFilter ( Source, Name, Value, ComparisonType = undefined, ViewMode = undefined ) export
 	
 	composer = ( TypeOf ( Source ) = Type ( "DataCompositionSettingsComposer" ) );
 	if ( composer ) then
@@ -153,9 +153,9 @@ Procedure AddFilter ( Source, Name, Value, ComparisonType = undefined, ViewMode 
 	item.Use = true;
 	item.ViewMode = ? ( ViewMode = undefined, DataCompositionSettingsItemViewMode.Inaccessible, ViewMode );
 	
-EndProcedure
+endprocedure
 
-Procedure SetParameter ( Source, Name, Value, Setup = true ) export
+procedure SetParameter ( Source, Name, Value, Setup = true ) export
 	
 	parameter = DC.GetParameter ( Source, Name );
 	if ( Setup ) then
@@ -165,9 +165,9 @@ Procedure SetParameter ( Source, Name, Value, Setup = true ) export
 		parameter.Use = false;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function GetParameter ( Source, Name ) export
+function GetParameter ( Source, Name ) export
 	
 	parameter = DC.FindParameter ( Source, Name );
 	if ( parameter = undefined ) then
@@ -183,9 +183,9 @@ Function GetParameter ( Source, Name ) export
 	endif; 
 	return parameter;
 	
-EndFunction
+endfunction
 
-Function FindParameter ( Source, Name ) export
+function FindParameter ( Source, Name ) export
 	
 	composer = ( TypeOf ( Source ) = Type ( "DataCompositionSettingsComposer" ) );
 	settings = ? ( composer, Source.Settings, Source );
@@ -207,9 +207,9 @@ Function FindParameter ( Source, Name ) export
 	endif; 
 	return parameter;
 	
-EndFunction
+endfunction
 
-Procedure SetOrder ( List, Expression ) export
+procedure SetOrder ( List, Expression ) export
 	
 	p = getOrderParams ( Expression );
 	deleteOrder ( List.Order.Items, p.Field );
@@ -218,9 +218,9 @@ Procedure SetOrder ( List, Expression ) export
 	item.Field = p.Field;
 	item.OrderType = p.Direction;
 	
-EndProcedure
+endprocedure
 
-Function getOrderParams ( Expression )
+function getOrderParams ( Expression )
 	
 	exp = Conversion.StringToArray ( Expression, " " );
 	p = new Structure ();
@@ -228,9 +228,9 @@ Function getOrderParams ( Expression )
 	p.Insert ( "Direction", ? ( exp.Count () = 1, DataCompositionSortDirection.Asc, DataCompositionSortDirection [ exp [ 1 ] ] ) );
 	return p;
 	
-EndFunction 
+endfunction 
 
-Procedure deleteOrder ( Items, Field )
+procedure deleteOrder ( Items, Field )
 	
 	i = Items.Count ();
 	while ( i > 0 ) do
@@ -241,15 +241,15 @@ Procedure deleteOrder ( Items, Field )
 		endif;
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Procedure RemoveOrder ( List, Name ) export
+procedure RemoveOrder ( List, Name ) export
 	
 	deleteOrder ( List.Order.Items, new DataCompositionField ( Name ) );
 	
-EndProcedure 
+endprocedure 
 
-Function FindValue ( Composer, Name ) export
+function FindValue ( Composer, Name ) export
 	
 	value = undefined;
 	item = DC.FindFilter ( Composer, Name, false );
@@ -267,9 +267,9 @@ Function FindValue ( Composer, Name ) export
 	endif;
 	return ? ( ValueIsFilled ( value ), value, undefined );
 	
-EndFunction 
+endfunction 
 
-Function FindSetting ( Composer, Name ) export
+function FindSetting ( Composer, Name ) export
 	
 	item = DC.FindFilter ( Composer, Name, false );
 	if ( item = undefined ) then
@@ -277,4 +277,4 @@ Function FindSetting ( Composer, Name ) export
 	endif;
 	return item;
 	
-EndFunction 
+endfunction 

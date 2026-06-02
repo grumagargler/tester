@@ -1,71 +1,71 @@
 
-Function FolderSuffix () export
+function FolderSuffix () export
 	
 	return ".dir";
 	
-EndFunction 
+endfunction 
 
-Function MXLFile () export
+function MXLFile () export
 	
 	return ".mxl";
 	
-EndFunction 
+endfunction 
 
-Function BSLFile () export
+function BSLFile () export
 	
 	return ".bsl";
 	
-EndFunction 
+endfunction 
 
-Function JSONFile () export
+function JSONFile () export
 	
 	return ".json";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function VSCodeWorkspace () export
+&atclient
+function VSCodeWorkspace () export
 	
 	return ".code-workspace";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function Gitignore () export
+&atclient
+function Gitignore () export
 	
 	return ".gitignore";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function GitFolder () export
+&atclient
+function GitFolder () export
 	
 	return ".git";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function BSLServerSettings () export
+&atclient
+function BSLServerSettings () export
 	
 	return ".bsl-language-server.json";
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function Signature () export
+&atserver
+function Signature () export
 	
 	return "92b895ac-0620-4a28-a128-76e2bd1a5ca4";
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function SystemFolder () export
+&atclient
+function SystemFolder () export
 	
 	return ".tester";
 	
-EndFunction
+endfunction
 
-Function ScenarioFile ( Scenario, Error = undefined ) export
+function ScenarioFile ( Scenario, Error = undefined ) export
 	
 	if ( TypeOf ( Scenario ) = Type ( "CatalogRef.Scenarios" ) ) then
 		if ( Scenario.IsEmpty () ) then
@@ -90,9 +90,9 @@ Function ScenarioFile ( Scenario, Error = undefined ) export
 		return folder + slash + path;
 	endif;
 	
-EndFunction
+endfunction
 
-Function scenarioFolder ( Object )
+function scenarioFolder ( Object )
 
 	application = Object.Application;
 	#if ( Server ) then
@@ -115,10 +115,10 @@ Function scenarioFolder ( Object )
 		return ? ( node = undefined, undefined, node.Folder );
 	#endif
 
-EndFunction
+endfunction
 
-&AtClient
-Function FileToPath ( File, PathBegins ) export
+&atclient
+function FileToPath ( File, PathBegins ) export
 
 	slash = GetPathSeparator ();
 	name = FileSystem.GetFileName(File);
@@ -128,18 +128,18 @@ Function FileToPath ( File, PathBegins ) export
 	path = StrReplace ( Mid ( path, PathBegins ), slash, "." );
 	return path;
 	
-EndFunction
+endfunction
 
-Function FileToName ( File ) export
+function FileToName ( File ) export
 	
 	name = FileSystem.GetFileName ( File );
 	i = StrFind ( name, "." );
 	return ? ( i = 0, name, Left ( name, i - 1 ) );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure Sync ( Callback = undefined ) export
+&atclient
+procedure Sync ( Callback = undefined ) export
 	
 	MCPCall = Callback <> undefined;
 	nothingToSync = FoldersWatchdog = undefined or FoldersWatchdog.Count () = 0;
@@ -152,11 +152,11 @@ Procedure Sync ( Callback = undefined ) export
 		startSyncing ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure startSyncing ()
+&atclient
+procedure startSyncing ()
 	
 	GetForm ( "DataProcessor.Unload.Form", new Structure ( "Silent", true ) ).Proceed ();
 	
-EndProcedure
+endprocedure

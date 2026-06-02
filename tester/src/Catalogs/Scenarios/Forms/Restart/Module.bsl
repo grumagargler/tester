@@ -1,9 +1,9 @@
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Restart ( Command )
+&atclient
+procedure Restart ( Command )
 	
 	Exit ( , true, "/TESTMANAGER" );
 	
-EndProcedure
+endprocedure

@@ -1,5 +1,5 @@
 
-Function SystemProfile () export
+function SystemProfile () export
 	
 	profile = new InternetMailProfile ();
 	profile.SMTPServerAddress = Cloud.SMTPServer ();
@@ -9,13 +9,13 @@ Function SystemProfile () export
 	profile.SMTPPort = Cloud.SMTPPort ();
 	return profile;
 	
-EndFunction 
+endfunction 
 
-Procedure Post ( Profile, Message ) export
+procedure Post ( Profile, Message ) export
 	
 	mail = new InternetMail ();
 	mail.Logon ( Profile );
 	mail.Send ( Message );
 	mail.Logoff ();
 	
-EndProcedure 
+endprocedure 

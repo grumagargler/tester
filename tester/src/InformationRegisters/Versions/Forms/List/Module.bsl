@@ -1,44 +1,44 @@
-&AtClient
+&atclient
 var TableRow;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	displayCaption ();
 	filterByScenario ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure displayCaption ()
+&atserver
+procedure displayCaption ()
 	
 	Title = Parameters.Scenario;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByScenario ()
+&atserver
+procedure filterByScenario ()
 	
 	DC.ChangeFilter ( List, "Scenario", Parameters.Scenario, true );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** List
 
-&AtClient
-Procedure ListOnActivateRow ( Item )
+&atclient
+procedure ListOnActivateRow ( Item )
 	
 	TableRow = Item.CurrentData;
 	AttachIdleHandler ( "showCode", 0.1, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showCode () export
+&atclient
+procedure showCode () export
 	
 	if ( TableRow = undefined ) then
 		Script = "";
@@ -50,20 +50,20 @@ Procedure showCode () export
 	OldVersion = TableRow.Version;
 	Script = DF.Pick ( OldVersion, "Script" );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	StandardProcessing = false;
 	ShowValue ( , TableRow.Version );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListBeforeRowChange ( Item, Cancel )
+&atclient
+procedure ListBeforeRowChange ( Item, Cancel )
 	
 	Cancel = true;
 	ShowValue ( , TableRow.Version );
 	
-EndProcedure
+endprocedure

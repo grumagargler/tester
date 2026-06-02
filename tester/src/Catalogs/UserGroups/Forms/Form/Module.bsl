@@ -1,20 +1,20 @@
-&AtClient
+&atclient
 var IsNew;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	RightsRelations = RightsTree.FillRights ( ThisObject );
 	RightsConfirmed = true;
 	fillUsers ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillUsers ()
+&atserver
+procedure fillUsers ()
 	
 	s = "
 	|select UsersAndGroups.User as User
@@ -26,36 +26,36 @@ Procedure fillUsers ()
 	q.SetParameter ( "Ref", Object.Ref );
 	Tables.Users.Load ( q.Execute ().Unload () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	if ( Object.Ref.IsEmpty () ) then
 		RightsRelations = RightsTree.FillRights ( ThisObject );
 		RightsConfirmed = true;
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	IsNew = Object.Ref.IsEmpty ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 	
 	if ( not checkRights () ) then
 		Cancel = true;
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkRights ()
+&atserver
+function checkRights ()
 	
 	if ( not RightsConfirmed ) then
 		Output.ConfirmAccessRights ( , "RightsChanges", , "" );
@@ -67,35 +67,35 @@ Function checkRights ()
 	endif; 
 	return not error;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
+&atserver
+procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 	
 	RightsTree.SaveSeletedRights ( ThisObject, CurrentObject );
 	getUsersTable ();
 	setProperties ( CurrentObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setProperties ( CurrentObject )
+&atserver
+procedure setProperties ( CurrentObject )
 	
 	CurrentObject.AdditionalProperties.Insert ( "SelectedUsers", getUsersTable () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getUsersTable ()
+&atserver
+function getUsersTable ()
 	
 	selectedUsers = Tables.Users.Unload ();
 	selectedUsers.GroupBy ( "User" );
 	return selectedUsers;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure AfterWrite ( WriteParameters )
+&atclient
+procedure AfterWrite ( WriteParameters )
 	
 	if ( IsNew ) then
 		Notify ( Enum.MessageUserGroupCreated () );
@@ -103,77 +103,77 @@ Procedure AfterWrite ( WriteParameters )
 	endif; 
 	Notify ( Enum.MessageUserGroupModified () );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Rights
 
-&AtClient
-Procedure MarkAllRights ( Command )
+&atclient
+procedure MarkAllRights ( Command )
 	
 	RightsTree.MarkAll ( Rights );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnmarkAllRights ( Command )
+&atclient
+procedure UnmarkAllRights ( Command )
 	
 	RightsTree.UnmarkAll ( Rights );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ConfirmRights ( Command )
+&atclient
+procedure ConfirmRights ( Command )
 	
 	RightsConfirmed = true;
 	RightsTree.HideConfirmation ( ThisObject );	
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RevertRights ( Command )	
+&atclient
+procedure RevertRights ( Command )	
 	
 	RightsConfirmed = true;
 	RightsTree.RevertRights ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Help ( Command )
+&atclient
+procedure Help ( Command )
 	
 	Output.RightsConfirmation ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsBeforeAddRow ( Item, Cancel, Clone, Parent, Folder )
+&atclient
+procedure RightsBeforeAddRow ( Item, Cancel, Clone, Parent, Folder )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure RightsBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RightsUseOnChange ( Item )
+&atclient
+procedure RightsUseOnChange ( Item )
 	
 	if ( RightsTree.UseChanged ( ThisObject ) ) then
 		showChanges ();	
 		RightsTree.Expand ( ThisObject );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure showChanges ()
+&atserver
+procedure showChanges ()
 	
 	RightsConfirmed = false;
 	RightsTree.FillChanges ( ThisObject );
 	RightsTree.ShowConfirmation ( ThisObject );
 	
-EndProcedure
+endprocedure

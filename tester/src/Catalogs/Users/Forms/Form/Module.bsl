@@ -1,18 +1,18 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnReadAtServer ( CurrentObject )
+&atserver
+procedure OnReadAtServer ( CurrentObject )
 	
 	RightsTree.FillRights ( ThisObject );
 	fillUserGroups ();
 	fillActualRights ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillUserGroups ()
+&atserver
+procedure fillUserGroups ()
 	
 	s = "
 	|select UserGroups.Ref as UserGroup,";
@@ -36,10 +36,10 @@ Procedure fillUserGroups ()
 	q.SetParameter ( "Ref", Object.Ref );
 	Tables.UserGroups.Load ( q.Execute ().Unload () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure fillActualRights ()
+&atserver
+procedure fillActualRights ()
 	
 	env = RightsTree.GetEnv ( ThisObject );
 	RightsTree.PrepareRightsTable ( env );
@@ -51,17 +51,17 @@ Procedure fillActualRights ()
 	deleteUnusedRows ( Env.RightsTable.Rows );
 	ValueToFormAttribute ( Env.RightsTable, "ActualAccess" );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure getSelectedRights ( Env )
+&atserver
+procedure getSelectedRights ( Env )
 	
 	Env.Insert ( "SelectedRights", new Array () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure addRolesToArray ( Env )
+&atserver
+procedure addRolesToArray ( Env )
 	
 	rightsValueTree = FormDataToValue ( Env.Form.Rights, Type ( "ValueTree" ) );
 	list = Env.SelectedRights;
@@ -76,10 +76,10 @@ Procedure addRolesToArray ( Env )
 		enddo;
 	enddo;	
 		
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure deleteUnusedRows ( Groups )
+&atserver
+procedure deleteUnusedRows ( Groups )
 	
 	count = Groups.Count();
 	for i = 1 to count do
@@ -91,10 +91,10 @@ Procedure deleteUnusedRows ( Groups )
 		endif;
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillRightsByGroups ( Env, Groups );
+&atserver
+procedure fillRightsByGroups ( Env, Groups );
 	
 	usedGroups = getUsedGroups ( Groups );
 	groupRoles = getRolesByGroups ( usedGroups );
@@ -105,10 +105,10 @@ Procedure fillRightsByGroups ( Env, Groups );
 		endif;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function getUsedGroups ( Groups )
+&atserver
+function getUsedGroups ( Groups )
 	
 	usedGroupsArray = new array;
 	usedGroups = Groups.FindRows ( new Structure ( "Use", true ) );
@@ -117,19 +117,19 @@ Function getUsedGroups ( Groups )
 	enddo;
 	return usedGroupsArray;
 	
-EndFunction
+endfunction
 
-&AtServer
-Function getRolesByGroups ( Groups )
+&atserver
+function getRolesByGroups ( Groups )
 	
 	q = new Query ( "select RoleName as RoleName from Catalog.UserGroups.Rights where Ref in ( &Groups )" );
 	q.SetParameter ( "Groups", Groups );
 	return q.Execute ().Unload ().UnloadColumn ( "RoleName" );
 	
-EndFunction
+endfunction
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	setAdministrator ();
 	fillTimeZones ();
@@ -142,10 +142,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 		
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -156,35 +156,35 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setAdministrator ()
+&atserver
+procedure setAdministrator ()
 	
 	Administrator = IsInRole ( "Administrator" );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure fillTimeZones ()
+&atserver
+procedure fillTimeZones ()
 	
 	timeZones = GetAvailableTimeZones ();
 	for each timeZone in timeZones do
 		Items.TimeZone.ChoiceList.Add ( timeZone, timeZone + " (" + TimeZonePresentation ( timeZone ) + ")" );
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setCurrentTimeZone ()
+&atserver
+procedure setCurrentTimeZone ()
 	
 	currentTimeZone = GetInfoBaseTimeZone ();
 	Object.TimeZone = ? ( currentTimeZone = undefined, TimeZone (), currentTimeZone );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure NotificationProcessing ( EventName, Parameter, Source )
+&atclient
+procedure NotificationProcessing ( EventName, Parameter, Source )
 	
 	if ( EventName = Enum.MessageUserGroupCreated () ) then
 		fillAccess ();
@@ -197,35 +197,35 @@ Procedure NotificationProcessing ( EventName, Parameter, Source )
 		expandTree ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure fillAccess ()
+&atserver
+procedure fillAccess ()
 	
 	fillUserGroups ();
 	fillActualRights ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure updateRights ( val Address ) export
+&atserver
+procedure updateRights ( val Address ) export
 	
 	table = GetFromTempStorage ( Address );
 	ValueToFormData ( table, Rights );
 	RightsTree.FillChanges ( ThisObject );
 	fillActualRights ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure expandTree ()
+&atclient
+procedure expandTree ()
 	
 	RightsTree.Expand ( ThisObject, "ActualAccess" );
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 	
 	if ( not checkUsersName () ) then
 		Cancel = true;
@@ -234,10 +234,10 @@ Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 		Cancel = true;
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function checkUsersName ()
+&atserver
+function checkUsersName ()
 	
 	user = Catalogs.Users.FindByDescription ( Object.Description, true );
 	error = not user.IsEmpty () and ( user <> Object.Ref );
@@ -246,10 +246,10 @@ Function checkUsersName ()
 	endif; 
 	return not error;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function checkRights ()
+&atserver
+function checkRights ()
 	
 	groupsSelected = Tables.UserGroups.FindRows ( new Structure ( "Use", true ) ).Count () > 0;
 	if ( groupsSelected ) then
@@ -266,18 +266,18 @@ Function checkRights ()
 		return not error;
 	endif;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
+&atserver
+procedure BeforeWriteAtServer ( Cancel, CurrentObject, WriteParameters )
 	
 	setProperties ( CurrentObject );
 	serializeRights ( CurrentObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setProperties ( CurrentObject )
+&atserver
+procedure setProperties ( CurrentObject )
 	
 	p = CurrentObject.AdditionalProperties;
 	if ( SetNewPassword ) then
@@ -285,10 +285,10 @@ Procedure setProperties ( CurrentObject )
 	endif; 
 	p.Insert ( "UserGroups", Tables.UserGroups.Unload () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure serializeRights ( CurrentObject )
+&atserver
+procedure serializeRights ( CurrentObject )
 	
 	RightsAugmented = false;
 	RightsTree.SaveSeletedRights ( ThisObject, CurrentObject );
@@ -302,161 +302,161 @@ Procedure serializeRights ( CurrentObject )
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
+&atserver
+procedure AfterWriteAtServer ( CurrentObject, WriteParameters )
 	
 	if ( RightsAugmented ) then
 		RightsTree.FillRights ( ThisObject );
 		fillActualRights ();
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure AfterWrite ( WriteParameters )
+&atclient
+procedure AfterWrite ( WriteParameters )
 	
 	if ( RightsAugmented ) then
 		expandTree ();
 	endif;
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Page User
 
-&AtClient
-Procedure DescriptionOnChange ( Item )
+&atclient
+procedure DescriptionOnChange ( Item )
 	
 	adjustLogin ();
 	setFirstName ();
 	Object.Code = Conversion.NameToCode ( Object.Description, 3 );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure adjustLogin ()
+&atclient
+procedure adjustLogin ()
 	
 	Object.Description = TrimAll ( Object.Description );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure setFirstName ()
+&atclient
+procedure setFirstName ()
 	
 	Object.FirstName = Object.Description;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure SetNewPasswordOnChange ( Item )
+&atclient
+procedure SetNewPasswordOnChange ( Item )
 	
 	Appearance.Apply ( ThisObject, "SetNewPassword" );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Page Rights
 
-&AtClient
-Procedure MarkAllGroups ( Command )
+&atclient
+procedure MarkAllGroups ( Command )
 	
 	markRows ( true );
 	fillActualRights ();
 	expandTree ();
 	
-EndProcedure
+endprocedure
 
-Procedure markRows ( Check )
+procedure markRows ( Check )
 	
 	for each item in Tables.UserGroups do
 		item.Use = Check;
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UnmarkAllGroups ( Command )
+&atclient
+procedure UnmarkAllGroups ( Command )
 	
 	markRows ( false );
 	fillActualRights ();
 	expandTree ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UsersGroupsBeforeAddRow ( Item, Cancel, Clone, Parent, Folder )
+&atclient
+procedure UsersGroupsBeforeAddRow ( Item, Cancel, Clone, Parent, Folder )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UsersGroupsBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure UsersGroupsBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure UsersGroupsSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure UsersGroupsSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	openSeletedUserGroup ( Item );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openSeletedUserGroup ( Item )
+&atclient
+procedure openSeletedUserGroup ( Item )
 	
 	ShowValue ( , Item.CurrentData.UserGroup );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure EditRights ( Command )
+&atclient
+procedure EditRights ( Command )
 	
 	openEditor ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openEditor ()
+&atclient
+procedure openEditor ()
 	
 	p = new Structure ();
 	p.Insert ( "UserRights", storeRights () );
 	OpenForm ( "Catalog.Users.Form.Rights", p, ThisObject );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function storeRights ()
+&atserver
+function storeRights ()
 	
 	return PutToTempStorage ( FormDataToValue ( Rights, Type ( "ValueTree" ) ) );
 
-EndFunction
+endfunction
 	
-&AtClient
-Procedure UsersGroupsUseOnChange ( Item )
+&atclient
+procedure UsersGroupsUseOnChange ( Item )
 	
 	fillActualRights ();
 	expandTree ();
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Page Applications
 
-&AtClient
-Procedure ApplicationAccessOnChange ( Item )
+&atclient
+procedure ApplicationAccessOnChange ( Item )
 	
 	adjustAccess ( "Applications" );
 	Appearance.Apply ( ThisObject, "Object.ApplicationsAccess" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure adjustAccess ( Class )
+&atclient
+procedure adjustAccess ( Class )
 	
 	if ( Class = "Applications" ) then
 		access = Object.ApplicationsAccess;
@@ -466,24 +466,24 @@ Procedure adjustAccess ( Class )
 		table.Clear ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Page Agent
 
-&AtClient
-Procedure AgentOnChange ( Item )
+&atclient
+procedure AgentOnChange ( Item )
 	
 	applyAgent ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure applyAgent ()
+&atclient
+procedure applyAgent ()
 	
 	if ( not Object.Agent ) then
 		Object.Managers.Clear ();
 	endif; 
 	Appearance.Apply ( ThisObject, "Object.Agent" );
 	
-EndProcedure 
+endprocedure 

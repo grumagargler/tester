@@ -1,6 +1,6 @@
 
-Procedure SetDescription () export
+procedure SetDescription () export
 	
 	Description = StrConcat ( Tags.UnloadColumn ( "Tag" ), ", " );
 	
-EndProcedure 
+endprocedure 

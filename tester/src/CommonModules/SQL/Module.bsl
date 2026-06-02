@@ -1,4 +1,4 @@
-Function Create ( Query ) export
+function Create ( Query ) export
 	
 	env = new Structure ();
 	env.Insert ( "Q", new Query () );
@@ -6,9 +6,9 @@ Function Create ( Query ) export
 	env.Selection.Add ( Query );
 	return env;
 	
-EndFunction
+endfunction
 
-Procedure Init ( Env ) export
+procedure Init ( Env ) export
 	
 	if ( Env = undefined ) then
 		Env = new Structure ();
@@ -16,9 +16,9 @@ Procedure Init ( Env ) export
 	Env.Insert ( "Q", new Query () );
 	Env.Insert ( "Selection", new Array () );
 	
-EndProcedure
+endprocedure
 
-Procedure Prepare ( Env ) export
+procedure Prepare ( Env ) export
 	
 	q = Env.Q;
 	q.Text = StrConcat ( Env.Selection, ";" );
@@ -26,9 +26,9 @@ Procedure Prepare ( Env ) export
 	SQL.DefineTempManager ( q );
 	Env.Selection = new Array ();
 
-EndProcedure 
+endprocedure 
 
-Procedure DefineTempManager ( Q ) export
+procedure DefineTempManager ( Q ) export
 	
 	if ( Find ( Q.Text, "into " ) > 0
 		or Find ( Q.Text, "INTO " ) > 0 ) then
@@ -37,9 +37,9 @@ Procedure DefineTempManager ( Q ) export
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure Unload ( Env, Data = undefined ) export
+procedure Unload ( Env, Data = undefined ) export
 
 	q = Env.Q;
 	if ( Data = undefined ) then
@@ -53,9 +53,9 @@ Procedure Unload ( Env, Data = undefined ) export
 		extractData ( tables, Env, result );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure extractData ( Tables, Env, Data )
+procedure extractData ( Tables, Env, Data )
 	
 	indexExists = false;
 	for each table in Tables do
@@ -80,9 +80,9 @@ Procedure extractData ( Tables, Env, Data )
 		Env.Insert ( "Data", Data );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure Perform ( Env, CheckAccess = true ) export
+procedure Perform ( Env, CheckAccess = true ) export
 	
 	if ( not CheckAccess ) then
 		SetPrivilegedMode ( true );
@@ -90,17 +90,17 @@ Procedure Perform ( Env, CheckAccess = true ) export
 	SQL.Prepare ( Env );
 	SQL.Unload ( Env );
 	
-EndProcedure 
+endprocedure 
 
-Function Fetch ( Env, Name ) export
+function Fetch ( Env, Name ) export
 	
 	field = "i" + Mid ( Name, 2 );
 	index = Env [ field ];
 	return Env.Data [ index ].Unload ();
 	
-EndFunction 
+endfunction 
 
-Function Exec ( Q, CheckAccess = true ) export
+function Exec ( Q, CheckAccess = true ) export
 	
 	if ( not CheckAccess ) then
 		SetPrivilegedMode ( true );
@@ -112,4 +112,4 @@ Function Exec ( Q, CheckAccess = true ) export
 	extractData ( tables, env, Q.ExecuteBatch () );
 	return env;
 	
-EndFunction 
+endfunction 

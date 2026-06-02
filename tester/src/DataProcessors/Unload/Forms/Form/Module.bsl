@@ -1,56 +1,56 @@
-&AtClient
+&atclient
 var TableRow export;
-&AtServer
+&atserver
 var DeletionType;
-&AtServer
+&atserver
 var Node;
-&AtServer
+&atserver
 var CurrentData;
-&AtServer
+&atserver
 var CurrentApplication;
-&AtServer
+&atserver
 var DataType;
-&AtServer
+&atserver
 var PathFinder;
-&AtServer
+&atserver
 var ChildHunter;
-&AtServer
+&atserver
 var RemovingSet;
-&AtClient
+&atclient
 var FolderSuffix;
-&AtClient
+&atclient
 var MXLExtension;
-&AtClient
+&atclient
 var JSONExtension;
-&AtClient
+&atclient
 var ContinueUnloading;
-&AtClient
+&atclient
 var CurrentIndex;
-&AtClient
+&atclient
 var LastIndex;
-&AtClient
+&atclient
 var Roots;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	saveChangesOnly ();
 	loadRepositories ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure saveChangesOnly ()
+&atserver
+procedure saveChangesOnly ()
 	
 	Object.Changes = true;
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure loadRepositories ()
+&atserver
+procedure loadRepositories ()
 	
 	if ( silentMode ( Parameters ) ) then
 		s = "select Repositories.Application as Application, Repositories.Folder as Folder, true as Use, Repositories.Ref as Node
@@ -76,17 +76,17 @@ Procedure loadRepositories ()
 	q.SetParameter ( "Session", SessionParameters.Session );
 	Object.Repositories.Load ( q.Execute ().Unload () );
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Function silentMode ( Parameters )
+&atclientatservernocontext
+function silentMode ( Parameters )
 	
 	return Parameters.Silent;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure Proceed () export
+&atclient
+procedure Proceed () export
 	
 	prepareForm ();
 	if ( not CheckFilling () ) then
@@ -94,36 +94,36 @@ Procedure Proceed () export
 	endif;
 	startUnloading ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	prepareForm ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure prepareForm ()
+&atclient
+procedure prepareForm ()
 
 	setConstants ();
 	RepositoryForm.SetFocus ( ThisObject );
 	LocalFiles.Prepare ();
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure setConstants ()
+&atclient
+procedure setConstants ()
 	
 	Slash = GetPathSeparator ();
 	FolderSuffix = RepositoryFiles.FolderSuffix ();
 	MXLExtension = RepositoryFiles.MXLFile ();
 	JSONExtension = RepositoryFiles.JSONFile ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure startUnloading ()
+&atclient
+procedure startUnloading ()
 	
 	prepareScenarios ();
 	prepareCounters ();
@@ -132,27 +132,27 @@ Procedure startUnloading ()
 	createSystemFolders ();
 	unloadScenarios ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure prepareScenarios ()
+&atserver
+procedure prepareScenarios ()
 	
 	init ();
 	fillScenarios ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure init ()
+&atserver
+procedure init ()
 	
 	DeletionType = Type ( "ObjectDeletion" );
 	PathFinder = getPathFinder ();
 	ChildHunter = getChildHunter ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getPathFinder ()
+&atserver
+function getPathFinder ()
 	
 	s = "
 	|select top 1 1
@@ -164,10 +164,10 @@ Function getPathFinder ()
 	|";
 	return new Query ( s );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function getChildHunter ()
+&atserver
+function getChildHunter ()
 
 	s = "
 	|select top 1 1
@@ -177,10 +177,10 @@ Function getChildHunter ()
 	|and Scenarios.Application = &Application";
 	return new Query ( s );
 
-EndFunction
+endfunction
 
-&AtServer
-Procedure fillScenarios ()
+&atserver
+procedure fillScenarios ()
 	
 	ScenariosCounter = 0;
 	RemovingSet = new Array ();
@@ -213,20 +213,20 @@ Procedure fillScenarios ()
 	ChangedScenarios.Sort ( "Application, Delete desc" );
 	RemovingIDs = new FixedArray ( RemovingSet );
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getChanges ()
+&atserver
+function getChanges ()
 	
 	if ( not Object.Changes ) then
 		ExchangePlans.Repositories.Reset ( Node );
 	endif; 
 	return ExchangePlans.SelectChanges ( Node, Node.SentNo );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure addDeletion ()
+&atserver
+procedure addDeletion ()
 	
 	if ( DataType = DeletionType ) then
 		id = CurrentData.Ref.UUID ();
@@ -249,10 +249,10 @@ Procedure addDeletion ()
 	row.Delete = deletedFile ( path );
 	ScenariosCounter = ScenariosCounter + 1;
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function deletedFile ( Path )
+&atserver
+function deletedFile ( Path )
 	
 	systemPath = StrReplace ( Path, ".", Slash );
 	deleteHash ( systemPath + RepositoryFiles.BSLFile () );
@@ -260,29 +260,29 @@ Function deletedFile ( Path )
 	deleteHash ( systemPath + RepositoryFiles.MXLFile () );
 	return systemPath + ".*";
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure deleteHash ( File )
+&atserver
+procedure deleteHash ( File )
 
 	r = InformationRegisters.Files.CreateRecordManager ();
 	r.ID = CoreLibrary.GetStringHash ( File, false );
 	r.Delete ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function scenarioRecreated ( Path, Tree )
+&atserver
+function scenarioRecreated ( Path, Tree )
 	
 	PathFinder.SetParameter ( "Path", Path );
 	PathFinder.SetParameter ( "Application", CurrentApplication );
 	PathFinder.SetParameter ( "Tree", Tree );
 	return not PathFinder.Execute ().IsEmpty ();
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure addRenaming ()
+&atserver
+procedure addRenaming ()
 	
 	id = CurrentData.Ref.UUID ();
 	r = InformationRegisters.Removing.Get ( new Structure ( "Repository, ID", Node, id ) );
@@ -305,19 +305,19 @@ Procedure addRenaming ()
 	endif;
 	RemovingSet.Add ( new Structure ( "ID, Repository", id, Node ) );
 		
-EndProcedure
+endprocedure
 
-&AtServer
-Function hasChildren ()
+&atserver
+function hasChildren ()
 	
 	ChildHunter.SetParameter ( "Ref", CurrentData.Ref );
 	ChildHunter.SetParameter ( "Application", CurrentApplication );
 	return not ChildHunter.Execute ().IsEmpty ();
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function unbindFolder ( Path )
+&atserver
+function unbindFolder ( Path )
 	
 	name = Mid ( Path, StrFind ( Path, ".", SearchDirection.FromEnd ) + 1 );
 	systemPath = StrReplace ( Path, ".", Slash ) + Slash;
@@ -328,39 +328,39 @@ Function unbindFolder ( Path )
 	deleteHash ( filePath + RepositoryFiles.MXLFile () );
 	return systemPath + "*" + suffix + ".*";
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure addScenario ()
+&atserver
+procedure addScenario ()
 	
 	row = ChangedScenarios.Add ();
 	row.Application = CurrentApplication;
 	row.Scenario = CurrentData.Ref;
 	ScenariosCounter = ScenariosCounter + 1;
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure prepareCounters ()
+&atclient
+procedure prepareCounters ()
 	
 	CurrentIndex = -1;
 	LastIndex = ChangedScenarios.Count () - 1;
 	initProgress ();
 	ContinueUnloading = new NotifyDescription ( "ContinueUnloading", ThisObject );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure initProgress ()
+&atclient
+procedure initProgress ()
 	
 	ProgressBar = 0;
 	Items.ProgressBar.MaxValue = 1 + LastIndex;
 	Items.ProgressBar.ShowPercent = true;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure getRoots ()
+&atclient
+procedure getRoots ()
 	
 	Roots = new Map ();
 	for each row in Object.Repositories do
@@ -369,10 +369,10 @@ Procedure getRoots ()
 		endif; 
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure toggleWatching ( On )
+&atclient
+procedure toggleWatching ( On )
 	
 	if ( FoldersWatchdog = undefined ) then
 		return;
@@ -389,10 +389,10 @@ Procedure toggleWatching ( On )
 		endif;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure createSystemFolders ()
+&atclient
+procedure createSystemFolders ()
 	
 	stub = new NotifyDescription ( "Stub", ThisObject );
 	for each root in Roots do
@@ -401,25 +401,25 @@ Procedure createSystemFolders ()
 		endif;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure Stub ( Result, Params ) export
+&atclient
+procedure Stub ( Result, Params ) export
 	
 	//@skip-warning
 	noerrors = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ContinueUnloading ( Result ) export
+&atclient
+procedure ContinueUnloading ( Result ) export
 	
 	unloadScenarios ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure unloadScenarios ()
+&atclient
+procedure unloadScenarios ()
 	
 	CurrentIndex = CurrentIndex + 1;
 	ProgressBar = ProgressBar + 1;
@@ -447,10 +447,10 @@ Procedure unloadScenarios ()
 			FileSystem.GetFileName ( victim ) );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure deleteRecords ()
+&atserver
+procedure deleteRecords ()
 	
 	for each repository in Object.Repositories do
 		if ( repository.Use ) then
@@ -460,10 +460,10 @@ Procedure deleteRecords ()
 	enddo; 
 	commitRemoving ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure commitRemoving ()
+&atserver
+procedure commitRemoving ()
 	
 	for each record in RemovingIDs do
 		r = InformationRegisters.Removing.CreateRecordManager ();
@@ -472,10 +472,10 @@ Procedure commitRemoving ()
 		r.Delete ();
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure showInfo ()
+&atclient
+procedure showInfo ()
 	
 	p = new Structure ( "Counter", Format ( ScenariosCounter, "NZ=; NG=" ) );
 	if ( silentMode ( Parameters ) ) then
@@ -484,17 +484,17 @@ Procedure showInfo ()
 		Output.ScenariosProcessed ( ThisObject, , p );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ScenariosProcessed ( Params ) export
+&atclient
+procedure ScenariosProcessed ( Params ) export
 	
 	Close ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Function scenarioData ( val Scenario )
+&atservernocontext
+function scenarioData ( val Scenario )
 	
 	data = new Structure ();
 	data.Insert ( "Properties", Catalogs.Scenarios.GetProperties ( Scenario ) );
@@ -507,10 +507,10 @@ Function scenarioData ( val Scenario )
 	data.Insert ( "Changed", changed );
 	return data;
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function getTemplate ( Scenario )
+&atservernocontext
+function getTemplate ( Scenario )
 	
 	tabDoc = Scenario.Template.Get ();
 	if ( Scenario.Spreadsheet ) then
@@ -521,10 +521,10 @@ Function getTemplate ( Scenario )
 	endif; 
 	return tabDoc;
 
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function serializeAreas ( Scenario )
+&atservernocontext
+function serializeAreas ( Scenario )
 	
 	parts = new Array ();
 	for each area in Scenario.Areas do
@@ -534,10 +534,10 @@ Function serializeAreas ( Scenario )
 	enddo; 
 	return Conversion.ToJSON ( parts, false );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function getBaseName ( Params )
+&atclient
+function getBaseName ( Params )
 	
 	data = Params.Data;
 	path = data.Path;
@@ -548,10 +548,10 @@ Function getBaseName ( Params )
 	endif;
 	return file;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure createFolder ( Params )
+&atclient
+procedure createFolder ( Params )
 	
 	data = Params.Data;
 	path = data.Path;
@@ -563,17 +563,17 @@ Procedure createFolder ( Params )
 	endif; 
 	BeginCreatingDirectory ( new NotifyDescription ( "CreatingDirectory", ThisObject, Params ), folder );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure CreatingDirectory ( Folder, Params ) export
+&atclient
+procedure CreatingDirectory ( Folder, Params ) export
 	
 	createScript ( Params );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure createScript ( Params )
+&atclient
+procedure createScript ( Params )
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		data = Params.Data;
@@ -584,27 +584,27 @@ Procedure createScript ( Params )
 		doc.BeginWriting ( new NotifyDescription ( "ScriptCreated", ThisObject, p ), file, , Chars.LF );
 	#endif
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ScriptCreated ( Result, Params ) export
+&atclient
+procedure ScriptCreated ( Result, Params ) export
 	
 	p = Params.Params;
 	callback = new NotifyDescription ( "ScriptTimeChanged", ThisObject, p );
 	file = new File ( Params.File );
 	file.BeginSettingModificationUniversalTime ( callback, p.Data.Changed );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ScriptTimeChanged ( Params ) export
+&atclient
+procedure ScriptTimeChanged ( Params ) export
 	
 	createPropeties ( Params );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure createPropeties ( Params )
+&atclient
+procedure createPropeties ( Params )
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		data = Params.Data;
@@ -615,27 +615,27 @@ Procedure createPropeties ( Params )
 		doc.BeginWriting ( new NotifyDescription ( "PropertiesCreated", ThisObject, p ), file, , Chars.LF );
 	#endif
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure PropertiesCreated ( Result, Params ) export
+&atclient
+procedure PropertiesCreated ( Result, Params ) export
 	
 	p = Params.Params;
 	callback = new NotifyDescription ( "PropertiesTimeChanged", ThisObject, p );
 	file = new File ( Params.File );
 	file.BeginSettingModificationUniversalTime ( callback, p.Data.Changed );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure PropertiesTimeChanged ( Params ) export
+&atclient
+procedure PropertiesTimeChanged ( Params ) export
 	
 	createSpreadsheet ( Params );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure createSpreadsheet ( Params )
+&atclient
+procedure createSpreadsheet ( Params )
 	
 	file = Params.BaseName + MXLExtension;
 	data = Params.Data;
@@ -647,18 +647,18 @@ Procedure createSpreadsheet ( Params )
 		BeginDeletingFiles ( ContinueUnloading, file );
 	endif; 
 		
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure modifyFile ( File, Date )
+&atclient
+procedure modifyFile ( File, Date )
 	
 	file = new File ( File );
 	file.SetModificationUniversalTime ( Date );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
+&atserver
+procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 	
 	if ( not RepositoryForm.CheckSelection ( Object ) ) then
 		Cancel = true;
@@ -667,78 +667,78 @@ Procedure FillCheckProcessingAtServer ( Cancel, CheckedAttributes )
 		Cancel = true;
 	endif; 
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure Unload ( Command )
+&atclient
+procedure Unload ( Command )
 	
 	if ( CheckFilling () ) then
 		startUnloading ();
 	endif;
 
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Table Repositories
 
-&AtClient
-Procedure MarkAll ( Command )
+&atclient
+procedure MarkAll ( Command )
 	
 	checkbox ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure checkbox ( Value )
+&atclient
+procedure checkbox ( Value )
 	
 	for each row in Object.Repositories do
 		row.Use = Value;
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UnmarkAll ( Command )
+&atclient
+procedure UnmarkAll ( Command )
 	
 	checkbox ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RepositoriesOnActivateRow ( Item )
+&atclient
+procedure RepositoriesOnActivateRow ( Item )
 	
 	TableRow = Item.CurrentData;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReporitoriesFolderStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure ReporitoriesFolderStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	StandardProcessing = false;
 	RepositoryForm.ChooseFolder ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ReporitoriesFolderOnChange ( Item )
+&atclient
+procedure ReporitoriesFolderOnChange ( Item )
 	
 	RepositoryForm.ApplyFolder ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RepositoriesBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
+&atclient
+procedure RepositoriesBeforeAddRow ( Item, Cancel, Clone, Parent, Folder, Parameter )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RepositoriesBeforeDeleteRow ( Item, Cancel )
+&atclient
+procedure RepositoriesBeforeDeleteRow ( Item, Cancel )
 	
 	Cancel = true;
 	
-EndProcedure
+endprocedure

@@ -1,7 +1,7 @@
 var CurrentName;
 var IsNew;
 
-Procedure FillCheckProcessing ( Cancel, CheckedAttributes )
+procedure FillCheckProcessing ( Cancel, CheckedAttributes )
 	
 	if ( IsFolder ) then
 		return;
@@ -9,26 +9,26 @@ Procedure FillCheckProcessing ( Cancel, CheckedAttributes )
 	checkApplicationsAccess ( CheckedAttributes );
 	checkUsers ( CheckedAttributes );
 	
-EndProcedure
+endprocedure
 
-Procedure checkApplicationsAccess ( CheckedAttributes )
+procedure checkApplicationsAccess ( CheckedAttributes )
 	
 	if ( ApplicationsAccess = Enums.Access.Allow
 		or ApplicationsAccess = Enums.Access.Forbid ) then
 		CheckedAttributes.Add ( "Applications" );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure checkUsers ( CheckedAttributes )
+procedure checkUsers ( CheckedAttributes )
 	
 	if ( Agent ) then
 		CheckedAttributes.Add ( "Users" );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure BeforeWrite ( Cancel )
+procedure BeforeWrite ( Cancel )
 
 	if ( DataExchange.Load ) then
 		return;
@@ -43,9 +43,9 @@ Procedure BeforeWrite ( Cancel )
 		ExchangePlans.Repositories.MarkDeletion ( Ref );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Procedure getCurrentName ()
+procedure getCurrentName ()
 	
 	if ( IsNew ) then
 		CurrentName = Description;
@@ -53,15 +53,15 @@ Procedure getCurrentName ()
 		CurrentName = DF.Pick ( Ref, "Description" );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure setFullName ()
+procedure setFullName ()
 	
 	FullName = FirstName + ? ( IsBlankString ( LastName ), "", " " + LastName );
 	
-EndProcedure 
+endprocedure 
 
-Procedure OnWrite ( Cancel )
+procedure OnWrite ( Cancel )
 	
 	if ( DataExchange.Load ) then
 		return;
@@ -82,9 +82,9 @@ Procedure OnWrite ( Cancel )
 	endif; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure
+endprocedure
 
-Procedure makeAccess ()
+procedure makeAccess ()
 	
 	usersGroups = undefined;
 	if ( not AdditionalProperties.Property ( "UserGroups", usersGroups ) ) then
@@ -102,18 +102,18 @@ Procedure makeAccess ()
 	enddo; 
 	recordset.Write ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure makeProfile ()
+procedure makeProfile ()
 	
 	user = getIBUser ();
 	setProfile ( user );
 	LoginsSrv.SetRights ( user );
 	user.Write ();
 	
-EndProcedure 
+endprocedure 
 
-Function getIBUser ()
+function getIBUser ()
 	
 	user = InfoBaseUsers.FindByName ( CurrentName );
 	if ( user = undefined ) then
@@ -121,9 +121,9 @@ Function getIBUser ()
 	endif;
 	return user;
 	
-EndFunction
+endfunction
 
-Procedure setProfile ( User )
+procedure setProfile ( User )
 	
 	User.Name = Description;
 	User.FullName = FullName;
@@ -133,4 +133,4 @@ Procedure setProfile ( User )
 		User.Password = password;
 	endif; 
 	
-EndProcedure 
+endprocedure 

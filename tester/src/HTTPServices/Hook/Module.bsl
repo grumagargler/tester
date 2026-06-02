@@ -1,13 +1,13 @@
 
-Function NotifyTester ( Request )
+function NotifyTester ( Request )
 
 	create ( Request );
 	response = new HTTPServiceResponse ( 200 );
 	return response;
 
-EndFunction
+endfunction
 
-Procedure create ( Request )
+procedure create ( Request )
 	
 	params = new Structure ( "Headers, Body", Request.Headers, Request.GetBodyAsString () );
 	jobKey = "Webhook";
@@ -17,4 +17,4 @@ Procedure create ( Request )
 		BackgroundJobs.Execute ( "Webhook.Go", p, jobKey );
 	endif;
 	
-EndProcedure
+endprocedure

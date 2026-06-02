@@ -1,8 +1,8 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	if ( FixedUserFilter.IsEmpty () ) then
@@ -12,10 +12,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -24,25 +24,25 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 
 	FixedUserFilter = Parameters.User;
 	UserFilter = FixedUserFilter; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setUser ()
+&atserver
+procedure setUser ()
 	
 	UserFilter = SessionParameters.User;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterByUser ()
+&atserver
+procedure filterByUser ()
 	
 	filter = not UserFilter.IsEmpty ();
 	DC.ChangeFilter ( List, "Session.User", UserFilter, filter );
@@ -50,14 +50,14 @@ Procedure filterByUser ()
 	DC.ChangeFilter ( Workspaces, "Owner", UserFilter, filter );
 	Appearance.Apply ( ThisObject, "UserFilter" );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure UserFilterOnChange ( Item )
+&atclient
+procedure UserFilterOnChange ( Item )
 	
 	filterByUser ();
 	
-EndProcedure
+endprocedure

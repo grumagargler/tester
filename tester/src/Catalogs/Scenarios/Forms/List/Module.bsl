@@ -1,11 +1,11 @@
-&AtClient
+&atclient
 var TableRow;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	initTags ();
 	bindWorkplace ();
@@ -15,10 +15,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -28,10 +28,10 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure initTags ()
+&atserver
+procedure initTags ()
 	
 	tags = getTagClassifier ();
 	for each row in tags do
@@ -43,10 +43,10 @@ Procedure initTags ()
 	enddo; 
 	TagsFilter.SortByPresentation ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getTagClassifier ()
+&atserver
+function getTagClassifier ()
 	
 	s = "
 	|select Tags.Ref as Ref, Tags.Description as Description
@@ -56,19 +56,19 @@ Function getTagClassifier ()
 	q = new Query ( s );
 	return q.Execute ().Unload ();
 
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure bindWorkplace ()
+&atserver
+procedure bindWorkplace ()
 	
 	params = new Array ();
 	params.Add ( new ChoiceParameter ( "Filter.Owner", SessionParameters.User ) );
 	Items.WorkplaceFilter.ChoiceParameters = new FixedArray ( params );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setView ()
+&atserver
+procedure setView ()
 	
 	control = Items.List;
 	if ( StatusFilter = 0
@@ -82,10 +82,10 @@ Procedure setView ()
 	Items.ListDescription.Visible = not showPath;
 	Items.ListFullDescription.Visible = showPath;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function tagsFiltered ()
+&atserver
+function tagsFiltered ()
 	
 	for each item in TagsFilter do
 		if ( item.Check ) then
@@ -94,10 +94,10 @@ Function tagsFiltered ()
 	enddo; 
 	return false;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure setFilters ()
+&atserver
+procedure setFilters ()
 	
 	DC.SetParameter ( List, "User", SessionParameters.User );
 	ApplicationFilter = EnvironmentSrv.GetApplication ();
@@ -106,10 +106,10 @@ Procedure setFilters ()
 	filterByWorkplace ();
 	filterByDeletion ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByApplication ()
+&atserver
+procedure filterByApplication ()
 	
 	if ( ApplicationFilter.IsEmpty () ) then
 		DC.ChangeFilter ( List, "Application", undefined, false );
@@ -120,10 +120,10 @@ Procedure filterByApplication ()
 		DC.ChangeFilter ( List, "Application", filter, true, DataCompositionComparisonType.InList );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByWorkplace ()
+&atserver
+procedure filterByWorkplace ()
 	
 	show = DC.FindParameter ( List, "Show" );
 	hide = DC.FindParameter ( List, "Hide" );
@@ -141,10 +141,10 @@ Procedure filterByWorkplace ()
 		show.Value = set;
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByDeletion ()
+&atserver
+procedure filterByDeletion ()
 	
 	if ( DeletionFilter ) then
 		DC.DeleteFilter ( List, "DeletionMark" );
@@ -152,10 +152,10 @@ Procedure filterByDeletion ()
 		DC.ChangeFilter ( List, "DeletionMark", false, true );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Procedure showFilters ( Form )
+&atclientatservernocontext
+procedure showFilters ( Form )
 	
 	label = Form.Items.ShowOptionsLabel;
 	if ( Form.ShowOptions ) then
@@ -187,10 +187,10 @@ Procedure showFilters ( Form )
 		endif; 
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Function selectedTags ( Form )
+&atclientatservernocontext
+function selectedTags ( Form )
 	
 	set = new Array ();
 	for each item in Form.TagsFilter do
@@ -200,18 +200,18 @@ Function selectedTags ( Form )
 	enddo; 
 	return StrConcat ( set, ", " );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	initProperties ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure initProperties ()
+&atclient
+procedure initProperties ()
 
 	if ( TestManager = true ) then
 		TestedMode = true;
@@ -219,127 +219,127 @@ Procedure initProperties ()
 		TestedMode = false;
 	endif;
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure NewWriteProcessing ( NewObject, Source, StandardProcessing )
+&atclient
+procedure NewWriteProcessing ( NewObject, Source, StandardProcessing )
 	
 	type = TypeOf ( NewObject );
 	if ( type = Type ( "CatalogRef.Tags" ) ) then
 		initTags ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Filters
 
-&AtClient
-Procedure QuickFilterStartChoice ( Item, ChoiceData, StandardProcessing )
+&atclient
+procedure QuickFilterStartChoice ( Item, ChoiceData, StandardProcessing )
 	
 	StandardProcessing = false;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure QuickFilterClearing ( Item, StandardProcessing )
+&atclient
+procedure QuickFilterClearing ( Item, StandardProcessing )
 	
 	resetSearch ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure resetSearch ()
+&atclient
+procedure resetSearch ()
 	
 	SearchString = "";
 	filterScenario ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure filterScenario () export
+&atclient
+procedure filterScenario () export
 	
 	applySearch ();
 	OldScenario = undefined;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure applySearch ()
+&atserver
+procedure applySearch ()
 	
 	setView ();
 	refs = FullSearch.Refs ( SearchString, Enums.Search.Scenarios );
 	DC.ChangeFilter ( List, "Ref", refs, not IsBlankString ( SearchString ), DataCompositionComparisonType.InList );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateList ()
+&atclient
+procedure activateList ()
 	
 	CurrentItem = Items.List;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure QuickFilterEditTextChange ( Item, Text, StandardProcessing )
+&atclient
+procedure QuickFilterEditTextChange ( Item, Text, StandardProcessing )
 	
 	DetachIdleHandler ( "filterScenario" );
 	SearchString = Text;
 	AttachIdleHandler ( "filterScenario", 0.4, true );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ShowOptionsLabelClick ( Item )
+&atclient
+procedure ShowOptionsLabelClick ( Item )
 	
 	ShowOptions = not ShowOptions;
 	Appearance.Apply ( ThisObject, "ShowOptions" );
 	showFilters ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ApplicationFilterOnChange ( Item )
+&atclient
+procedure ApplicationFilterOnChange ( Item )
 	
 	filterByApplication ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure WorkplaceFilterOnChange ( Item )
+&atclient
+procedure WorkplaceFilterOnChange ( Item )
 	
 	applyWorkplace ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyWorkplace ()
+&atserver
+procedure applyWorkplace ()
 	
 	Logins.SaveSettings ( Enum.SettingsWorkplaceFilter (), , WorkplaceFilter );
 	filterByWorkplace ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure StatusFilterOnChange ( Item )
+&atclient
+procedure StatusFilterOnChange ( Item )
 	
 	applyStatusFilter ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyStatusFilter ()
+&atserver
+procedure applyStatusFilter ()
 	
 	setView ();
 	filterByStatus ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByStatus ()
+&atserver
+procedure filterByStatus ()
 	
 	if ( StatusFilter = 2 ) then
 		DC.ChangeFilter ( List, "Locked", 1, true, DataCompositionComparisonType.NotEqual );
@@ -347,40 +347,40 @@ Procedure filterByStatus ()
 		DC.ChangeFilter ( List, "Locked", StatusFilter, StatusFilter <> 0 );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure DeletionFilterOnChange ( Item )
+&atclient
+procedure DeletionFilterOnChange ( Item )
 	
 	filterByDeletion ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TagsFilterOnChange ( Item )
+&atclient
+procedure TagsFilterOnChange ( Item )
 	
 	applyTagsFilter ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyTagsFilter ()
+&atserver
+procedure applyTagsFilter ()
 	
 	setView ();
 	filterByTag ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByTag ()
+&atserver
+procedure filterByTag ()
 	
 	tags = gatherTags ();
 	DC.ChangeFilter ( List, "Tag", gatherKeys ( Tags ), tags.Count () > 0, DataCompositionComparisonType.InList );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function gatherTags ()
+&atserver
+function gatherTags ()
 	
 	set = new Array ();
 	for each item in TagsFilter do
@@ -390,10 +390,10 @@ Function gatherTags ()
 	enddo; 
 	return set;
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Function gatherKeys ( Tags )
+&atserver
+function gatherKeys ( Tags )
 	
 	if ( Tags.Count () = 0 ) then
 		result = new Array ();
@@ -421,20 +421,20 @@ Function gatherKeys ( Tags )
 	endif; 
 	return result;
 
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure TagsFilterBeforeRowChange ( Item, Cancel )
+&atclient
+procedure TagsFilterBeforeRowChange ( Item, Cancel )
 	
 	if ( Item.CurrentItem.Name = "TagsFilterValue" ) then
 		Cancel = true;
 		toggleTagsFilter ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure toggleTagsFilter ()
+&atclient
+procedure toggleTagsFilter ()
 	
 	row = Items.TagsFilter.CurrentData;
 	// The code does not work in 8.3.11.2924:
@@ -444,41 +444,41 @@ Procedure toggleTagsFilter ()
 	TagsFilter.FindByValue ( row.Value ).Check = not row.Check;
 	applyTagsFilter ();
 		
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group List
 
-&AtClient
-Procedure Restart(Command)
+&atclient
+procedure Restart(Command)
 
 	OpenForm ( "Catalog.Scenarios.Form.Restart" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure RunScenario ( Command )
+&atclient
+procedure RunScenario ( Command )
 	
 	RunScenarios.Go ( undefined, false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SetCurrent ( Command )
+&atclient
+procedure SetCurrent ( Command )
 	
 	Environment.ChangeApplication ( ApplicationFilter );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure FindMain ( Command )
+&atclient
+procedure FindMain ( Command )
 	
 	findHead ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure findHead ()
+&atclient
+procedure findHead ()
 	
 	if ( SessionScenario.IsEmpty () ) then
 		Output.MainScenarioUndefined ();
@@ -487,25 +487,25 @@ Procedure findHead ()
 		activateList ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure RefreshList ( Command )
+&atclient
+procedure RefreshList ( Command )
 	
 	Items.List.Refresh ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListOnActivateRow ( Item )
+&atclient
+procedure ListOnActivateRow ( Item )
 	
 	TableRow = Item.CurrentData;
 	AttachIdleHandler ( "showCode", 0.1, true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showCode () export
+&atclient
+procedure showCode () export
 	
 	if ( TableRow = undefined ) then
 		CodePreview = "";
@@ -517,10 +517,10 @@ Procedure showCode () export
 	OldScenario = TableRow.Ref;
 	CodePreview = preview ( OldScenario, adjustText ( Items.QuickFilter.EditText ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClientAtServerNoContext
-Function adjustText ( Text )
+&atclientatservernocontext
+function adjustText ( Text )
 	
 	if ( IsBlankString ( Text ) ) then
 		return "";
@@ -535,10 +535,10 @@ Function adjustText ( Text )
 	enddo; 
 	return Mid ( s, 2 );
 	
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function preview ( val Scenario, val Highlighting ) export
+&atservernocontext
+function preview ( val Scenario, val Highlighting ) export
 	
 	return "
 	|<html>
@@ -551,10 +551,10 @@ Function preview ( val Scenario, val Highlighting ) export
 	|</body>
 	|</html>";
 	
-EndFunction
+endfunction
 
-&AtServerNoContext
-Function styles ()
+&atservernocontext
+function styles ()
 	
 	s = "
 	|.yellow{
@@ -564,10 +564,10 @@ Function styles ()
 	|";
 	return s;
 	
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function scripts ()
+&atservernocontext
+function scripts ()
 	
 	s = "
 	|function highlightWord(searchString) {
@@ -602,38 +602,38 @@ Function scripts ()
 	|";
 	return s;
 	
-EndFunction 
+endfunction 
 
-&AtServerNoContext
-Function body ( val Scenario )
+&atservernocontext
+function body ( val Scenario )
 	
 	body = DF.Pick ( Scenario, "Script" );
 	return Conversion.XMLToStandard ( body );
 
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	if ( hierarchy () ) then
 		StandardProcessing = false;
 		processHierarchy ();
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function hierarchy ()
+&atclient
+function hierarchy ()
 	
 	type = TableRow.Type;
 	return TableRow.Tree
 	and ( type = PredefinedValue ( "Enum.Scenarios.Folder" )
 		or type = PredefinedValue ( "Enum.Scenarios.Library" ) );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure processHierarchy ()
+&atclient
+procedure processHierarchy ()
 	
 	tree = Items.List;
 	row = tree.CurrentRow;
@@ -643,11 +643,11 @@ Procedure processHierarchy ()
 		tree.Expand ( row );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ListDrag ( Item, DragParameters, StandardProcessing, Row, Field )
+&atclient
+procedure ListDrag ( Item, DragParameters, StandardProcessing, Row, Field )
 	
 	ScenarioForm.ListDrag ( ThisObject, DragParameters, StandardProcessing, Row );
 	
-EndProcedure
+endprocedure

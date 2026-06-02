@@ -1,6 +1,6 @@
 
-&AtClient
-Procedure CommandProcessing ( Node, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( Node, CommandExecuteParameters )
 	
 	if ( main ( Node ) ) then
 		Output.EnrollmentError ();
@@ -8,18 +8,18 @@ Procedure CommandProcessing ( Node, CommandExecuteParameters )
 		Output.EnrollNode ( ThisObject, Node );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function main ( val Node )
+&atserver
+function main ( val Node )
 	
 	name = Node.Metadata ().Name;
 	return ExchangePlans [ name ].ThisNode () = Node;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure EnrollNode ( Answer, Node ) export
+&atclient
+procedure EnrollNode ( Answer, Node ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
@@ -27,11 +27,11 @@ Procedure EnrollNode ( Answer, Node ) export
 	enroll ( Node );
 	Output.EnrollmentCompleted ();
 
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure enroll ( val Node )
+&atserver
+procedure enroll ( val Node )
 	
 	ExchangePlans.Repositories.Reset ( Node );
 	
-EndProcedure 
+endprocedure 

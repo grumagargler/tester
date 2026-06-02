@@ -1,14 +1,14 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenarios, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenarios, ExecuteParameters )
 	
 	p = new NotifyDescription ( "TargetSelected", ThisObject, Scenarios );
 	OpenForm ( "Catalog.Scenarios.ChoiceForm", , , , , , p );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure TargetSelected ( Target, Scenarios ) export
+&atclient
+procedure TargetSelected ( Target, Scenarios ) export
 	
 	if ( Target = undefined ) then
 		return;
@@ -18,4 +18,4 @@ Procedure TargetSelected ( Target, Scenarios ) export
 	endif;
 	ScenarioForm.CopyMove ( Scenarios, Target, true );
 	
-EndProcedure
+endprocedure

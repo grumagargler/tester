@@ -1,11 +1,11 @@
 
-Procedure DisconnectMe () export
+procedure DisconnectMe () export
 	
 	disconnect ( "Me" );
 	
-EndProcedure
+endprocedure
 
-Function getSessions ( Filter )
+function getSessions ( Filter )
 	
 	SetPrivilegedMode ( true );
 	credentials = GetCredentials ();
@@ -55,15 +55,15 @@ Function getSessions ( Filter )
 	enddo; 
 	return sessions;
 	
-EndFunction
+endfunction
 
-Procedure LeaveMeAlone () export
+procedure LeaveMeAlone () export
 	
 	disconnect ( "LeaveMeAlone" );
 	
-EndProcedure
+endprocedure
 
-Procedure disconnect ( Filter )
+procedure disconnect ( Filter )
 	
 	sessions = getSessions ( Filter );
 	if ( sessions.Count () = 0 ) then
@@ -75,9 +75,9 @@ Procedure disconnect ( Filter )
 	enddo; 
 	kill ( selection );
 	
-EndProcedure
+endprocedure
 
-Procedure kill ( Sessions )
+procedure kill ( Sessions )
 	
 	SetPrivilegedMode ( true );
 	credentials = GetCredentials ();
@@ -103,9 +103,9 @@ Procedure kill ( Sessions )
 	enddo; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function GetCredentials () export
+function GetCredentials () export
 	
 	s = "
 	|select Constants.ClusterAdministrator as ClusterAdministrator, Constants.ClusterPassword as ClusterPassword,
@@ -116,9 +116,9 @@ Function GetCredentials () export
 	q = new Query ( s );
 	return q.Execute ().Unload () [ 0 ];
 	
-EndFunction 
+endfunction 
 
-Function getIBName ()
+function getIBName ()
 	
 	s = InfoBaseConnectionString ();
 	a = Find ( s, "Ref=""" );
@@ -127,15 +127,15 @@ Function getIBName ()
 	ibName = Left ( ibName, a - 1 );
 	return Lower ( ibName );
 	
-EndFunction 
+endfunction 
 
-Function getConnection ()
+function getConnection ()
 	
 	return Constants.Agent.Get ();
 	
-EndFunction 
+endfunction 
 
-Procedure Lock () export
+procedure Lock () export
 	
 	SetPrivilegedMode ( true );
 	start = CurrentDate ();
@@ -167,15 +167,15 @@ Procedure Lock () export
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function fileMode ()
+function fileMode ()
 	
 	return StrFind ( Lower ( InfoBaseConnectionString () ), "file=" ) > 0;
 	
-EndFunction
+endfunction
 
-Procedure findMe ( FoundDB, FoundProcess )
+procedure findMe ( FoundDB, FoundProcess )
 	
 	credentials = GetCredentials ();
 	mydb = getIBName ();
@@ -205,9 +205,9 @@ Procedure findMe ( FoundDB, FoundProcess )
 		enddo;
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Procedure Unlock () export 
+procedure Unlock () export 
 	
 	SetPrivilegedMode ( true );
 	if ( fileMode () ) then
@@ -229,4 +229,4 @@ Procedure Unlock () export
 		endif;
 	endif;
 	
-EndProcedure
+endprocedure

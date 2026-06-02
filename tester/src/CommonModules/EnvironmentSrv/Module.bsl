@@ -1,4 +1,4 @@
-Function InitSession ( val Computer, val WebClient, val MobileClient, val ThinClient, val ThickClient ) export
+function InitSession ( val Computer, val WebClient, val MobileClient, val ThinClient, val ThickClient ) export
 	
 	SetPrivilegedMode ( true );
 	EnvironmentSrv.SetSession ( Computer );
@@ -11,16 +11,16 @@ Function InitSession ( val Computer, val WebClient, val MobileClient, val ThinCl
 	data.Connection = SessionParameters.Connection;
 	return data;
 	
-EndFunction 
+endfunction 
 
-Function GetApplication () export
+function GetApplication () export
 	
 	r = InformationRegisters.Applications.Get ( new Structure ( "User", SessionParameters.User ) );
 	return r.Application;
 	
-EndFunction 
+endfunction 
 
-Function SetApplication ( val Application ) export
+function SetApplication ( val Application ) export
 	
 	actual = FindApplication ( Application );
 	SetPrivilegedMode ( true );
@@ -31,9 +31,9 @@ Function SetApplication ( val Application ) export
 	SetPrivilegedMode ( false );
 	return actual;
 	
-EndFunction
+endfunction
 
-Function FindApplication ( Application ) export
+function FindApplication ( Application ) export
 	
 	if ( TypeOf ( Application ) = Type ( "String" ) ) then
 		value = Catalogs.Applications.FindByDescription ( Application, true );
@@ -46,9 +46,9 @@ Function FindApplication ( Application ) export
 		return Application;
 	endif; 
 	
-EndFunction 
+endfunction 
 
-Procedure ChangeScenario ( val Scenario, NewApplication ) export
+procedure ChangeScenario ( val Scenario, NewApplication ) export
 	
 	SetPrivilegedMode ( true );
 	user = SessionParameters.User;
@@ -68,9 +68,9 @@ Procedure ChangeScenario ( val Scenario, NewApplication ) export
 	endif; 
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Procedure SetSession ( Computer ) export
+procedure SetSession ( Computer ) export
 	
 	SetPrivilegedMode ( true );
 	host = getComputer ( Computer );
@@ -81,9 +81,9 @@ Procedure SetSession ( Computer ) export
 	SessionParameters.Session = session;
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function getComputer ( Name )
+function getComputer ( Name )
 	
 	host = Catalogs.Computers.FindByDescription ( Name, true );
 	if ( host.IsEmpty () ) then
@@ -94,9 +94,9 @@ Function getComputer ( Name )
 	endif; 
 	return host;
 	
-EndFunction 
+endfunction 
 
-Function findSession ( Host )
+function findSession ( Host )
 	
 	s = "
 	|select top 1 Sessions.Ref as Ref
@@ -111,9 +111,9 @@ Function findSession ( Host )
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Ref );
 	
-EndFunction 
+endfunction 
 
-Function createSession ( Host )
+function createSession ( Host )
 	
 	obj = Catalogs.Sessions.CreateItem ();
 	obj.Computer = Host;
@@ -122,9 +122,9 @@ Function createSession ( Host )
 	obj.Write ();
 	return obj.Ref;
 	
-EndFunction 
+endfunction 
 
-Procedure SetConnection ( WebClient, MobileClient, ThinClient, ThickClient ) export
+procedure SetConnection ( WebClient, MobileClient, ThinClient, ThickClient ) export
 	
 	SetPrivilegedMode ( true );
 	connection = findConnection ( WebClient, MobileClient, ThinClient, ThickClient );
@@ -134,9 +134,9 @@ Procedure SetConnection ( WebClient, MobileClient, ThinClient, ThickClient ) exp
 	SessionParameters.Connection = connection;
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function findConnection ( WebClient, MobileClient, ThinClient, ThickClient )
+function findConnection ( WebClient, MobileClient, ThinClient, ThickClient )
 	
 	s = "
 	|select top 1 Connections.Ref as Ref
@@ -155,9 +155,9 @@ Function findConnection ( WebClient, MobileClient, ThinClient, ThickClient )
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].Ref );
 	
-EndFunction 
+endfunction 
 
-Function createConnection ( WebClient, MobileClient, ThinClient, ThickClient )
+function createConnection ( WebClient, MobileClient, ThinClient, ThickClient )
 	
 	obj = Catalogs.Connections.CreateItem ();
 	obj.WebClient = WebClient;
@@ -167,9 +167,9 @@ Function createConnection ( WebClient, MobileClient, ThinClient, ThickClient )
 	obj.Write ();
 	return obj.Ref;
 	
-EndFunction 
+endfunction 
 
-Procedure SetVersion ( val Version, val Running ) export
+procedure SetVersion ( val Version, val Running ) export
 	
 	r = InformationRegisters.ApplicationVersions.CreateRecordManager ();
 	r.Period = ? ( Running, testingSession (), CurrentSessionDate () );
@@ -178,9 +178,9 @@ Procedure SetVersion ( val Version, val Running ) export
 	r.Version = Version;
 	r.Write ();
 	
-EndProcedure 
+endprocedure 
 
-Function testingSession ()
+function testingSession ()
 	
 	s = "
 	|select top 1 Sessions.Started as Started
@@ -192,9 +192,9 @@ Function testingSession ()
 	q.SetParameter ( "Session", SessionParameters.Session );
 	return q.Execute ().Unload () [ 0 ].Started;
 	
-EndFunction
+endfunction
 
-Function FindByID ( val ID, val Application ) export
+function FindByID ( val ID, val Application ) export
 	
 	r = InformationRegisters.Environment.CreateRecordManager ();
 	r.Session = SessionParameters.Session;
@@ -203,9 +203,9 @@ Function FindByID ( val ID, val Application ) export
 	r.Read ();
 	return r.Selected ();
 	
-EndFunction 
+endfunction 
 
-Function GetData ( val ID, val Application ) export
+function GetData ( val ID, val Application ) export
 	
 	r = InformationRegisters.Environment.CreateRecordManager ();
 	r.Session = SessionParameters.Session;
@@ -214,9 +214,9 @@ Function GetData ( val ID, val Application ) export
 	r.Read ();
 	return ? ( r.Selected (), r.Data.Get (), undefined );
 	
-EndFunction 
+endfunction 
 
-Procedure Register ( val ID, val Application, val Data ) export
+procedure Register ( val ID, val Application, val Data ) export
 	
 	r = InformationRegisters.Environment.CreateRecordManager ();
 	r.Session = SessionParameters.Session;
@@ -226,9 +226,9 @@ Procedure Register ( val ID, val Application, val Data ) export
 	r.Created = CurrentSessionDate ();
 	r.Write ();
 	
-EndProcedure
+endprocedure
 
-Function LastID ( val Application ) export
+function LastID ( val Application ) export
 	
 	s = "
 	|select top 1 Environments.ID as ID
@@ -242,15 +242,15 @@ Function LastID ( val Application ) export
 	table = q.Execute ().Unload ();
 	return ? ( table.Count () = 0, undefined, table [ 0 ].ID );
 	
-EndFunction 
+endfunction 
 
-Function User () export
+function User () export
 	
 	return SessionParameters.User;
 	
-EndFunction 
+endfunction 
 
-Function StartAgent () export
+function StartAgent () export
 	
 	agent = DF.Pick ( SessionParameters.User, "Agent" );
 	if ( agent ) then
@@ -258,33 +258,33 @@ Function StartAgent () export
 	endif;
 	return agent;
 	
-EndFunction
+endfunction
 
-Function MobileClient () export
+function MobileClient () export
 	
 	return isClient ( "MobileClient" );
 	
-EndFunction
+endfunction
 
-Function isClient ( Type )
+function isClient ( Type )
 	
 	return GetFunctionalOption ( Type, new Structure ( "Connection", SessionParameters.Connection ) );
 	
-EndFunction
+endfunction
 
-Function WebClient () export
+function WebClient () export
 	
 	return isClient ( "WebClient" );
 	
-EndFunction
+endfunction
 
-Function Library () export
+function Library () export
 	
 	return Constants.Library.Get ();
 	
-EndFunction
+endfunction
 
-Function TestingID () export
+function TestingID () export
 	
 	newTransaction = not TransactionActive ();
 	if ( newTransaction ) then
@@ -301,9 +301,9 @@ Function TestingID () export
 	endif;
 	return id;
 	
-EndFunction
+endfunction
 
-Function newID ( LastID )
+function newID ( LastID )
 	
 	id = ? ( IsBlankString ( LastID ), "A000", LastID );
 	i = StrLen ( id );
@@ -327,4 +327,4 @@ Function newID ( LastID )
 	enddo;
 	return Left ( id, i - 1 ) + StrConcat ( suffix );
 
-EndFunction
+endfunction

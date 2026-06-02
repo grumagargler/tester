@@ -1,6 +1,6 @@
 
-Procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
+procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
 	
 	TesterAgent.AgentStatus ( Enums.AgentStatuses.Offline );
 	
-EndProcedure
+endprocedure

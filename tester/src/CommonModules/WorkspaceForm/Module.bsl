@@ -1,4 +1,4 @@
-Procedure Create ( Reference ) export
+procedure Create ( Reference ) export
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		workspace = WorkspaceFormSrv.GetFolders ( Reference );
@@ -27,17 +27,17 @@ Procedure Create ( Reference ) export
 		doc.BeginWriting ( new NotifyDescription ( "WorkspaceCreated", ThisObject, path ), path, , Chars.LF );
 	#endif
 
-EndProcedure
+endprocedure
 
-Procedure WorkspaceCreated ( Result, Path ) export
+procedure WorkspaceCreated ( Result, Path ) export
 	
 	if ( Result ) then
 		Output.WorkspaceCreated ( new Structure ( "Path", Path ) );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Procedure RunStudio ( Reference ) export
+procedure RunStudio ( Reference ) export
 	
 	#if ( WebClient or MobileClient ) then
 		Output.ClientDoesNotSupport ();
@@ -67,9 +67,9 @@ Procedure RunStudio ( Reference ) export
 		endif;
 	#endif
 
-EndProcedure
+endprocedure
 
-Function applicationName ( Application )
+function applicationName ( Application )
 	
 	if ( Application = PredefinedValue ( "Catalog.Applications.EmptyRef" ) ) then
 		return Output.CommonApplicationName ();
@@ -77,32 +77,32 @@ Function applicationName ( Application )
 		return Application;
 	endif;
 	
-EndFunction
+endfunction
 
-Procedure VSCodeWorkspaceUndefined ( Params ) export
+procedure VSCodeWorkspaceUndefined ( Params ) export
 	
 	OpenForm ( "ExchangePlan.Repositories.ListForm" );
 	
-EndProcedure
+endprocedure
 
-Procedure askUser ( Params )
+procedure askUser ( Params )
 	
 	list = new ValueList ();
 	list.LoadValues ( Params.Info.Workspaces );
 	list.ShowChooseItem ( new NotifyDescription ( "WorkspaceSelected", ThisObject, Params ), Output.SelectWorkspace () );
 	
-EndProcedure
+endprocedure
 
-Procedure WorkspaceSelected ( Workspace, Params ) export
+procedure WorkspaceSelected ( Workspace, Params ) export
 	
 	if ( Workspace = undefined ) then
 		return;
 	endif;
 	executeStudio ( Params.Info.VSCode, Workspace.Value, Params.File );
 	
-EndProcedure
+endprocedure
 
-Procedure executeStudio ( VSCode, Workspace, File = undefined )
+procedure executeStudio ( VSCode, Workspace, File = undefined )
 
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		if ( VSCode = "" ) then
@@ -123,11 +123,11 @@ Procedure executeStudio ( VSCode, Workspace, File = undefined )
 		BeginRunningApplication ( new NotifyDescription ( "StudioLaunched", ThisObject ), StrConcat ( cmd, " " ) );
 	#endif
 
-EndProcedure
+endprocedure
 
-Procedure StudioLaunched ( Result, Next ) export
+procedure StudioLaunched ( Result, Next ) export
 	
 	//@skip-warning
 	noerrors = true;
 
-EndProcedure
+endprocedure

@@ -1,4 +1,4 @@
-Function HierarchyList ( val Scenarios ) export
+function HierarchyList ( val Scenarios ) export
 	
 	s = "
 	|select distinct allowed Scenarios.Ref as Ref
@@ -9,9 +9,9 @@ Function HierarchyList ( val Scenarios ) export
 	q.SetParameter ( "Scenarios", Scenarios );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction
+endfunction
 
-Procedure CopyMove ( val Scenarios, val Folder, val Copying ) export
+procedure CopyMove ( val Scenarios, val Folder, val Copying ) export
 	
 	if ( recursion ( Scenarios, Folder ) ) then
 		raise Output.CopyingError ();
@@ -26,9 +26,9 @@ Procedure CopyMove ( val Scenarios, val Folder, val Copying ) export
 	enddo;
 	CommitTransaction ();
 	
-EndProcedure
+endprocedure
 
-Function recursion ( Scenarios, Folder )
+function recursion ( Scenarios, Folder )
 	
 	s = "
 	|select top 1 1
@@ -47,9 +47,9 @@ Function recursion ( Scenarios, Folder )
 	SetPrivilegedMode ( true );
 	return not q.Execute ().IsEmpty ();
 	
-EndFunction
+endfunction
 
-Procedure copyScenario ( Scenario, Folder )
+procedure copyScenario ( Scenario, Folder )
 	
 	obj = Scenario.GetObject ().Copy ();
 	obj.Parent = Folder;
@@ -60,9 +60,9 @@ Procedure copyScenario ( Scenario, Folder )
 		copyScenario ( baby, parent );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Function children ( Scenario )
+function children ( Scenario )
 	
 	s = "
 	|select allowed Scenarios.Ref as Ref
@@ -73,17 +73,17 @@ Function children ( Scenario )
 	q.SetParameter ( "Scenario", Scenario );
 	return q.Execute ().Unload ().UnloadColumn ( "Ref" );
 	
-EndFunction
+endfunction
 
-Procedure moveScenario ( Scenario, Folder )
+procedure moveScenario ( Scenario, Folder )
 	
 	obj = Scenario.GetObject ();
 	obj.Parent = Folder;
 	obj.Write ();
 	
-EndProcedure
+endprocedure
 
-Function InheritApplication ( val Scenarios, val Target ) export
+function InheritApplication ( val Scenarios, val Target ) export
 	
 	application = DF.Pick ( Target, "Application" );
 	if ( application.IsEmpty () ) then
@@ -100,4 +100,4 @@ Function InheritApplication ( val Scenarios, val Target ) export
 	q.SetParameter ( "Scenarios", Scenarios );
 	return ? ( q.Execute ().IsEmpty (), undefined, application );
 	
-EndFunction
+endfunction

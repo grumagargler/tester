@@ -1,16 +1,16 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenarios, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenarios, ExecuteParameters )
 	
 	saveAll ();
 	p = new Structure ( "Scenarios", Scenarios );
 	OpenForm ( "Document.Job.ObjectForm", p, ExecuteParameters.Source, ExecuteParameters.Uniqueness, ExecuteParameters.Window, ExecuteParameters.URL );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure saveAll ()
+&atclient
+procedure saveAll ()
 	
 	Notify ( Enum.MessageSaveAll () );
 	
-EndProcedure 
+endprocedure 

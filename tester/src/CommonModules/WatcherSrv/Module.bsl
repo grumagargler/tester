@@ -1,4 +1,4 @@
-Function Repositories () export
+function Repositories () export
 	
 	table = getFolders ();
 	result = new Structure ();
@@ -7,9 +7,9 @@ Function Repositories () export
 	result.Insert ( "Mapped", table.UnloadColumn ( "Mapped" ) );
 	return result;
 	
-EndFunction
+endfunction
 
-Function getFolders ()
+function getFolders ()
 	
 	s = "
 	|select allowed Repositories.Application as Application, Repositories.Folder as Folder,
@@ -21,9 +21,9 @@ Function getFolders ()
 	q.SetParameter ( "Session", SessionParameters.Session );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-Function Update ( val Context, val Data, Error ) export
+function Update ( val Context, val Data, Error ) export
 	
 	var errors;
 	
@@ -41,15 +41,15 @@ Function Update ( val Context, val Data, Error ) export
 		return scenario;
 	endif;
 	
-EndFunction
+endfunction
 
-Function FindScenario ( val Context, val EvenRemoved = false ) export
+function FindScenario ( val Context, val EvenRemoved = false ) export
 
 	return RuntimeSrv.FindScenario ( Context.Path, Context.Application, undefined, undefined, true, EvenRemoved );
 
-EndFunction
+endfunction
 
-Function wrapScenario ( Scenario, Hierarchy )
+function wrapScenario ( Scenario, Hierarchy )
 	
 	if ( Hierarchy ) then
 		s = "select allowed Scenarios.Ref as Ref
@@ -68,9 +68,9 @@ Function wrapScenario ( Scenario, Hierarchy )
 	endif;
 	return table;
 	
-EndFunction
+endfunction
 
-Function updateScenario ( Scenario, Data, Context, Error )
+function updateScenario ( Scenario, Data, Context, Error )
 	
 	obj = Scenario.GetObject ();
 	ext = Context.Extension;
@@ -100,9 +100,9 @@ Function updateScenario ( Scenario, Data, Context, Error )
 	enrollChanges ( obj, Context.Application, Enum.FSUserActionsChange () );
 	return true;
 		
-EndFunction
+endfunction
 
-Procedure enrollChanges ( Object, RepoApplication, Action, OldPath = undefined )
+procedure enrollChanges ( Object, RepoApplication, Action, OldPath = undefined )
 
 	Object.FullExchange ();
 	scenario = Object.Ref;
@@ -126,9 +126,9 @@ Procedure enrollChanges ( Object, RepoApplication, Action, OldPath = undefined )
 		endif;
 	endif;
 
-EndProcedure
+endprocedure
 
-Function Create ( val Context, val IsFolder, Error ) export
+function Create ( val Context, val IsFolder, Error ) export
 	
 	scenario = fetchScenario ( Context, Error );
 	if ( Error <> undefined ) then
@@ -150,9 +150,9 @@ Function Create ( val Context, val IsFolder, Error ) export
 		endif;
 	endif;
 
-EndFunction
+endfunction
 
-Function fetchScenario ( Context, Error )
+function fetchScenario ( Context, Error )
 
 	var errors;
 	
@@ -166,9 +166,9 @@ Function fetchScenario ( Context, Error )
 	endif;
 	return scenario;
 
-EndFunction
+endfunction
 
-Function lockParent ( Context, Error )
+function lockParent ( Context, Error )
 	
 	var errors;
 	
@@ -188,9 +188,9 @@ Function lockParent ( Context, Error )
 	endif;
 	return parent;
 
-EndFunction
+endfunction
 
-Function initScenario ( Parent, Scenario, Context, IsFolder, Error )
+function initScenario ( Parent, Scenario, Context, IsFolder, Error )
 	
 	application = Context.Application;
 	if ( Scenario = undefined ) then
@@ -239,9 +239,9 @@ Function initScenario ( Parent, Scenario, Context, IsFolder, Error )
 	endif;
 	return true;
 	
-EndFunction
+endfunction
 
-Function GetMethods ( val Starting ) export
+function GetMethods ( val Starting ) export
 	
 	table = getScenarios ( Starting );
 	result = new Array ();
@@ -250,9 +250,9 @@ Function GetMethods ( val Starting ) export
 	enddo;
 	return result;
 	
-EndFunction
+endfunction
 
-Function getScenarios ( Starting )
+function getScenarios ( Starting )
 	
 	q = new Query ();
 	s = "
@@ -274,9 +274,9 @@ Function getScenarios ( Starting )
 	q.SetParameter ( "Common", Output.CommonApplicationName () );
 	return q.Execute ().Unload ();
 	
-EndFunction
+endfunction
 
-Function Rename ( val Context, val NewFile, val NewPath, val IsFolder, Error ) export
+function Rename ( val Context, val NewFile, val NewPath, val IsFolder, Error ) export
 	
 	var errors;
 	
@@ -300,9 +300,9 @@ Function Rename ( val Context, val NewFile, val NewPath, val IsFolder, Error ) e
 		return scenario;
 	endif;
 
-EndFunction
+endfunction
 
-Function renameScenario ( Scenario, Application, NewFile, IsFolder, Error )
+function renameScenario ( Scenario, Application, NewFile, IsFolder, Error )
 	
 	BeginTransaction ();
 	obj = Scenario.GetObject ();
@@ -329,9 +329,9 @@ Function renameScenario ( Scenario, Application, NewFile, IsFolder, Error )
 	CommitTransaction ();
 	return true;
 		
-EndFunction
+endfunction
 
-Function Remove ( val Context, Error ) export
+function Remove ( val Context, Error ) export
 	
 	var errors;
 	
@@ -351,9 +351,9 @@ Function Remove ( val Context, Error ) export
 		return scenario;
 	endif;
 	
-EndFunction
+endfunction
 
-Function removeScenario ( Scenario, Context, Error )
+function removeScenario ( Scenario, Context, Error )
 	
 	obj = Scenario.GetObject ();
 	obj.DataExchange.Load = true;
@@ -401,9 +401,9 @@ Function removeScenario ( Scenario, Context, Error )
 	endif;
 	return true;
 		
-EndFunction
+endfunction
 
-Function ExtractIDs ( Changes, Application ) export
+function ExtractIDs ( Changes, Application ) export
 
 	q = new Query ( "
 	|select Changes.ID as ID, Changes.File as File
@@ -435,9 +435,9 @@ Function ExtractIDs ( Changes, Application ) export
 	q.SetParameter ( "Changes", changesTable ( Changes ) );
 	return serializeChanges ( SQL.Exec ( q ) );
 
-EndFunction
+endfunction
 
-Function changesTable ( Changes )
+function changesTable ( Changes )
 	
 	table = new ValueTable ();
 	columns = table.Columns;
@@ -451,19 +451,19 @@ Function changesTable ( Changes )
 	enddo;
 	return table;
 
-EndFunction
+endfunction
 
-Function serializeChanges ( Data )
+function serializeChanges ( Data )
 
 	changes = Collections.Serialize ( Data.Changes );
 	newFiles = Collections.Serialize ( Data.New );
 	return new Structure ( "Changes, New", changes, newFiles );
 
-EndFunction
+endfunction
 
-Function GetContent ( val ID ) export
+function GetContent ( val ID ) export
 
 	return InformationRegisters.Files.Get (
 		new Structure ( "Session, ID", SessionParameters.Session, ID ) ).Content;
 
-EndFunction
+endfunction

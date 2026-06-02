@@ -1,23 +1,23 @@
-Function MobileClient () export
+function MobileClient () export
 	
 	return isClient ( "MobileClient" );
 	
-EndFunction
+endfunction
 
-Function isClient ( Type )
+function isClient ( Type )
 	
 	return GetFunctionalOption ( Type, new Structure ( "Session", SessionParameters.Session ) );
 	
-EndFunction
+endfunction
 
-Function WebClient () export
+function WebClient () export
 	
 	return isClient ( "WebClient" );
 	
-EndFunction
+endfunction
 
-Function LinuxClient () export
+function LinuxClient () export
 	
 	return DF.Pick ( SessionParameters.Session, "Linux" );
 	
-EndFunction
+endfunction

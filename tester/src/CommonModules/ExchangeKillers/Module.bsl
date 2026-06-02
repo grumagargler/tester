@@ -1,4 +1,4 @@
-Procedure Write ( Object ) export
+procedure Write ( Object ) export
 	
 	if ( TransactionActive () ) then
 		Object.Write ();
@@ -9,9 +9,9 @@ Procedure Write ( Object ) export
 		CommitTransaction ();
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure Delete ( Object ) export
+procedure Delete ( Object ) export
 	
 	if ( TransactionActive () ) then
 		Object.Delete ();
@@ -22,13 +22,13 @@ Procedure Delete ( Object ) export
 		CommitTransaction ();
 	endif;
 
-EndProcedure
+endprocedure
 
-Procedure Wait () export
+procedure Wait () export
 	
 	lock = new DataLock ();
 	scope = lock.Add ( "Constant.Exchange" );
 	scope.Mode = DataLockMode.Exclusive;
 	lock.Lock ();
 	
-EndProcedure
+endprocedure

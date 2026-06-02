@@ -1,4 +1,4 @@
-Procedure Generate ( RecordKey ) export
+procedure Generate ( RecordKey ) export
 	
 	p = getParams ( RecordKey );
 	name = getName ( p.ReportPath );
@@ -9,9 +9,9 @@ Procedure Generate ( RecordKey ) export
 	endif; 
 	write ( p, report );
 	
-EndProcedure 
+endprocedure 
 
-Function getParams ( RecordKey )
+function getParams ( RecordKey )
 	
 	s = "
 	|select top 1 Schedule.*, Schedule.Report.Description as ReportPath
@@ -25,15 +25,15 @@ Function getParams ( RecordKey )
 	SetPrivilegedMode ( false );
 	return p;
 	
-EndFunction 
+endfunction 
 
-Function getName ( ReportPath )
+function getName ( ReportPath )
 	
 	return Mid ( ReportPath, Find ( ReportPath, "." ) + 1 );
 	
-EndFunction 
+endfunction 
 
-Procedure write ( Params, Report )
+procedure write ( Params, Report )
 	
 	SetPrivilegedMode ( true );
 	r = InformationRegisters.SendingReports.CreateRecordManager ();
@@ -42,9 +42,9 @@ Procedure write ( Params, Report )
 	r.Write ();
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Procedure Send () export
+procedure Send () export
 	
 	SetPrivilegedMode ( true );
 	table = getTable ();
@@ -61,9 +61,9 @@ Procedure Send () export
 	DeleteFiles ( folder );
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function getTable ()
+function getTable ()
 	
 	s = "
 	|select SendingReports.*, SendingReports.Report.Description as ReportPath
@@ -72,9 +72,9 @@ Function getTable ()
 	q = new Query ( s );
 	return q.Execute ().Unload ();
 	
-EndFunction 
+endfunction 
 
-Procedure sendEmail ( Row, Profile, TempFolder )
+procedure sendEmail ( Row, Profile, TempFolder )
 
 	message = new InternetMailMessage ();
 	setSenderAndReceiver ( Row, message );
@@ -86,9 +86,9 @@ Procedure sendEmail ( Row, Profile, TempFolder )
 		WriteLogEvent ( "Mailboxes.Post", EventLogLevel.Error, Metadata.ScheduledJobs.SendingReports, , ErrorDescription () );
 	endtry
 	
-EndProcedure 
+endprocedure 
 
-Procedure setSenderAndReceiver ( Row, Message )
+procedure setSenderAndReceiver ( Row, Message )
 	
 	Message.From = Cloud.Info ();
 	addresses = Conversion.StringToArray ( Row.Receiver );
@@ -100,9 +100,9 @@ Procedure setSenderAndReceiver ( Row, Message )
 		Message.Cc.Add ( address );
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-Procedure setSubjectAndBody ( Row, Message )
+procedure setSubjectAndBody ( Row, Message )
 	
 	recordKey = InformationRegisters.ScheduledReports.CreateRecordKey ( new Structure ( "User, Report", Row.User, Row.Report ) );
 	url = Conversion.ObjectToURL ( recordKey );
@@ -115,21 +115,21 @@ Procedure setSubjectAndBody ( Row, Message )
 	p.Insert ( "Website", Cloud.Website () );
 	Message.Texts.Add ( Output.ReportByEmailBody ( p ) );
 	
-EndProcedure
+endprocedure
 
-Procedure attachFile ( Row, Message, Folder )
+procedure attachFile ( Row, Message, Folder )
 	
 	path = Folder + "\Report." + FileSystem.TableExtension ( Row.AttachmentType );
 	data = Row.Data.Get ();
 	data.Write ( path, FileSystem.SpreadsheetType ( Row.AttachmentType ) );
 	Message.Attachments.Add ( path );
 
-EndProcedure 
+endprocedure 
 
-Procedure clean ( Row )
+procedure clean ( Row )
 	
 	r = InformationRegisters.SendingReports.CreateRecordManager ();
 	FillPropertyValues ( r, Row );
 	r.Delete ();
 	
-EndProcedure 
+endprocedure 

@@ -1,6 +1,6 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenarios, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenarios, ExecuteParameters )
 	
 	deletion = not DF.Pick ( Scenarios [ 0 ], "DeletionMark" );
 	if ( deletion ) then
@@ -9,20 +9,20 @@ Procedure CommandProcessing ( Scenarios, ExecuteParameters )
 		Output.UnmarkForDeletion ( ThisObject, Scenarios );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure MarkForDeletion ( Answer, Scenarios ) export
+&atclient
+procedure MarkForDeletion ( Answer, Scenarios ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
 	endif;
 	proceedDeletion ( true, Scenarios );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure proceedDeletion ( Delete, Scenarios )
+&atclient
+procedure proceedDeletion ( Delete, Scenarios )
 
 	error = undefined;
 	changes = setMark ( Delete, Scenarios, error );
@@ -32,10 +32,10 @@ Procedure proceedDeletion ( Delete, Scenarios )
 	broadcast ( changes );
 	RepositoryFiles.Sync ();
 
-EndProcedure
+endprocedure
 
-&AtServer
-Function setMark ( val Delete, val Scenarios, Error )
+&atserver
+function setMark ( val Delete, val Scenarios, Error )
 	
 	list = new Array ();
 	for each scenario in Scenarios do
@@ -47,29 +47,29 @@ Function setMark ( val Delete, val Scenarios, Error )
 		try
 			obj.SetDeletionMark ( Delete );
 		except
-			Error = BriefErrorDescription ( ErrorInfo () );
+			Error = ErrorProcessing.BriefErrorDescription ( ErrorInfo () );
 			break;
 		endtry;
 		list.Add ( scenario );
 	enddo;
 	return list;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure broadcast ( Scenarios )
+&atclient
+procedure broadcast ( Scenarios )
 	
 	Notify ( Enum.MessageReload (), Scenarios );
 	NotifyChanged ( Type ( "CatalogRef.Scenarios" ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure UnmarkForDeletion ( Answer, Scenarios ) export
+&atclient
+procedure UnmarkForDeletion ( Answer, Scenarios ) export
 	
 	if ( Answer = DialogReturnCode.No ) then
 		return;
 	endif;
 	proceedDeletion ( false, Scenarios );
 	
-EndProcedure
+endprocedure

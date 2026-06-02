@@ -1,4 +1,4 @@
-Function Perform ( Log, Lang, SmartMode, AlreadyConnected ) export
+function Perform ( Log, Lang, SmartMode, AlreadyConnected ) export
 	
 	obj = Create ();
 	obj.Log = Log;
@@ -7,4 +7,4 @@ Function Perform ( Log, Lang, SmartMode, AlreadyConnected ) export
 	obj.AlreadyConnected = AlreadyConnected;
 	return obj.Perform ();
 	
-EndFunction 
+endfunction 

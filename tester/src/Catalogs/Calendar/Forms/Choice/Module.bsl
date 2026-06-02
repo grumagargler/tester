@@ -1,47 +1,47 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	setDate ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setDate ()
+&atserver
+procedure setDate ()
 	
 	Date = DF.Pick ( Parameters.CurrentRow, "Date", CurrentSessionDate () );
 	
-EndProcedure
+endprocedure
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure OK ( Command )
+&atclient
+procedure OK ( Command )
 	
 	commitChoice ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure commitChoice ()
+&atclient
+procedure commitChoice ()
 	
 	NotifyChoice ( getDate ( Date ) );
 	
-EndProcedure
+endprocedure
 
-&AtServerNoContext
-Function getDate ( val Date )
+&atservernocontext
+function getDate ( val Date )
 	
 	return Catalogs.Calendar.GetDate ( Date );
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure DateSelection ( Item, SelectedDate )
+&atclient
+procedure DateSelection ( Item, SelectedDate )
 	
 	commitChoice ();
 	
-EndProcedure
+endprocedure

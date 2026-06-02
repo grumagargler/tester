@@ -1,12 +1,12 @@
 
-Function AccessDenies () export
+function AccessDenies () export
 	
 	SetPrivilegedMode ( true );
 	return DF.Pick ( SessionParameters.User, "AccessDenied" );
 	
-EndFunction 
+endfunction 
 
-Procedure Init () export
+procedure Init () export
 	
 	SetPrivilegedMode ( true );
 	name = Output.UserAdmin ();
@@ -30,24 +30,24 @@ Procedure Init () export
 	user.Write ();
 	SetPrivilegedMode ( false );
 	
-EndProcedure 
+endprocedure 
 
-Function CanEditScenarios () export
+function CanEditScenarios () export
 	
 	return AccessRight ( "Edit", Metadata.Catalogs.Scenarios );
 	
-EndFunction 
+endfunction 
 
-Procedure SaveSettings ( ObjectKey, SettingsKey = undefined, Settings ) export
+procedure SaveSettings ( ObjectKey, SettingsKey = undefined, Settings ) export
 	
 	if ( AccessRight ( "SaveUserData", Metadata ) ) then
 		CommonSettingsStorage.Save ( ObjectKey, SettingsKey, Settings );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Function Admin () export
+function Admin () export
 	
 	return IsInRole ( "Administrator" );
 	
-EndFunction 
+endfunction 

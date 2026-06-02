@@ -1,7 +1,7 @@
 
-&AtClient
-Procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( CommandParameter, CommandExecuteParameters )
 	
 	OpenHelp ( "Configuration" );
 	
-EndProcedure
+endprocedure

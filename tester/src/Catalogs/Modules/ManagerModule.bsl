@@ -1,14 +1,14 @@
-Procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
+procedure PresentationFieldsGetProcessing ( Fields, StandardProcessing )
 	
 	Fields.Add ( "Path" );
 	Fields.Add ( "IsVersion" );
 	StandardProcessing = false;
 	
-EndProcedure
+endprocedure
 
-Procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
+procedure PresentationGetProcessing ( Data, Presentation, StandardProcessing )
 	
 	StandardProcessing = false;
 	Presentation = ? ( Data.IsVersion, Enum.OthersVersionPrefix (), "" ) + Data.Path;
 	
-EndProcedure
+endprocedure

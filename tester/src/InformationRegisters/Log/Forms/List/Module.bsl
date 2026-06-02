@@ -1,18 +1,18 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	setFilter ();
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -23,18 +23,18 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	ScenarioFilter = Parameters.Scenario;
 	JobFilter = Parameters.Job;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setFilter ()
+&atserver
+procedure setFilter ()
 	
 	defaultFilter = true;
 	if ( not JobFilter.IsEmpty () ) then
@@ -50,42 +50,42 @@ Procedure setFilter ()
 		filterByUser ();
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByJob ()
+&atserver
+procedure filterByJob ()
 	
 	DC.ChangeFilter ( List, "Job", JobFilter, not JobFilter.IsEmpty () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByUser ()
+&atserver
+procedure filterByUser ()
 	
 	DC.ChangeFilter ( List, "User", UserFilter, not UserFilter.IsEmpty () );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByScenario ()
+&atserver
+procedure filterByScenario ()
 	
 	DC.ChangeFilter ( List, "Scenario", ScenarioFilter, ScenarioFilter <> undefined );
 	Appearance.Apply ( ThisObject, "ScenarioFilter" );
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure UserFilterOnChange ( Item )
+&atclient
+procedure UserFilterOnChange ( Item )
 	
 	applyUserFilter ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyUserFilter ()
+&atserver
+procedure applyUserFilter ()
 	
 	if ( not UserFilter.IsEmpty () ) then
 		JobFilter = undefined;
@@ -95,39 +95,39 @@ Procedure applyUserFilter ()
 	filterByUser ();
 	Appearance.Apply ( ThisObject, "UserFilter" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SeverityFilterOnChange ( Item )
+&atclient
+procedure SeverityFilterOnChange ( Item )
 	
 	filterBySeverity ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure filterBySeverity ()
+&atserver
+procedure filterBySeverity ()
 	
 	DC.ChangeFilter ( List, "Severity", SeverityFilter, not SeverityFilter.IsEmpty () );
 	Appearance.Apply ( ThisObject, "SeverityFilter" );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ScenarioFilterOnChange ( Item )
+&atclient
+procedure ScenarioFilterOnChange ( Item )
 	
 	filterByScenario ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure JobFilterOnChange ( Item )
+&atclient
+procedure JobFilterOnChange ( Item )
 	
 	applyJobFilter ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure applyJobFilter ()
+&atserver
+procedure applyJobFilter ()
 	
 	if ( not JobFilter.IsEmpty () ) then
 		UserFilter = undefined;
@@ -137,10 +137,10 @@ Procedure applyJobFilter ()
 	filterByJob ();
 	Appearance.Apply ( ThisObject, "JobFilter" );
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
+&atclient
+procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 	
 	if ( openError ( Field )
 		or showError ()
@@ -148,10 +148,10 @@ Procedure ListSelection ( Item, SelectedRow, Field, StandardProcessing )
 		StandardProcessing = false;
 	endif; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function openError ( Field )
+&atclient
+function openError ( Field )
 	
 	if ( Field.Name = "Error" ) then
 		ShowValue ( , Items.List.CurrentData.Error );
@@ -159,10 +159,10 @@ Function openError ( Field )
 	endif; 
 	return false;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Function showError ()
+&atclient
+function showError ()
 	
 	error = Items.List.CurrentData.Error;
 	if ( error.IsEmpty ()
@@ -176,10 +176,10 @@ Function showError ()
 		return true;
 	endif; 
 	
-EndFunction
+endfunction
 
-&AtClient
-Function openJob ( Field )
+&atclient
+function openJob ( Field )
 	
 	if ( Field.Name = "Job" ) then
 		ShowValue ( , Items.List.CurrentData.Job );
@@ -187,4 +187,4 @@ Function openJob ( Field )
 	endif; 
 	return false;
 	
-EndFunction 
+endfunction 

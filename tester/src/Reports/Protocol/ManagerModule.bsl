@@ -1,15 +1,15 @@
 
-Function Events () export
+function Events () export
 	
 	params = Reporter.Events ();
 	params.OnDetail = true;
 	params.OnCompose = true;
 	return params;
 	
-EndFunction 
+endfunction 
 
-Procedure OnDetail ( Menu, StandardMenu, UseMainAction, Filters ) export
+procedure OnDetail ( Menu, StandardMenu, UseMainAction, Filters ) export
 	
 	UseMainAction = true;
 
-EndProcedure
+endprocedure

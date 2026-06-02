@@ -1,8 +1,8 @@
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	ScenarioForm.InitPort ( Items.Port );
 	setTitle ();
@@ -10,10 +10,10 @@ Procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	readAppearance ();
 	Appearance.Apply ( ThisObject );
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure readAppearance ()
+&atserver
+procedure readAppearance ()
 
 	rules = new Array ();
 	rules.Add ( "
@@ -26,69 +26,69 @@ Procedure readAppearance ()
 	|" );
 	Appearance.Read ( ThisObject, rules );
 
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure setTitle ()
+&atserver
+procedure setTitle ()
 	
 	Title = Output.RecordSenario ();
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setDefaults ()
+&atserver
+procedure setDefaults ()
 	
 	Mode = Enums.Recording.Tester;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	init ();
 	fixLang ();
 	start ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure init ()
+&atclient
+procedure init ()
 	
 	Test.AttachApplication ( SessionScenario );
 	Port = AppData.Port;
 	flagConnected ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure flagConnected ()
+&atclient
+procedure flagConnected ()
 	
 	Connected = AppData.Connected;
 	Appearance.Apply ( ThisObject, "Connected" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure fixLang ()
+&atclient
+procedure fixLang ()
 	
 	if ( Items.Lang.ChoiceList.FindByValue ( Lang ) = undefined ) then
 		Lang = CurrentLanguage ();
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure start ( Silently )
+&atclient
+procedure start ( Silently )
 	
 	if ( attach ( Silently ) ) then
 		App.StartUILogRecording ();
 		setStatus ( "R" );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function attach ( Silently )
+&atclient
+function attach ( Silently )
 	
 	if ( Silently ) then
 		try
@@ -104,10 +104,10 @@ Function attach ( Silently )
 	flagConnected ();
 	return attached;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure setStatus ( Value )
+&atclient
+procedure setStatus ( Value )
 	
 	Status = Value;
 	if ( Status = "R" ) then
@@ -119,17 +119,17 @@ Procedure setStatus ( Value )
 	endif; 
 	Appearance.Apply ( ThisObject, "Status" );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnClose ( Exit )
+&atclient
+procedure OnClose ( Exit )
 	
 	detach ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure detach ()
+&atclient
+procedure detach ()
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		if ( Connected ) then
@@ -140,59 +140,59 @@ Procedure detach ()
 		endif; 
 	#endif
 	
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** Group Form
 
-&AtClient
-Procedure StartRecording ( Command )
+&atclient
+procedure StartRecording ( Command )
 	
 	start ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure PauseRecording ( Command )
+&atclient
+procedure PauseRecording ( Command )
 	
 	App.PauseUILogRecording ();
 	setStatus ( "P" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure StopRecording ( Command )
+&atclient
+procedure StopRecording ( Command )
 	
 	setStatus ( "" );
 	Close ( getLog () );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function getLog ()
+&atclient
+function getLog ()
 	
 	log = App.FinishUILogRecording ();
 	return new Structure ( "Log, Lang, Mode", log, Lang, Mode );
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure ResumeRecording ( Command )
+&atclient
+procedure ResumeRecording ( Command )
 	
 	App.ResumeUILogRecording ();
 	setStatus ( "R" );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ModeClearing ( Item, StandardProcessing )
+&atclient
+procedure ModeClearing ( Item, StandardProcessing )
 	
 	StandardProcessing = false;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure DisconnectClient ( Command )
+&atclient
+procedure DisconnectClient ( Command )
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
 		App.CancelUILogRecording ();
@@ -201,4 +201,4 @@ Procedure DisconnectClient ( Command )
 		setStatus ( "" );
 	#endif
 	
-EndProcedure
+endprocedure

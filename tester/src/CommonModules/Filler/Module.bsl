@@ -1,4 +1,4 @@
-Function GetParams () export
+function GetParams () export
 	
 	p = new Structure ();
 	p.Insert ( "Report" );
@@ -12,9 +12,9 @@ Function GetParams () export
 	p.Insert ( "CloseOnErrors", false );
 	return p;
 	
-EndFunction 
+endfunction 
 
-Function Result () export
+function Result () export
 	
 	p = new Structure ();
 	p.Insert ( "Address", "" );
@@ -22,19 +22,19 @@ Function Result () export
 	p.Insert ( "Completed" );
 	return p;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Open ( Params, Caller ) export
+&atclient
+procedure Open ( Params, Caller ) export
 	
 	callback = callbackParams ( Params, Caller );
 	p = new Structure ( "Caller, Filling", Caller.UUID, Params );
 	OpenForm ( "CommonForm.Filling", p, Caller, , , , new CallbackDescription ( "Filling", ThisObject, callback ) );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function callbackParams ( Params, Caller )
+&atclient
+function callbackParams ( Params, Caller )
 	
 	p = new Structure ();
 	p.Insert ( "Report", Params.Report );
@@ -43,20 +43,20 @@ Function callbackParams ( Params, Caller )
 	p.Insert ( "Caller", Caller );
 	return p;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure Filling ( Result, Params ) export
+&atclient
+procedure Filling ( Result, Params ) export
 	
 	if ( Result = undefined ) then
 		return;
 	endif;
 	RunCallback ( new CallbackDescription ( Params.Processor, Params.Caller, Params ), Result );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure ProcessData ( Params, Caller ) export
+&atclient
+procedure ProcessData ( Params, Caller ) export
 	
 	id = Caller.UUID;
 	resultAddress = "";
@@ -67,17 +67,17 @@ Procedure ProcessData ( Params, Caller ) export
 	p = new Structure ( "Callback, Result", callback, Result );
 	Progress.Open ( id, Caller, new CallbackDescription ( "ProcessComplete", ThisObject, p ) );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ProcessComplete ( Result, Params ) export
+&atclient
+procedure ProcessComplete ( Result, Params ) export
 	
 	Filler.Filling ( Params.Result, Params.Callback );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function Fetch ( Result ) export
+&atserver
+function Fetch ( Result ) export
 	
 	table = GetFromTempStorage ( Result.Address );
 	if ( table = undefined
@@ -87,4 +87,4 @@ Function Fetch ( Result ) export
 		return table;
 	endif;
 	
-EndFunction
+endfunction

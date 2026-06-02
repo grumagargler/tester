@@ -1,4 +1,4 @@
-Function Values ( val Ref, val Fields ) export
+function Values ( val Ref, val Fields ) export
 	
 	set = ? ( TypeOf ( Fields ) = Type ( "Array" ), StrConcat ( Fields, "," ), Fields );
 	meta = Ref.Metadata ();
@@ -32,9 +32,9 @@ Function Values ( val Ref, val Fields ) export
 	enddo; 
 	return result;
 	
-EndFunction
+endfunction
 
-Function getTypes ( Meta, Fields )
+function getTypes ( Meta, Fields )
 	
 	var field;
 	var name;
@@ -46,9 +46,9 @@ Function getTypes ( Meta, Fields )
 	enddo; 
 	return types;
 	
-EndFunction
+endfunction
 
-Procedure setFieldAndName ( Attribute, Field, Name )
+procedure setFieldAndName ( Attribute, Field, Name )
 	
 	synonym = Find ( Attribute, " as " );
 	if ( synonym = 0 ) then
@@ -59,9 +59,9 @@ Procedure setFieldAndName ( Attribute, Field, Name )
 		Name = Mid ( Attribute, synonym + 4 );
 	endif; 
 	
-EndProcedure
+endprocedure
 
-Function getFieldType ( Meta, Field )
+function getFieldType ( Meta, Field )
 	
 	currentMeta = Meta;
 	attributesArray = Conversion.StringToArray ( Field, "." );
@@ -94,9 +94,9 @@ Function getFieldType ( Meta, Field )
 	enddo; 
 	return currentType;
 
-EndFunction
+endfunction
 
-Function Pick ( val Ref, val Field, val Default = undefined ) export
+function Pick ( val Ref, val Field, val Default = undefined ) export
 	
 	if ( Default <> undefined
 		and Ref.IsEmpty () ) then
@@ -105,9 +105,9 @@ Function Pick ( val Ref, val Field, val Default = undefined ) export
 	name = fieldName ( Field );
 	return Values ( Ref, Field ) [ name ];
 	
-EndFunction
+endfunction
 
-Function fieldName ( Field )
+function fieldName ( Field )
 	
 	synonym = Find ( Field, " as " );
 	if ( synonym = 0 ) then
@@ -116,9 +116,9 @@ Function fieldName ( Field )
 		return Mid ( Field, synonym + 4 );
 	endif; 
 	
-EndFunction
+endfunction
 
-Function GetOriginal ( Exception, Field, Value, Owner = undefined ) export
+function GetOriginal ( Exception, Field, Value, Owner = undefined ) export
 	
 	if ( not ValueIsFilled ( Value ) ) then
 		return undefined;
@@ -140,4 +140,4 @@ Function GetOriginal ( Exception, Field, Value, Owner = undefined ) export
 	result = q.Execute ().Unload ();
 	return ? ( result.Count () = 0, undefined, result [ 0 ].Ref );
 		
-EndFunction
+endfunction

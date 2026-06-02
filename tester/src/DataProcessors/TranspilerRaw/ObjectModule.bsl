@@ -16,16 +16,16 @@ var TopDescriptor;
 var StackIndex;
 var Dictionary;
 
-Function Perform () export
+function Perform () export
 	
 	init ();
 	build ();
 	complete ();
 	return Script;
 	
-EndFunction
+endfunction
 
-Procedure init ()
+procedure init ()
 	
 	Program = new Array ();
 	Reader = new XMLReader ();
@@ -35,9 +35,9 @@ Procedure init ()
 	Reader.SetString ( Log );
 	fillDictionary ();
 
-EndProcedure 
+endprocedure 
 
-Procedure fillDictionary ()
+procedure fillDictionary ()
 	
 	Dictionary = new Map ();
 	Dictionary [ "Connect" ] = ? ( Lang = "en", "Connect", "Подключить" );
@@ -130,9 +130,9 @@ Procedure fillDictionary ()
 	Dictionary [ "Type" ] = ? ( Lang = "en", "Type", "Вид" );
 	Dictionary [ "clickFormattedStringHyperlink" ] = ? ( Lang = "en", "ClickFormattedStringHyperlink", "НажатьНаГиперссылкуВФорматированнойСтроке" );
 
-EndProcedure 
+endprocedure 
 
-Procedure build ()
+procedure build ()
 	
 	while ( read () ) do
 		if ( NodeComplete ) then
@@ -150,9 +150,9 @@ Procedure build ()
 		endif; 
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-Function read ()
+function read ()
 	
 	taken = Reader.Read ();
 	if ( taken ) then
@@ -163,16 +163,16 @@ Function read ()
 	endif; 
 	return taken;
 	
-EndFunction 
+endfunction 
 
-Function isMethod ()
+function isMethod ()
 	
 	k = Left ( Node, 1 );
 	return k = Lower ( k );
 	
-EndFunction 
+endfunction 
 
-Procedure callMethod ()
+procedure callMethod ()
 	
 	if ( Node = "uilog" ) then
 		if ( not NodeComplete
@@ -241,28 +241,28 @@ Procedure callMethod ()
 		endif; 
 	endif;
 
-EndProcedure 
+endprocedure 
 
-Procedure addRow ( Code )
+procedure addRow ( Code )
 	
 	Program.Add ( Code );
 
-EndProcedure 
+endprocedure 
 
-Function wrapAttribute ( Name )
+function wrapAttribute ( Name )
 	
 	return Conversion.Wrap ( Attributes [ Name ] );
 	
-EndFunction 
+endfunction 
 
-Function translate ( Text )
+function translate ( Text )
 	
 	result = Dictionary [ Text ];
 	return ? ( result = undefined, Text, result );
 	
-EndFunction 
+endfunction 
 
-Procedure applyRowTree ( Obj, Method, Expand )
+procedure applyRowTree ( Obj, Method, Expand )
 	
 	if ( NodeComplete ) then
 		currentRow = ( Node = LastNode );
@@ -285,9 +285,9 @@ Procedure applyRowTree ( Obj, Method, Expand )
 		addRow ( translate ( "search" ) + " = " + translate ( "new" ) + " " + translate ( "Map" ) + " ();" );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-Procedure applyCloseDropList ( Obj, Method )
+procedure applyCloseDropList ( Obj, Method )
 	
 	if ( SmartMode ) then
 		addRow ( translate ( "if" ) + " ( " + Obj + "." + translate ( "DropListIsOpen" ) + " () ) " + translate ( "then" ) );
@@ -297,9 +297,9 @@ Procedure applyCloseDropList ( Obj, Method )
 		addRow ( method + " ();" );
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-Procedure applyExecuteChoiceFromDropList ( Obj, Method )
+procedure applyExecuteChoiceFromDropList ( Obj, Method )
 	
 	if ( SmartMode ) then
 		if ( LastNode = "closeDropList" ) then
@@ -320,9 +320,9 @@ Procedure applyExecuteChoiceFromDropList ( Obj, Method )
 		addRow ( method + " ();" );
 	endif; 
 
-EndProcedure 
+endprocedure 
 
-Procedure pop ()
+procedure pop ()
 	
 	Stack.Delete ( StackIndex );
 	StackIndex = StackIndex - 1;
@@ -334,9 +334,9 @@ Procedure pop ()
 		endif; 
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Procedure defineVar ()
+procedure defineVar ()
 	
 	variable = Descriptor.Var;
 	if ( Node = "Field" ) then
@@ -361,9 +361,9 @@ Procedure defineVar ()
 		addRow ( expression + translate ( "GetObject" ) + " " + getObjectParams () + ";" );
 	endif;
 	
-EndProcedure 
+endprocedure 
 
-Function getObjectParams ()
+function getObjectParams ()
 	
 	list = new Array ();
 	list.Add ();
@@ -372,9 +372,9 @@ Function getObjectParams ()
 	params = paramsToString ( list );
 	return ? ( params = "", "()", "( " + params + " )" );
 	
-EndFunction 
+endfunction 
 
-Function paramsToString ( Params )
+function paramsToString ( Params )
 	
 	i = Params.Ubound ();
 	while ( i >= 0 ) do
@@ -392,9 +392,9 @@ Function paramsToString ( Params )
 	enddo; 
 	return StrConcat ( Params, ", " );
 	
-EndFunction 
+endfunction 
 
-Procedure push ()
+procedure push ()
 	
 	attributes = new Map ();
 	if ( Reader.AttributeCount () > 0 ) then
@@ -409,9 +409,9 @@ Procedure push ()
 	Stack.Add ( Descriptor );
 	StackIndex = StackIndex + 1;
 	
-EndProcedure 
+endprocedure 
 
-Function getVar ()
+function getVar ()
 	
 	i = StackIndex;
 	if ( i = -1 ) then
@@ -428,11 +428,11 @@ Function getVar ()
 		return translate ( Node ) + Format ( suffix, "NG=" );
 	endif; 
 
-EndFunction 
+endfunction 
 
-Procedure complete ()
+procedure complete ()
 	
 	addRow ( "" );
 	Script = StrConcat ( Program, Chars.LF );
 	
-EndProcedure 
+endprocedure 

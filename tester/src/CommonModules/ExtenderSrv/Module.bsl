@@ -1,36 +1,36 @@
 
-Function CallServer ( Debug, Scenario, Params = undefined, Application = undefined ) export
+function CallServer ( Debug, Scenario, Params = undefined, Application = undefined ) export
 	
 	return Runtime.Perform ( Scenario, Params, Application, false, Debug );
 	
-EndFunction
+endfunction
 
-Function ВызватьСервер ( Debug, Scenario, Params = undefined, Application = undefined ) export
+function ВызватьСервер ( Debug, Scenario, Params = undefined, Application = undefined ) export
 	
 	return CallServer ( Debug, Scenario, Params, Application );
 	
-EndFunction
+endfunction
 
-Function RunServer ( Debug, Scenario, Params = undefined, Application = undefined ) export
+function RunServer ( Debug, Scenario, Params = undefined, Application = undefined ) export
 	
 	return Runtime.Perform ( Scenario, Params, Application, true, Debug );
 	
-EndFunction
+endfunction
 
-Function ПозватьСервер ( Debug, Scenario, Params = undefined, Application = undefined ) export
+function ПозватьСервер ( Debug, Scenario, Params = undefined, Application = undefined ) export
 	
 	return RunServer ( Debug, Scenario, Params, Application );
 	
-EndFunction
+endfunction
 
-Procedure CheckTable ( Debug, Table, Standard, Params = undefined, Options = undefined ) export
+procedure CheckTable ( Debug, Table, Standard, Params = undefined, Options = undefined ) export
 	
 	TableProcessor.CompareVTAndTable ( Debug, Table, Standard, Params, Options );
 	
-EndProcedure 
+endprocedure 
 
-Procedure ПроверитьТаблицу ( Debug, Table, Standard, Params = undefined, Options = undefined ) export
+procedure ПроверитьТаблицу ( Debug, Table, Standard, Params = undefined, Options = undefined ) export
 	
 	CheckTable ( Debug, Table, Standard, Params, Options );
 	
-EndProcedure 
+endprocedure 

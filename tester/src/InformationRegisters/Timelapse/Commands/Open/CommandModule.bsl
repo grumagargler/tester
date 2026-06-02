@@ -1,6 +1,6 @@
 
-&AtClient
-Procedure CommandProcessing ( Source, ExecuteParameters )
+&atclient
+procedure CommandProcessing ( Source, ExecuteParameters )
 	
 	if ( TypeOf ( Source ) = Type ( "CatalogRef.ErrorLog" ) ) then
 		openByError ( Source, ExecuteParameters );
@@ -8,27 +8,27 @@ Procedure CommandProcessing ( Source, ExecuteParameters )
 		openByScenario ( Source, ExecuteParameters );
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openByError ( Error, ExecuteParameters )
+&atclient
+procedure openByError ( Error, ExecuteParameters )
 	
 	p = new Structure ( "Error", Error );
 	OpenForm ( "InformationRegister.Timelapse.Form.Form", p, executeParameters.Source, executeParameters.Uniqueness, executeParameters.Window, executeParameters.URL );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openByScenario ( Source, ExecuteParameters )
+&atclient
+procedure openByScenario ( Source, ExecuteParameters )
 	
 	p = new Structure ( "Scenario", Source );
 	callback = new NotifyDescription ( "SessionSelected", ThisObject, ExecuteParameters );
 	OpenForm ( "InformationRegister.Timelapse.Form.Sessions", p, ExecuteParameters.Source, ExecuteParameters.Uniqueness, ExecuteParameters.Window, ExecuteParameters.URL, callback );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure SessionSelected ( Value, Params ) export
+&atclient
+procedure SessionSelected ( Value, Params ) export
 	
 	if ( Value = undefined ) then
 		return;
@@ -39,4 +39,4 @@ Procedure SessionSelected ( Value, Params ) export
 	p.Insert ( "Date", Value.Started );
 	OpenForm ( "InformationRegister.Timelapse.Form.Form", p, Params.Source, Params.Uniqueness, Params.Window, Params.URL );
 	
-EndProcedure
+endprocedure

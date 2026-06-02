@@ -1,5 +1,5 @@
 
-Function Begin ( Node, Device, Incoming, Outgoing )
+function Begin ( Node, Device, Incoming, Outgoing )
 	
 	env = getEnv ( Node, Device, Incoming, Outgoing );
 	checkAccess ( env );
@@ -8,9 +8,9 @@ Function Begin ( Node, Device, Incoming, Outgoing )
 	SetPrivilegedMode ( false );
 	return error;
 	
-EndFunction
+endfunction
 
-Function getEnv ( Node, Device, Incoming, Outgoing )
+function getEnv ( Node, Device, Incoming, Outgoing )
 	
 	env = new Structure ();
 	env.Insert ( "Node", Node );
@@ -19,17 +19,17 @@ Function getEnv ( Node, Device, Incoming, Outgoing )
 	env.Insert ( "Outgoing", Outgoing );
 	return env;
 	
-EndFunction
+endfunction
 
-Procedure checkAccess ( Env )
+procedure checkAccess ( Env )
 	
 	if ( not AccessRight ( "Read", Metadata.ExchangePlans.Full ) ) then
 		raise Output.ExchangeReadDataError ( new Structure ( "User", SessionParameters.User ) );
 	endif;
 	
-EndProcedure
+endprocedure
 
-Function checkNodes ( Env )
+function checkNodes ( Env )
 	
 	error = true;
 	code = Env.Node;
@@ -48,9 +48,9 @@ Function checkNodes ( Env )
 	endif;
 	return error;
 	
-EndFunction
+endfunction
 
-Function createNodes ( Env )
+function createNodes ( Env )
 	
 	codes = createCodes ( Env );
 	full = ExchangePlans.Full.CreateNode ();
@@ -62,9 +62,9 @@ Function createNodes ( Env )
 	enrollNode ( full.Ref, Metadata.ExchangePlans.Full );
 	return codes;
 	
-EndFunction
+endfunction
 
-Function createCodes ( Env )
+function createCodes ( Env )
 	
 	BeginTransaction ( DataLockControlMode.Managed );
 	lock = new DataLock ();
@@ -82,17 +82,17 @@ Function createCodes ( Env )
 	codes.Insert ( "Full", Format ( full, "ND=" + meta.Full.CodeLength + "; NLZ=; NG=" ) );
 	return codes;
 	
-EndFunction
+endfunction
 
-Procedure enrollNode ( Node, Plan )
+procedure enrollNode ( Node, Plan )
 	
 	for each item in Plan.Content do
 		ExchangePlans.RecordChanges ( Node, item.Metadata );
 	enddo;
 	
-EndProcedure
+endprocedure
 
-Procedure resetNodes ( Node, Env  )
+procedure resetNodes ( Node, Env  )
 	
 	obj = Node.GetObject ();
 	if ( obj.DeletionMark ) then
@@ -110,9 +110,9 @@ Procedure resetNodes ( Node, Env  )
 	obj.Write ();
 	enrollNode ( obj.Ref, Metadata.ExchangePlans.Full );
 			
-EndProcedure
+endprocedure
 
-Function Read ( Node )
+function Read ( Node )
     
 	full = getNode ( Node );
 	if ( full.IsEmpty () ) then
@@ -120,7 +120,7 @@ Function Read ( Node )
 	endif;
     return getChanges ( full );	
 	
-EndFunction
+endfunction
 
 function getChanges ( Node )
 	
@@ -142,7 +142,7 @@ function getChanges ( Node )
 
 endfunction
 
-Procedure Write ( Node, Data, File )
+procedure Write ( Node, Data, File )
 	
 	id = getUUID ();
 	postfix = getPostFix ( id );
@@ -159,22 +159,22 @@ Procedure Write ( Node, Data, File )
 	Catalogs.Exchange.WriteAttributes ( full, new Structure ( "DateLoad", CurrentSessionDate () ) );
 	Exchange.EraseFile ( Mid ( folder, 1, ( StrLen ( folder ) - 1 ) ) );
 	
-EndProcedure
+endprocedure
 
-Function getPostFix ( ID )
+function getPostFix ( ID )
 	
 	return "ExchangeWebService_" + ID;
 	
-EndFunction 
+endfunction 
 
-Function getUUID ()
+function getUUID ()
 	
 	return String ( new UUID () ); 
 	
-EndFunction
+endfunction
 
-Function getNode ( Code )
+function getNode ( Code )
 	
 	return Catalogs.Exchange.FindByCode ( Code ); 
 
-EndFunction
+endfunction

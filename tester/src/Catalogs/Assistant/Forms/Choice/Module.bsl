@@ -1,37 +1,37 @@
-&AtClient
+&atclient
 var Reference;
-&AtClient
+&atclient
 var ReferenceCode;
-&AtClient
+&atclient
 var Buitin;
-&AtClient
+&atclient
 var AssistantRow;
-&AtClient
+&atclient
 var NavigationLink;
 
 // *****************************************
 // *********** Form events
 
-&AtServer
-Procedure OnCreateAtServer ( Cancel, StandardProcessing )
+&atserver
+procedure OnCreateAtServer ( Cancel, StandardProcessing )
 	
 	loadParams ();
 	setQuery ();
 	filterList ();
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Procedure loadParams ()
+&atserver
+procedure loadParams ()
 	
 	ControlName = Parameters.ControlName;
 	TypeFilter = Parameters.ControlType;
 	Picking = Parameters.Picking;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure setQuery ()
+&atserver
+procedure setQuery ()
 	
 	if ( CurrentLanguage () = Metadata.Languages.Russian ) then
 		callMethod = "Вызвать";
@@ -83,10 +83,10 @@ Procedure setQuery ()
 	DC.SetParameter ( List, "User", SessionParameters.User );
 	DC.SetParameter ( List, "Application", Parameters.Application );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getBuiltin ()
+&atserver
+function getBuiltin ()
 	
 	parts = new Array ();
 	t = Catalogs.Assistant.GetTemplate ( "Builtin" );
@@ -100,10 +100,10 @@ Function getBuiltin ()
 	enddo; 
 	return StrConcat ( parts, " union all " );
 	
-EndFunction 
+endfunction 
 
-&AtServer
-Procedure filterList ()
+&atserver
+procedure filterList ()
 	
 	filterByType ();
 	if ( not Picking ) then
@@ -111,10 +111,10 @@ Procedure filterList ()
 	endif; 
 	DC.ChangeFilter ( List, "Ref", Catalogs.Assistant.EmptyRef (), true );
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure filterByType ()
+&atserver
+procedure filterByType ()
 	
 	if ( not LastFilter.IsEmpty () ) then
 		DC.DeleteFilter ( List, getColumn ( LastFilter ) );
@@ -124,10 +124,10 @@ Procedure filterByType ()
 	endif; 
 	LastFilter = TypeFilter;
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Function getColumn ( Control )
+&atserver
+function getColumn ( Control )
 	
 	column = Conversion.EnumToName ( Control );
 	if ( column = "Group" ) then
@@ -135,39 +135,39 @@ Function getColumn ( Control )
 	endif; 
 	return column;
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure TypeFilterOnChange ( Item )
+&atclient
+procedure TypeFilterOnChange ( Item )
 	
 	filterByType ();
 	activateList ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure activateList ()
+&atclient
+procedure activateList ()
 	
 	CurrentItem = Items.List;
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure OnOpen ( Cancel )
+&atclient
+procedure OnOpen ( Cancel )
 	
 	startListener ();
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure startListener ()
+&atclient
+procedure startListener ()
 	
 	AttachIdleHandler ( "listener", 0.1, true );
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure listener ()
+&atclient
+procedure listener ()
 	
 	if ( AssistantRow <> Items.List.CurrentData ) then
 		readRow ();
@@ -183,10 +183,10 @@ Procedure listener ()
 	endif; 
 	startListener ();
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure readRow ()
+&atclient
+procedure readRow ()
 	
 	AssistantRow = Items.List.CurrentData;
 	if ( AssistantRow = undefined ) then
@@ -203,43 +203,43 @@ Procedure readRow ()
 		Buitin = false;
 	endif;
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure showExplanation ()
+&atclient
+procedure showExplanation ()
 	
 	Items.HelpPages.CurrentPage = Items.UserHelpPage;
 	HTML = "";
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure helpOnline ()
+&atclient
+procedure helpOnline ()
 	
 	Items.HelpPages.CurrentPage = Items.BuiltinHelpPage;
 	HTML = OnlineHelp.Href ( getLink () );
 				
-EndProcedure
+endprocedure
 
-&AtClient
-Function getLink ()
+&atclient
+function getLink ()
 	
 	return ? ( AssistantRow = undefined, "", Lower ( AssistantRow.Help ) );
 	
-EndFunction 
+endfunction 
 
 // *****************************************
 // *********** List
 
-&AtClient
-Procedure Create ( Command )
+&atclient
+procedure Create ( Command )
 	
 	openElement ( true );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openElement ( CreateNew )
+&atclient
+procedure openElement ( CreateNew )
 	
 	tableRow = Items.List.CurrentData;
 	ref = ? ( tableRow = undefined or CreateNew, PredefinedValue ( "Catalog.Assistant.EmptyRef" ), tableRow.Ref );
@@ -252,10 +252,10 @@ Procedure openElement ( CreateNew )
 		OpenForm ( form ( ref ), p, ThisObject, , , , new NotifyDescription ( "HintCreated", ThisObject ) );
 	endif; 
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Function form ( Ref )
+&atclient
+function form ( Ref )
 	
 	if ( TypeOf ( Ref ) = Type ( "CatalogRef.Scenarios" ) ) then
 		return "Catalog.Scenarios.ObjectForm";
@@ -263,24 +263,24 @@ Function form ( Ref )
 		return "Catalog.Assistant.ObjectForm";
 	endif; 
 	
-EndFunction 
+endfunction 
 
-&AtClient
-Procedure HintCreated ( Result, Params ) export
+&atclient
+procedure HintCreated ( Result, Params ) export
 	
 	Items.List.Refresh ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure Edit ( Command )
+&atclient
+procedure Edit ( Command )
 	
 	openElement ( false );
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure ListValueChoice ( Item, Value, StandardProcessing )
+&atclient
+procedure ListValueChoice ( Item, Value, StandardProcessing )
 	
 	StandardProcessing = false;
 	readRow ();
@@ -290,10 +290,10 @@ Procedure ListValueChoice ( Item, Value, StandardProcessing )
 		notifySelection ();
 	endif; 
 
-EndProcedure
+endprocedure
 
-&AtClient
-Procedure openParams ()
+&atclient
+procedure openParams ()
 	
 	data = Items.List.CurrentData;
 	if ( data.Help = "CheckTable"
@@ -306,28 +306,28 @@ Procedure openParams ()
 	endif;
 	OpenForm ( form, p, ThisObject, , , , new NotifyDescription ( "AssistantParams", ThisObject ) );
 
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure AssistantParams ( Details, Params ) export
+&atclient
+procedure AssistantParams ( Details, Params ) export
 	
 	if ( Details = undefined ) then
 		return;
 	endif; 
 	notifyOwner ( Details );	
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure notifyOwner ( Params )
+&atclient
+procedure notifyOwner ( Params )
 	
 	updateUsage ( Reference, ReferenceCode );
 	NotifyChoice ( Params );
 
-EndProcedure 
+endprocedure 
 
-&AtServerNoContext
-Procedure updateUsage ( val Reference, val Code )
+&atservernocontext
+procedure updateUsage ( val Reference, val Code )
 	
 	r = InformationRegisters.Usage.CreateRecordManager ();
 	r.User = SessionParameters.User;
@@ -336,10 +336,10 @@ Procedure updateUsage ( val Reference, val Code )
 	r.Date = CurrentSessionDate ();
 	r.Write ();
 	
-EndProcedure 
+endprocedure 
 
-&AtClient
-Procedure notifySelection ()
+&atclient
+procedure notifySelection ()
 	
 	data = Items.List.CurrentData;
 	value = data.Body;
@@ -348,13 +348,13 @@ Procedure notifySelection ()
 	endif;
 	notifyOwner ( value );
 		
-EndProcedure 
+endprocedure 
 
 // *****************************************
 // *********** HTML
 
-&AtClient
-Procedure HTMLDocumentComplete ( Item )
+&atclient
+procedure HTMLDocumentComplete ( Item )
 	
 	if ( Framework.VersionLess ( "8.3.14" ) ) then
 		return;
@@ -366,4 +366,4 @@ Procedure HTMLDocumentComplete ( Item )
 	NavigationLink = newLink;
 	Item.Document.location.hash = "#" + newLink;
 
-EndProcedure
+endprocedure

@@ -1,7 +1,7 @@
 
-&AtClient
-Procedure CommandProcessing ( Scenario, CommandExecuteParameters )
+&atclient
+procedure CommandProcessing ( Scenario, CommandExecuteParameters )
 	
 	Notify ( Enum.MessageRunExternally (), Scenario );
 	
-EndProcedure
+endprocedure

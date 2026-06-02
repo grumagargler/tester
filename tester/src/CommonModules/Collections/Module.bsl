@@ -1,15 +1,15 @@
 
-&AtServer
-Procedure Sort ( A ) export
+&atserver
+procedure Sort ( A ) export
 	
 	list = new ValueList ();
 	list.LoadValues ( A );
 	list.SortByValue ();
 	A = list.UnloadValues ();
 	
-EndProcedure 
+endprocedure 
 
-Procedure Group ( A ) export
+procedure Group ( A ) export
 
 	groupped = new Array ();
 	for each item in A do
@@ -19,10 +19,10 @@ Procedure Group ( A ) export
 	enddo; 
 	A = groupped;
 	
-EndProcedure
+endprocedure
 
-&AtServer
-Function Serialize ( Table ) export
+&atserver
+function Serialize ( Table ) export
 	
 	result = new Structure ();
 	colums = new Array ();
@@ -39,10 +39,10 @@ Function Serialize ( Table ) export
 	result.Insert ( "_Columns", colums );
 	return result;
 	
-EndFunction
+endfunction
 
-&AtClient
-Function DeserializeTable ( SerializedTable ) export
+&atclient
+function DeserializeTable ( SerializedTable ) export
 	
 	result = new Array ();
 	a = SerializedTable._Columns;
@@ -56,19 +56,19 @@ Function DeserializeTable ( SerializedTable ) export
 	enddo; 
 	return result;
 	
-EndFunction
+endfunction
 
-&AtClient
-Procedure deserializeTableRow ( Row, SerializedTable, Index ) export
+&atclient
+procedure deserializeTableRow ( Row, SerializedTable, Index ) export
 	
 	for each column in SerializedTable._Columns do
 		Row [ column ] = SerializedTable [ column ] [ Index ];
 	enddo; 
 	
-EndProcedure 
+endprocedure 
 
-&AtServer
-Procedure Join ( Table1, Table2 ) export
+&atserver
+procedure Join ( Table1, Table2 ) export
 	
 	if ( TypeOf ( Table1 ) = Type ( "ValueTable" ) ) then
 		if ( Table1.Columns.Count () = 0 ) then
@@ -80,10 +80,10 @@ Procedure Join ( Table1, Table2 ) export
 		FillPropertyValues ( newRow, row );
 	enddo; 
 	
-EndProcedure
+endprocedure
 
-&AtClient
-Function CopyStructure ( Struct ) export
+&atclient
+function CopyStructure ( Struct ) export
 
 	newStructure = new Structure ();
 	for each item in Struct do
@@ -91,4 +91,4 @@ Function CopyStructure ( Struct ) export
 	enddo; 
 	return newStructure;
 		
-EndFunction 
+endfunction 

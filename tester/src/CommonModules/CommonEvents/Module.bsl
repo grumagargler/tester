@@ -1,5 +1,5 @@
 
-Procedure CheckDoubles ( Source, Cancel, CheckedAttributes ) export
+procedure CheckDoubles ( Source, Cancel, CheckedAttributes ) export
 	
 	if ( IsInRole ( Metadata.Roles.DoublesAllowed ) ) then
 		return;
@@ -14,9 +14,9 @@ Procedure CheckDoubles ( Source, Cancel, CheckedAttributes ) export
 	Cancel = true;
 	Output.ObjectNotOriginal ( new Structure ( "Value", Source.Description ), "Description" );
 	
-EndProcedure
+endprocedure
 
-Function exception ( Source )
+function exception ( Source )
 	
 	type = TypeOf ( Source );
 	return type = Type ( "CatalogObject.ReportSettings" )
@@ -28,9 +28,9 @@ Function exception ( Source )
 	or type = Type ( "CatalogObject.Versions" )
 	or type = Type ( "CatalogObject.Users" );
 
-EndFunction 
+endfunction 
 
-Function getOwner ( Source )
+function getOwner ( Source )
 	
 	meta = Source.Metadata ();
 	if ( Metadata.Catalogs.Contains ( meta )
@@ -40,4 +40,4 @@ Function getOwner ( Source )
 		return undefined;
 	endif; 
 
-EndFunction 
+endfunction 
