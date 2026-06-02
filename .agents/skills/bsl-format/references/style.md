@@ -1,11 +1,11 @@
 # Project BSL Style
 
 Sources checked (representative):
-- /home/dmitry/git/n5/src/CommonModules/DocumentPresenter/Module.bsl
-- /home/dmitry/git/n5/src/CommonModules/PaymentsTable/Module.bsl
-- /home/dmitry/git/n5/src/Documents/Invoice/ObjectModule.bsl
-- /home/dmitry/git/n5/src/Documents/CashReceipt/ManagerModule.bsl
-- /home/dmitry/git/n5/src/CommonModules/Output/Module.bsl
+- tester/src/CommonModules/Output/Module.bsl
+- tester/src/CommonModules/Collections/Module.bsl
+- tester/src/CommonModules/SQL/Module.bsl
+- tester/src/CommonForms/Report/Module.bsl
+- tester/src/Documents/Job/ObjectModule.bsl
 
 ## Keywords and casing
 - Use lowercase for control-flow and other keywords: procedure, function, endprocedure, endfunction, if, then, elsif, else, endif, for each, enddo, while, do, return, continue, break, and, or, not, true, false, undefined, null, new, var, export, val.
@@ -37,12 +37,8 @@ Sources checked (representative):
 - Line comments use //; inline comments are preceded by a space before //.
 - Query strings use the `|` prefix on each line; keep `|` at the start of the string line, aligned with surrounding query blocks.
 
-## Outliers
-- n5/src/DataProcessors/StandardEventLog/... and some test scripts use a different style (PascalCase keywords, no spaces in calls).
-- Preserve the file's existing style when it clearly follows that outlier pattern, unless explicitly asked to normalize to the project default.
-
 ## EDT formatter settings (source of truth)
-File: n5/.settings/com.e1c.g5.v8.dt.formatter.bsl.prefs
+File: tester/.settings/com.e1c.g5.v8.dt.formatter.bsl.prefs
 Key values:
 - spacesForTabs=false (tabs for indent)
 - indentMethodInternal=true
