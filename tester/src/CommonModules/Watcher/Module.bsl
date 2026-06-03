@@ -392,8 +392,8 @@ endprocedure
 
 procedure proceedChanging ( File )
 
-	if ( unchanged ( File )
-		or not validFile ( File, false ) ) then
+	if ( not validFile ( File, false )
+		or unchanged ( File ) ) then
 		return;
 	endif;
 	TesterExternalRequestsApplication = FindApplication ( File );
@@ -415,8 +415,13 @@ endprocedure
 
 function unchanged ( File )
 
-	external = Number ( ExternalLibrary.GetHash ( File ) );
-	internal = WatcherSrv.GetContent ( Number ( ExternalLibrary.GetStringHash ( File, false ) ) );
+	try
+		external = Number ( ExternalLibrary.GetHash ( File ) );
+		internal = WatcherSrv.GetContent ( Number ( ExternalLibrary.GetStringHash ( File, false ) ) );
+	except
+		entry = new File ( File );
+		return not entry.Exist ();
+	endtry;
 	return external = internal;
 
 endfunction
