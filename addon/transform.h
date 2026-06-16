@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <numeric>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace strings {
@@ -29,4 +30,8 @@ std::string concat ( const Collection& collection, const std::string& splitter,
 }
 
 std::string lower ( const std::string& str );
+std::wstring toNumber ( std::wstring_view string, wchar_t decimalSeparator,
+												wchar_t groupSeparator );
+bool isNumber ( std::wstring_view string, wchar_t decimalSeparator,
+								wchar_t groupSeparator );
 }

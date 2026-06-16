@@ -535,6 +535,66 @@ function КСтроке ( Table, Column, Value, FromStart = true, Source = undef
 endfunction
 
 &atclient
+procedure GotoFirstRow ( Table, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.NavigateToTableRow ( Table, Source, "First" );
+
+endprocedure
+
+&atclient
+procedure ПерейтиКПервойСтроке ( Table, Source = undefined ) export
+
+	GotoFirstRow ( Table, Source );
+
+endprocedure
+
+&atclient
+procedure GotoLastRow ( Table, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.NavigateToTableRow ( Table, Source, "Last" );
+
+endprocedure
+
+&atclient
+procedure ПерейтиКПоследнейСтроке ( Table, Source = undefined ) export
+
+	GotoLastRow ( Table, Source );
+
+endprocedure
+
+&atclient
+procedure GotoNextRow ( Table, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.NavigateToTableRow ( Table, Source, "Next" );
+
+endprocedure
+
+&atclient
+procedure ПерейтиКСледующейСтроке ( Table, Source = undefined ) export
+
+	GotoNextRow ( Table, Source );
+
+endprocedure
+
+&atclient
+procedure GotoPreviousRow ( Table, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.NavigateToTableRow ( Table, Source, "Previous" );
+
+endprocedure
+
+&atclient
+procedure ПерейтиКПредыдущейСтроке ( Table, Source = undefined ) export
+
+	GotoPreviousRow ( Table, Source );
+
+endprocedure
+
+&atclient
 function Commando ( Action, Activate = true ) export
 	
 	Test.CheckConnection ();
@@ -994,6 +1054,64 @@ function ВнестиЗначение ( Name, Value ) export
 	return EnterValue ( Name, Value );
 
 endfunction
+
+&atclient
+procedure ExpandTreeRow ( Table, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.SetTreeRow ( Table, Source, false );
+
+endprocedure
+
+&atclient
+procedure РаскрытьСтрокуДерева ( Table, Source = undefined ) export
+
+	ExpandTreeRow ( Table, Source );
+
+endprocedure
+
+&atclient
+procedure CollapseTreeRow ( Table, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.SetTreeRow ( Table, Source, true );
+
+endprocedure
+
+&atclient
+procedure СвернутьСтрокуДерева ( Table, Source = undefined ) export
+
+	CollapseTreeRow ( Table, Source );
+
+endprocedure
+
+&atclient
+procedure GoOneLevelDown ( Table, Source = undefined ) export
+
+	Fields.GotoTableLevel ( Table, Source, 1 );
+
+endprocedure
+
+&atclient
+procedure ПерейтиНаУровеньНиже ( Table, Source = undefined ) export
+
+	GoOneLevelDown ( Table, Source );
+
+endprocedure
+
+&atclient
+procedure GoOneLevelUp ( Table, Source = undefined ) export
+
+	Fields.GotoTableLevel ( Table, Source, -1 );
+
+endprocedure
+
+&atclient
+procedure ПерейтиНаУровеньВыше ( Table, Source = undefined ) export
+
+	GoOneLevelUp ( Table, Source );
+
+endprocedure
 
 #if ( not webclient ) then
 

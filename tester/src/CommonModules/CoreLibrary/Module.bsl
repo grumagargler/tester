@@ -68,4 +68,3 @@ function GetStringHash ( String, AddBOM ) export
 	return module ().GetLibrary ( "Root" ).GetStringHash ( String, AddBOM );
 
 endfunction
-

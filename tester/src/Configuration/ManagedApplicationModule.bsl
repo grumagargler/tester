@@ -90,6 +90,7 @@ var MCPRequestProcessing export;
 var LastScenarioReturn export;
 var RepositoryFilesSynchingCallback export;
 var LastActiveWindowControls export;
+var LatestSeparatorsInfo export;
 var CachedControlTooltips export;
 
 procedure BeforeStart ( Cancel )

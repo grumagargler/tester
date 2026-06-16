@@ -5,17 +5,19 @@
 #include <utility>
 #include <vector>
 
-namespace tooltips_internal {
+namespace metadata::internal {
 enum class MetadataFamily {
 	Catalog,
 	ExchangePlan,
 	Document,
+	CommonForm,
 	ChartOfAccounts,
 	BusinessProcess,
 	ChartOfCharacteristicTypes,
 	ChartOfCalculationTypes,
 	Task,
 	InformationRegister,
+	DataProcessor,
 	Unknown
 };
 
@@ -24,13 +26,14 @@ struct MetadataType {
 	std::string name;
 };
 
+struct MetadataField {
+	std::string tooltip, type, fillChecking;
+};
+
 struct FormAttribute {
 	std::vector<std::string> types;
 	std::string mainTable;
-};
-
-struct MetadataField {
-	std::string tooltip, type;
+	MetadataField field;
 };
 
 struct MetadataDescription {
@@ -53,26 +56,30 @@ inline const std::unordered_map<std::string, MetadataFamily> FormKinds {
 		{ "ПланОбмена", MetadataFamily::ExchangePlan },
 		{ "Document", MetadataFamily::Document },
 		{ "Документ", MetadataFamily::Document },
+		{ "CommonForm", MetadataFamily::CommonForm },
+		{ "ОбщаяФорма", MetadataFamily::CommonForm },
 		{ "ChartOfAccounts", MetadataFamily::ChartOfAccounts },
 		{ "ПланСчетов", MetadataFamily::ChartOfAccounts },
 		{ "BusinessProcess", MetadataFamily::BusinessProcess },
 		{ "БизнесПроцесс", MetadataFamily::BusinessProcess },
 		{ "ChartOfCharacteristicTypes",
 			MetadataFamily::ChartOfCharacteristicTypes },
-		{ "ПланВидовХарактеристик",
-			MetadataFamily::ChartOfCharacteristicTypes },
+		{ "ПланВидовХарактеристик", MetadataFamily::ChartOfCharacteristicTypes },
 		{ "ChartOfCalculationTypes", MetadataFamily::ChartOfCalculationTypes },
 		{ "ПланВидовРасчета", MetadataFamily::ChartOfCalculationTypes },
 		{ "Task", MetadataFamily::Task },
 		{ "Задача", MetadataFamily::Task },
 		{ "InformationRegister", MetadataFamily::InformationRegister },
 		{ "РегистрСведений", MetadataFamily::InformationRegister },
+		{ "DataProcessor", MetadataFamily::DataProcessor },
+		{ "Обработка", MetadataFamily::DataProcessor },
 };
 
 inline const std::unordered_map<MetadataFamily, std::string> SourceFolders {
 		{ MetadataFamily::Catalog, "Catalogs" },
 		{ MetadataFamily::ExchangePlan, "ExchangePlans" },
 		{ MetadataFamily::Document, "Documents" },
+		{ MetadataFamily::CommonForm, "CommonForms" },
 		{ MetadataFamily::ChartOfAccounts, "ChartsOfAccounts" },
 		{ MetadataFamily::BusinessProcess, "BusinessProcesses" },
 		{ MetadataFamily::ChartOfCharacteristicTypes,
@@ -80,6 +87,7 @@ inline const std::unordered_map<MetadataFamily, std::string> SourceFolders {
 		{ MetadataFamily::ChartOfCalculationTypes, "ChartsOfCalculationTypes" },
 		{ MetadataFamily::Task, "Tasks" },
 		{ MetadataFamily::InformationRegister, "InformationRegisters" },
+		{ MetadataFamily::DataProcessor, "DataProcessors" },
 };
 
 inline const std::unordered_map<MetadataFamily, std::string> ReferencePrefixes {
@@ -93,6 +101,7 @@ inline const std::unordered_map<MetadataFamily, std::string> ReferencePrefixes {
 		{ MetadataFamily::ChartOfCalculationTypes, "ChartOfCalculationTypesRef." },
 		{ MetadataFamily::Task, "TaskRef." },
 		{ MetadataFamily::InformationRegister, "InformationRegisterRecordKey." },
+		{ MetadataFamily::DataProcessor, "DataProcessorObject." },
 };
 
 inline const std::unordered_map<MetadataFamily, std::vector<std::string>>
@@ -183,6 +192,9 @@ inline const std::vector<std::pair<std::string, MetadataFamily>> TypePrefixes {
 		{ "CatalogList.", MetadataFamily::Catalog },
 		{ "CatalogManager.", MetadataFamily::Catalog },
 		{ "Catalog.", MetadataFamily::Catalog },
+		{ "DataProcessorObject.", MetadataFamily::DataProcessor },
+		{ "DataProcessorManager.", MetadataFamily::DataProcessor },
+		{ "DataProcessor.", MetadataFamily::DataProcessor },
 		{ "TaskObject.", MetadataFamily::Task },
 		{ "TaskRef.", MetadataFamily::Task },
 		{ "TaskSelection.", MetadataFamily::Task },

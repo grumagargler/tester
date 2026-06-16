@@ -2491,3 +2491,45 @@ function UnloadingFilesCheckFillingError () export
 	return NStr ( "en = 'CheckFilling() of data processor Unload returned an error. Please try to sync files manually'; ru = 'ПроверкаЗаполнения() обработчика данных Выгрузка вернул ошибку. Пожалуйста, попробуйте синхронизировать файлы вручную'" );
 
 endfunction
+
+function ValuesListFieldHint ( Params ) export
+
+	text = NStr ( "en = 'This field represents a list of values. To change the list of values, use the Choose(""%Name"") method';ru = 'Это поле представляет собой список значений. Для изменения списка значений используйте метод Выбрать(""%Name"").'" );
+	return Sformat ( text, Params );
+
+endfunction
+
+&atclient
+function GotoNextRowFailed () export
+
+	return NStr ( "en = 'Failed to navigate to the next table row. The current row is probably already the last, or the table is empty or inaccessible';ru = 'Не удалось перейти к следующей строке таблицы. Вероятно, текущая строка уже является последней, либо таблица пуста или недоступна'" );
+
+endfunction
+
+&atclient
+function GotoPreviousRowFailed () export
+
+	return NStr ( "en = 'Failed to navigate to the previous table row. The current row is probably already the first, or the table is empty or inaccessible';ru = 'Не удалось перейти к предыдущей строке таблицы. Вероятно, текущая строка уже является первой, либо таблица пуста или недоступна'" );
+
+endfunction
+
+&atclient
+function TableRowIsNotExpandable () export
+
+	return NStr ( "en = 'The current table row is not expandable';ru = 'Текущая строка таблицы не является раскрываемой'" );
+
+endfunction
+
+&atclient
+function GoOneLevelDownFailed () export
+
+	return NStr ( "en = 'Failed to go to the lower level. The current row is probably already the innermost, or the table is empty or inaccessible';ru = 'Не удалось перейти на уровень ниже. Текущая строка, вероятно, уже является самой вложенной, либо таблица пуста или недоступна'" );
+
+endfunction
+
+&atclient
+function GoOneLevelUpFailed () export
+
+	return NStr ( "en = 'Failed to move to the upper level. The current row is probably already the root, or the table is empty or unavailable';ru = 'Не удалось перейти на уровень выше. Текущая строка, вероятно, уже корневая, либо таблица пуста или недоступна'" );
+
+endfunction

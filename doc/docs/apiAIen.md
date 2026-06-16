@@ -359,6 +359,18 @@ Comparing the value displayed in the field with the value passed to the method i
 
 In some cases, using this method is the only solution due to the specific behavior of the [Set](#set) method when the focus transitions between a field and a table, or a field in a table row. The specificity is that in some cases, the platform skips the value set by the [Set](#set) method, which leads to unplanned behavior. In such cases, you can use the `Put` method, which will reliably force the platform to select a value in the field.
 
+## EnterValue
+
+`Object = EnterValue ( Name, Value )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Object|Tested object|The found tested object according to the provided parameters.|
+|Name|String|Identifier or title of a field in the current form|
+|Value|String|The value to enter|
+
+Short form for entering a value in a field of the current form. The method waits for a dropdown choice and checks the resulting value. After calling this method, analyze the window state again, for example with `GetActiveWindowChanges`.
+
 ## Clear
 
 `Object = Clear ( Name, Source = undefined, Type = undefined )`
@@ -729,14 +741,31 @@ Examples:
 
 | Parameter | Type | Value |
 | --------- | ---- | ----- |
-|controls|Array|Hierarchical array of visual controls from the active window|
+|controls|Structure|Hierarchical structure of visual controls from the active window|
 
-Returns a tree of controls from only the active window of the tested application. Array elements contain standard fields `Type`, `Name`, `TitleText`, and, if child controls exist, the `ChildObjects` field.
+Returns a tree of controls from only the active window of the tested application. The top-level result is usually the form structure. Elements contain the standard fields `Type`, `Name`, `TitleText`; child controls are stored in `Items`, and table columns are stored in `Columns`.
+
+When tested-client data and form metadata are available, elements can also contain `ToolTip`, `DataType`, `Value`, `Mandatory`, `ReadOnly`, `InputHint`, `WarningOnEdit`, `DropList`, `Rows`, `RowCount`, `CurrentRowData`, `CurrentColumn`, `TableIsTree`, `TableIsHierarchicalList`, and other form state fields.
 
 Example:
 
     controls = GetActiveWindowControls ();
     return controls;
+
+## GetActiveWindowChanges
+
+`changes = GetActiveWindowChanges ()`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|changes|Structure|Changes in active-window controls since the previous snapshot|
+
+Returns active-window changes after the previous `GetActiveWindowControls` or `GetActiveWindowChanges` call. If this is the first snapshot or the active form changed completely, returns the full control tree. The element format is the same as in `GetActiveWindowControls`.
+
+Example:
+
+    Click ( "#FormCreate" );
+    return GetActiveWindowChanges ();
 
 ## GetMainMenu
 
@@ -755,6 +784,30 @@ Example:
 
     menu = GetMainMenu ();
     return menu;
+
+## GetTableContent
+
+`data = GetTableContent ( Name, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|data|Array|Rows of the active form table|
+|Name|String|Identifier or title of a table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Returns the visible table content as an array of structures. If the table is too large, filter it first or export it to a spreadsheet document.
+
+## GetSpreadsheetContent
+
+`file = GetSpreadsheetContent ( Name, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|file|String|Path to a temporary xlsx file|
+|Name|String|Identifier or title of a spreadsheet document field|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Saves a spreadsheet document to a temporary xlsx file and returns its path. The method is unavailable in the web client.
 
 ## GetMessages
 
@@ -860,6 +913,94 @@ Examples:
     GotoRow ( "!Folders", "Name", "Memos" );
     Pause ( 1 );
     GotoRow ( "!List", "Name", "On allocating a personal telephone set" );
+
+## GotoFirstRow
+
+`GotoFirstRow ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of the table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Navigates to the first table row.
+
+## GotoLastRow
+
+`GotoLastRow ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of the table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Navigates to the last table row.
+
+## GotoNextRow
+
+`GotoNextRow ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of the table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Navigates to the next table row. Throws an exception if navigation is impossible.
+
+## GotoPreviousRow
+
+`GotoPreviousRow ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of the table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Navigates to the previous table row. Throws an exception if navigation is impossible.
+
+## ExpandTreeRow
+
+`ExpandTreeRow ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of a tree table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Expands the current tree-table row without changing the current row.
+
+## CollapseTreeRow
+
+`CollapseTreeRow ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of a tree table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Collapses the current tree-table row without changing the current row.
+
+## GoOneLevelDown
+
+`GoOneLevelDown ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of a hierarchical table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Goes one level down from the current row of a hierarchical list or tree table.
+
+## GoOneLevelUp
+
+`GoOneLevelUp ( Table, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Table|String \| TestedFormTable|Identifier, title, or object of a hierarchical table|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentObject](#currentsource) will be used as the source.|
+
+Goes one level up in a hierarchical list or tree table.
 
 ## Commando
 

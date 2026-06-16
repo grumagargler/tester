@@ -15,6 +15,11 @@ private:
 	bool shoot ( tVariant* Params, tVariant* Result );
 	bool getHash ( tVariant* Params, tVariant* Result );
 	bool getStringHash ( tVariant* Params, tVariant* Result );
+	bool normalizeNumber ( tVariant* Params, tVariant* Result );
+	bool isNumber ( tVariant* Params, tVariant* Result );
+	bool readNumberParams ( tVariant* Params, std::wstring& string,
+													wchar_t& decimalDelimiter,
+													wchar_t& groupDelimiter );
 	bool compareJSON ( tVariant* Params, tVariant* Result );
 	bool maximize ( tVariant* Params );
 	bool minimize ( tVariant* Params );

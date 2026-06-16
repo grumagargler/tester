@@ -1,6 +1,5 @@
-#include "tooltips.h"
-#include "tooltips_designer.h"
-#include "tooltips_internal.h"
+#include "edt.h"
+#include "internal.h"
 #include "transform.h"
 #include <algorithm>
 #include <filesystem>
@@ -16,15 +15,19 @@
 
 namespace {
 using Json = nlohmann::ordered_json;
-using namespace tooltips_internal;
-
-bool designerSources ( const std::string& sources ) {
-	return std::filesystem::exists ( std::filesystem::path { sources } /
-																	 "Configuration.xml" );
-}
+using namespace metadata::internal;
+using FormColumns =
+		std::unordered_map<std::string,
+											 std::unordered_map<std::string, MetadataField>>;
+constexpr const char* DefaultFillChecking = "DontCheck";
 
 std::string trim ( const pugi::xml_node& node ) {
 	return strings::trim ( node.text ().as_string () );
+}
+
+std::string fillCheckingValue ( const pugi::xml_node& node, const char* tag ) {
+	const auto value = trim ( node.child ( tag ) );
+	return value.empty () ? DefaultFillChecking : value;
 }
 
 std::string localizedValue ( const pugi::xml_node& node, std::string_view tag,
@@ -35,6 +38,15 @@ std::string localizedValue ( const pugi::xml_node& node, std::string_view tag,
 		}
 	}
 	return {};
+}
+
+std::string localizedFormValue ( const pugi::xml_node& node,
+																 const std::string& language ) {
+	auto value = localizedValue ( node, "toolTip", language );
+	if ( value.empty () ) {
+		value = localizedValue ( node, "title", language );
+	}
+	return value;
 }
 
 std::vector<std::string> typeValues ( const pugi::xml_node& node ) {
@@ -135,18 +147,18 @@ public:
 private:
 	std::shared_ptr<const pugi::xml_document>
 	loadDocument ( const std::filesystem::path& path ) {
-		const auto key = path.lexically_normal ().string ();
+		const auto key = path.string ();
 		if ( const auto found = documents.find ( key );
 				 found != documents.end () ) {
 			return found->second;
 		}
 		auto document = std::make_shared<pugi::xml_document> ();
-		if ( !document->load_file ( path.c_str () ) ) {
-			documents [ key ] = nullptr;
-			return nullptr;
+		if ( document->load_file ( path.c_str () ) ) {
+			documents [ key ] = document;
+			return document;
 		}
-		documents [ key ] = document;
-		return document;
+		documents [ key ] = nullptr;
+		return nullptr;
 	}
 
 	std::filesystem::path metadataPath ( const MetadataType& type ) const {
@@ -197,8 +209,11 @@ private:
 			if ( type == "Number" ) {
 				const auto qualifiers = node.child ( "numberQualifiers" );
 				const auto precision = trim ( qualifiers.child ( "precision" ) );
-				const auto scale = trim ( qualifiers.child ( "scale" ) );
-				if ( !precision.empty () && !scale.empty () ) {
+				auto scale = trim ( qualifiers.child ( "scale" ) );
+				if ( !precision.empty () ) {
+					if ( scale.empty () ) {
+						scale = "0";
+					}
 					value += "(" + precision + "," + scale + ")";
 				}
 			} else if ( type == "String" ) {
@@ -351,7 +366,8 @@ private:
 			const auto type = formatType ( child.child ( "type" ) );
 			addField ( fields, name,
 								 MetadataField { localizedValue ( child, "toolTip", language ),
-																 type } );
+															 type,
+															 fillCheckingValue ( child, "fillChecking" ) } );
 		}
 	}
 
@@ -367,7 +383,8 @@ private:
 					fields, name,
 					MetadataField { localizedValue ( child, "toolTip", language ),
 													standardAttributeType ( type, metadataRoot, name,
-																									child, tableName ) } );
+																									child, tableName ),
+													fillCheckingValue ( child, "fillChecking" ) } );
 		}
 	}
 
@@ -384,7 +401,8 @@ private:
 			}
 			addField (
 					fields, name,
-					MetadataField { "", standardAttributeType ( type, root, name ) } );
+					MetadataField { "", standardAttributeType ( type, root, name ),
+													DefaultFillChecking } );
 		}
 	}
 
@@ -444,7 +462,8 @@ std::optional<MetadataType> formMetadataType ( const std::string& formName ) {
 }
 
 std::unordered_map<std::string, FormAttribute>
-formAttributes ( const pugi::xml_node& root ) {
+formAttributes ( const pugi::xml_node& root, Repository& repository,
+								 const std::string& language ) {
 	std::unordered_map<std::string, FormAttribute> result;
 	for ( const auto& attribute : root.children ( "attributes" ) ) {
 		const auto name = trim ( attribute.child ( "name" ) );
@@ -455,17 +474,70 @@ formAttributes ( const pugi::xml_node& root ) {
 		value.types = typeValues ( attribute.child ( "valueType" ) );
 		value.mainTable =
 				trim ( attribute.child ( "extInfo" ).child ( "mainTable" ) );
+		value.field = MetadataField {
+				localizedFormValue ( attribute, language ),
+				repository.formatType ( attribute.child ( "valueType" ) ),
+				fillCheckingValue ( attribute, "fillChecking" ),
+		};
+	}
+	return result;
+}
+
+void addFormColumn ( FormColumns& result, const std::string& tablePath,
+										 const std::string& name, MetadataField field ) {
+	if ( tablePath.empty () || name.empty () || field.type.empty () ) {
+		return;
+	}
+	result [ tablePath ].try_emplace ( name, std::move ( field ) );
+}
+
+void collectFormColumns ( FormColumns& result, const std::string& tablePath,
+													const pugi::xml_node& owner,
+													Repository& repository,
+													const std::string& language ) {
+	for ( const auto& column : owner.children ( "columns" ) ) {
+		const auto name = trim ( column.child ( "name" ) );
+		addFormColumn (
+				result, tablePath, name,
+				MetadataField { localizedFormValue ( column, language ),
+												repository.formatType ( column.child ( "valueType" ) ),
+												fillCheckingValue ( column, "fillChecking" ) } );
+	}
+}
+
+FormColumns formColumns ( const pugi::xml_node& root, Repository& repository,
+													const std::string& language ) {
+	FormColumns result;
+	for ( const auto& attribute : root.children ( "attributes" ) ) {
+		const auto name = trim ( attribute.child ( "name" ) );
+		collectFormColumns ( result, name, attribute, repository, language );
+		for ( const auto& additional : attribute.children ( "additionalColumns" ) ) {
+			auto tablePath = trim ( additional.child ( "tablePath" ).child (
+					"segments" ) );
+			if ( tablePath.empty () ) {
+				tablePath = trim ( additional.child ( "tablePath" ) );
+			}
+			collectFormColumns ( result, tablePath, additional, repository,
+													 language );
+		}
 	}
 	return result;
 }
 
 std::optional<ParsedPath> parsePath ( const std::string& path ) {
 	const auto parts = strings::split ( path, "." );
+	if ( parts.size () == 1 ) {
+		return ParsedPath { parts [ 0 ], {}, std::nullopt };
+	}
 	if ( parts.size () == 2 ) {
 		return ParsedPath { parts [ 0 ], parts [ 1 ], std::nullopt };
 	}
 	if ( parts.size () == 3 ) {
 		return ParsedPath { parts [ 0 ], parts [ 1 ], parts [ 2 ] };
+	}
+	if ( parts.size () == 4 && parts [ 0 ] == "Items" &&
+			 parts [ 2 ] == "CurrentData" ) {
+		return ParsedPath { parts [ 1 ], parts [ 3 ], std::nullopt };
 	}
 	return std::nullopt;
 }
@@ -501,9 +573,47 @@ bool hasType ( const pugi::xml_node& node, std::string_view type ) {
 }
 
 const MetadataField*
+resolveFormColumn ( const ParsedPath& path, const FormColumns& formColumns ) {
+	auto tablePath = path.source;
+	auto fieldName = path.member;
+	if ( path.field.has_value () ) {
+		tablePath += "." + path.member;
+		fieldName = *path.field;
+	}
+	const auto table = formColumns.find ( tablePath );
+	if ( table == formColumns.end () ) {
+		return nullptr;
+	}
+	const auto field = table->second.find ( fieldName );
+	if ( field == table->second.end () ) {
+		return nullptr;
+	}
+	return &field->second;
+}
+
+const MetadataField* resolveFormAttribute (
+		const ParsedPath& path,
+		const std::unordered_map<std::string, FormAttribute>& attributes ) {
+	if ( !path.member.empty () || path.field.has_value () ) {
+		return nullptr;
+	}
+	const auto attribute = attributes.find ( path.source );
+	if ( attribute == attributes.end () || attribute->second.field.type.empty () ) {
+		return nullptr;
+	}
+	return &attribute->second.field;
+}
+
+const MetadataField*
 resolveField ( const ParsedPath& path,
 							 const std::unordered_map<std::string, FormAttribute>& attributes,
-							 Repository& repository ) {
+							 const FormColumns& formColumns, Repository& repository ) {
+	if ( const auto field = resolveFormAttribute ( path, attributes ) ) {
+		return field;
+	}
+	if ( const auto field = resolveFormColumn ( path, formColumns ) ) {
+		return field;
+	}
 	const auto source = resolveSource ( path, attributes );
 	if ( !source.has_value () ) {
 		return nullptr;
@@ -535,25 +645,55 @@ void addResultField ( Json& target, const std::string& name,
 	if ( name.empty () || target.contains ( name ) ) {
 		return;
 	}
-	target [ name ] =
-			Json { { "tooltip", field.tooltip }, { "type", field.type } };
+	target [ name ] = Json { { "tooltip", field.tooltip },
+													 { "type", field.type },
+													 { "fillChecking",
+														 field.fillChecking.empty () ? DefaultFillChecking
+																												: field.fillChecking } };
+}
+
+void addInvisibleItem ( Json& result, const std::string& name ) {
+	if ( name.empty () ) {
+		return;
+	}
+	auto& items = result [ "invisibleFields" ];
+	const auto found = std::any_of (
+			items.begin (), items.end (), [ &name ] ( const Json& item ) {
+				return item.is_string () && item.get<std::string> () == name;
+			} );
+	if ( !found ) {
+		items.push_back ( name );
+	}
+}
+
+void addDataPath ( Json& result, const std::string& name,
+									 const std::string& dataPath ) {
+	if ( name.empty () || dataPath.empty () ) {
+		return;
+	}
+	result [ "dataPaths" ].push_back (
+			Json { { "name", name }, { "dataPath", dataPath } } );
+}
+
+bool userVisible ( const pugi::xml_node& node ) {
+	return trim ( node.child ( "userVisible" ).child ( "common" ) ) == "true";
 }
 
 void collectFormItems (
 		const pugi::xml_node& node, const std::string& currentTable,
 		const std::unordered_map<std::string, FormAttribute>& attributes,
-		Repository& repository, Json& result ) {
+		const FormColumns& formColumns, Repository& repository, Json& result ) {
 	const auto itemName = trim ( node.child ( "name" ) );
 	auto tableName = currentTable;
 	if ( hasType ( node, "form:Table" ) && !itemName.empty () ) {
 		tableName = itemName;
 	}
-
 	if ( hasType ( node, "form:FormField" ) ) {
 		const auto segments =
 				trim ( node.child ( "dataPath" ).child ( "segments" ) );
 		if ( const auto path = parsePath ( segments ); path.has_value () ) {
-			if ( const auto field = resolveField ( *path, attributes, repository ) ) {
+			if ( const auto field =
+							 resolveField ( *path, attributes, formColumns, repository ) ) {
 				if ( tableName.empty () ) {
 					addResultField ( result [ "fields" ], itemName, *field );
 				} else {
@@ -566,51 +706,39 @@ void collectFormItems (
 			}
 		}
 	}
-
 	for ( const auto& child : node.children ( "items" ) ) {
-		collectFormItems ( child, tableName, attributes, repository, result );
+		collectFormItems ( child, tableName, attributes, formColumns, repository,
+											 result );
 	}
-}
 }
 
-Tooltips::Tooltips ( std::string sources, std::string formName,
-										 std::string language )
-		: sources ( std::move ( sources ) ), formName ( std::move ( formName ) ),
-			language ( std::move ( language ) ) {
+void collectInvisibleItems ( const pugi::xml_node& node, Repository& repository,
+														 Json& result ) {
+	if ( std::string_view ( node.name () ) == "items" && !userVisible ( node ) ) {
+		addInvisibleItem ( result, trim ( node.child ( "name" ) ) );
+	}
+	for ( const auto& child : node.children () ) {
+		collectInvisibleItems ( child, repository, result );
+	}
 }
 
-std::string Tooltips::get () {
-	if ( designerSources ( sources ) ) {
-		return tooltips_designer::get ( sources, formName, language );
-	}
-	const auto path = formPath ();
-	Repository repository { sources, language };
-	const auto form = repository.document ( path );
-	if ( !form ) {
-		return {};
-	}
-	const auto root = form->document_element ();
-	const auto attributes = formAttributes ( root );
-	Json result {
-			{ "explanation", "" },
-			{ "fields", Json::object () },
-			{ "tables", Json::object () },
-	};
-	if ( const auto mainType = formMetadataType ( formName );
-			 mainType.has_value () ) {
-		if ( const auto metadata = repository.metadata ( *mainType ) ) {
-			result [ "explanation" ] = metadata->explanation;
+void collectDataPaths ( const pugi::xml_node& node, Json& result ) {
+	if ( std::string_view ( node.name () ) == "items" ) {
+		auto dataPath = trim ( node.child ( "dataPath" ).child ( "segments" ) );
+		if ( dataPath.empty () ) {
+			dataPath = trim ( node.child ( "dataPath" ) );
 		}
+		addDataPath ( result, trim ( node.child ( "name" ) ), dataPath );
 	}
-	for ( const auto& item : root.children ( "items" ) ) {
-		collectFormItems ( item, {}, attributes, repository, result );
+	for ( const auto& child : node.children () ) {
+		collectDataPaths ( child, result );
 	}
-	return result.dump ();
 }
 
-std::filesystem::path Tooltips::formPath () const {
+std::filesystem::path formPath ( const std::filesystem::path& sources,
+																 const std::string& formName ) {
 	auto parts = strings::split ( formName, "." );
-	if ( parts.size () < 4 ) {
+	if ( parts.empty () ) {
 		return {};
 	}
 	const auto kind = FormKinds.find ( parts [ 0 ] );
@@ -621,8 +749,64 @@ std::filesystem::path Tooltips::formPath () const {
 	if ( folder == SourceFolders.end () ) {
 		return {};
 	}
-	std::filesystem::path fullPath { sources };
-	return ( fullPath / folder->second / parts [ 1 ] / "Forms" / parts [ 3 ] /
+	if ( kind->second == MetadataFamily::CommonForm ) {
+		if ( parts.size () != 2 ) {
+			return {};
+		}
+		return sources / folder->second / parts [ 1 ] / "Form.form";
+	}
+	if ( parts.size () < 4 ) {
+		return {};
+	}
+	return ( sources / folder->second / parts [ 1 ] / "Forms" / parts [ 3 ] /
 					 "Form.form" )
 			.string ();
+}
+}
+
+std::string metadata::edt::getFormInfo ( const std::filesystem::path& sources,
+																				 const std::string& formName,
+																				 const std::string& language ) {
+	const auto path = formPath ( sources, formName );
+	Repository repository { sources, language };
+	const auto form = repository.document ( path );
+	if ( !form ) {
+		return {};
+	}
+	const auto root = form->document_element ();
+	const auto attributes = formAttributes ( root, repository, language );
+	const auto formDefinedColumns = formColumns ( root, repository, language );
+	Json result {
+			{ "explanation", "" },
+			{ "fields", Json::object () },
+			{ "tables", Json::object () },
+			{ "invisibleFields", Json::array () },
+	};
+	if ( const auto mainType = formMetadataType ( formName );
+			 mainType.has_value () ) {
+		if ( const auto metadata = repository.metadata ( *mainType ) ) {
+			result [ "explanation" ] = metadata->explanation;
+		}
+	}
+	for ( const auto& item : root.children ( "items" ) ) {
+		collectFormItems ( item, {}, attributes, formDefinedColumns, repository,
+											 result );
+	}
+	collectInvisibleItems ( root, repository, result );
+	return result.dump ();
+}
+
+std::string metadata::edt::getFormDataPaths (
+		const std::filesystem::path& sources, const std::string& formName ) {
+	const auto path = formPath ( sources, formName );
+	Repository repository { sources, {} };
+	const auto form = repository.document ( path );
+	if ( !form ) {
+		return {};
+	}
+	Json result {
+			{ "dataPaths", Json::array () },
+	};
+	collectDataPaths ( form->document_element (), result );
+	return result [ "dataPaths" ].dump ();
 }

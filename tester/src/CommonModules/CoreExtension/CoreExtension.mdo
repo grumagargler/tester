@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mdclass:CommonModule xmlns:mdclass="http://g5.1c.ru/v8/dt/metadata/mdclass" uuid="701a06c3-5072-4e41-8754-10237ed252fc">
   <name>CoreExtension</name>
+  <clientManagedApplication>true</clientManagedApplication>
   <server>true</server>
   <externalConnection>true</externalConnection>
   <returnValuesReuse>DuringSession</returnValuesReuse>

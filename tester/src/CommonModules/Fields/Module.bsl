@@ -331,21 +331,36 @@ endfunction
 
 function getDisplayedText ( Control, ClientField )
 
+	data = "";
 	type = Control.Type;
-	if ( type = FormFieldType.InputField
-		or type = FormFieldType.CheckBoxField
-		or type = FormFieldType.LabelField
-		or type = FormFieldType.RadioButtonField ) then
+	if ( type = FormFieldType.InputField ) then
+		if ( ClientField = undefined ) then
+			try
+				data = Control.GetDisplayedText ();
+			except
+			endtry;
+		else
+			data = ? ( IsBlankString ( ClientField.EditText ), ClientField.FieldValue, ClientField.EditText );
+		endif;
+	elsif ( type = FormFieldType.CheckBoxField ) then
 		try
-			data = ? ( ClientField = undefined, Control.GetDisplayedText (), ClientField.EditText );
+			data = Boolean ( Control.GetDataPresentation () );
 		except
-			data = "";
+			try
+				data = Control.GetDisplayedText ();
+			except
+			endtry;
+		endtry;
+	elsif ( type = FormFieldType.RadioButtonField
+		or type = FormFieldType.LabelField ) then
+		try
+			data = Control.GetDisplayedText ();
+		except
 		endtry;
 	else
 		try
 			data = Control.GetDataPresentation ();
 		except
-			data = "";
 		endtry;
 	endif;
 	return data;
@@ -508,6 +523,8 @@ function SetValue ( Name, Value, Source = undefined, Type = undefined, ChooseVal
 	fieldType = field.Type;
 	if ( fieldType = FormFieldType.RadioButtonField ) then
 		field.SelectOption ( Value );
+	elsif ( fieldType = FormFieldType.TrackBarField ) then
+		field.GotoValue ( Value );
 	else
 		stringValue = String ( Value );
 		if ( fieldType = FormFieldType.SpreadsheetDocumentField ) then
@@ -879,12 +896,6 @@ function tableData ( Control, Rows )
 
 endfunction
 
-function cellValue ( Value )
-
-	return RemoveSeachingTags ( StrConcat ( StrSplit ( Value, Char ( 160 ) + Char ( 8239 ) + Char ( 8195 ) + Char ( 8194 ) ) ) );
-
-endfunction
-
 procedure addToTable ( Table, Row, Columns )
 
 	data = new Structure ();
@@ -894,6 +905,16 @@ procedure addToTable ( Table, Row, Columns )
 	Table.Add ( data );
 
 endprocedure
+
+function cellValue ( Value )
+
+	data = RemoveSeachingTags ( StrConcat ( StrSplit ( Value, Char ( 160 ) + Char ( 8239 ) + Char ( 8195 ) + Char ( 8194 ) ) ) );
+	if ( LatestSeparatorsInfo <> undefined ) then
+		data = toNumber ( data );
+	endif;
+	return data;
+
+endfunction
 
 function GetWindowControls () export
 
@@ -909,54 +930,135 @@ function GetWindowControls () export
 	if ( form = undefined ) then
 		return undefined;
 	endif;
-	clientContorls = clientControls ( window.Caption, form.FormName );
-	context = new Structure ( "ClientControls, CurrentDropList, FormName", clientContorls );
+	context = prepareContext ( window, form );
+	applyMetadata ( context );
 	elements = new Array ();
 	prepareElements ( elements, controls, context );
 	LastActiveWindowControls = Conversion.ToJSON ( elements, false );
-	return new Structure ( "ActiveForm, Elements", form, elements );
+	return new Structure ( "ActiveForm, Elements", form,
+		? ( elements.Count () = 1, elements [ 0 ], elements ) );
 
 endfunction
 
-function clientControls ( Window, Form )
+function prepareContext ( Window, Form )
+
+	context = new Structure (
+		"FormName, CurrentControl, CurrentDropList, ClientControls, Language, Metadata, SourcesFolder",
+		Form.FormName );
+	currentControl = getCurrentControl ( Form );
+	if ( currentControl <> undefined ) then
+		context.CurrentControl = currentControl;
+		dropList = false;
+		type = typeOfControl ( currentControl );
+		if ( type = FormFieldType.InputField ) then
+			try
+				dropList = currentControl.DropListIsOpen ();
+			except
+			endtry;
+		endif;
+		context.CurrentDropList = ? ( dropList, currentControl, undefined );
+	endif;
+	path = AppData.SourcesEDT;
+	if ( path = "" ) then
+		path = AppData.SourcesDesigner;
+	endif;
+	if ( path <> "" ) then
+		context.SourcesFolder = path;
+	endif;
+	clientContext = clientContext ( context, Window.Caption );
+	if ( clientContext = undefined ) then
+		context.Language = CurrentLanguage ();
+		LatestSeparatorsInfo = FieldsSrv.Separators ();
+	else
+		context.Language = clientContext.Language;
+		context.ClientControls = clientContext.Items;
+		LatestSeparatorsInfo = clientContext.separators;
+	endif;
+	context.Metadata = getMetadata ( context );
+	return context;
+
+endfunction
+
+function getCurrentControl ( Form )
+
+	try
+		// There are tricky windows (Type selection) which will
+		// throw an exception in this case
+		control = Form.GetCurrentItem ();
+	except
+		return undefined;
+	endtry;
+	if ( TypeOf ( control ) = Type ( "TestedFormTable" ) ) then
+		try
+			control = control.GetCurrentItem ();
+		except
+		endtry;
+	endif;
+	return control;
+
+endfunction
+
+function typeOfControl ( Control )
+
+	type = TypeOf ( Control );
+	if ( type = Type ( "TestedFormField" )
+		or type = Type ( "TestedFormGroup" )
+		or type = Type ( "TestedFormButton" )
+		or type = Type ( "TestedFormDecoration" )
+		or type = Type ( "TestedFormItemAddition" ) ) then
+		return Control.Type;
+	endif;
+
+endfunction
+
+function clientContext ( Context, FormCaption )
 
 	address = StrSplit ( TesterAgentConnectionString, ":" );
 	if ( address.Count () <> 2 ) then
 		return undefined;
 	endif;
+	formName = Context.FormName;
+	sources = Context.SourcesFolder;
+	if ( sources <> undefined ) then
+		try
+			dataPaths = ExternalMeta.GetFormDataPaths ( sources, formName );
+		except
+			RuntimeSrv.LogException ( "ExternalMeta", ExternalMeta.Problem (), "Warning" );
+		endtry;
+	endif;
 	connection = new HTTPConnection ( address [ 0 ], Number ( address [ 1 ] ) );
 	request = new HTTPRequest ();
 	p = new Structure ( "command, parameters",
-		"getControls", new Structure ( "Caption, Form", Window, Form ) );
+		"getControls", new Structure ( "Caption, Form, DataPaths",
+		FormCaption, formName, dataPaths ) );
 	request.SetBodyFromString ( Conversion.ToJSON ( p ) );
 	response = connection.Post ( request );
 	result = Conversion.FromJson ( response.GetBodyAsString () );
-	if ( not result.success ) then
-		return undefined;
+	if ( result.success ) then
+		return new Structure ( "Items, Language, Separators",
+			result.content.items, result.content.language, result.content.separators );
 	endif;
-	applyMetadata ( result.content, Form );
-	return result.content.items;
 
 endfunction
 
-procedure applyMetadata ( ClientControls, Form )
+procedure applyMetadata ( Context )
 
-	info = getMetadata ( Form, ClientControls.language );
-	if ( info = undefined ) then
+	meta = Context.Metadata;
+	clientControls = Context.ClientControls;
+	if ( meta = undefined or clientControls = undefined ) then
 		return;
 	endif;
 	sources = new Array ();
-	sources.Add ( info.fields );
-	for each table in info.tables do
+	sources.Add ( meta.fields );
+	for each table in meta.tables do
 		sources.Add ( table.Value );
 	enddo;
 	control = undefined;
-	items = ClientControls.items;
 	for each set in sources do
 		for each field in set do
 			name = field.Key;
 			value = field.Value;
-			if ( items.Property ( name, control ) ) then
+			if ( clientControls.Property ( name, control ) ) then
 				if ( IsBlankString ( control.ToolTip )
 					and not IsBlankString ( value.tooltip ) ) then
 					control.Tooltip = value.tooltip;
@@ -967,26 +1069,23 @@ procedure applyMetadata ( ClientControls, Form )
 			endif;
 		enddo;
 	enddo;
-	items.Insert ( Enum.ConstantsEntityInfoMark (), info.explanation );
+	clientControls.Insert ( Enum.ConstantsEntityInfoMark (), meta.explanation );
 
 endprocedure
 
-function getMetadata ( Form, Language )
+function getMetadata ( Context )
 
-	path = AppData.SourcesEDT;
-	if ( path = "" ) then
-		path = AppData.SourcesDesigner;
-		if ( path = "" ) then
-			return undefined;
-		endif;
+	sources = Context.SourcesFolder;
+	if ( sources = undefined ) then
+		return undefined;
 	endif;
 	try
-		data = ExternalMeta.GetTooltips ( path, Form, Language );
+		return Conversion.FromJSON (
+			ExternalMeta.GetFormInfo ( sources, Context.FormName, Context.Language )
+		);
 	except
 		RuntimeSrv.LogException ( "ExternalMeta", ExternalMeta.Problem (), "Warning" );
-		return undefined;
 	endtry;
-	return Conversion.FromJSON ( data );
 
 endfunction
 
@@ -1002,19 +1101,19 @@ procedure prepareElements ( Elements, Objects, Context )
 		except
 			continue;
 		endtry;
-		if ( isInvisible ( control, Context.ClientControls ) ) then
+		if ( isInvisible ( control, Context ) ) then
 			continue;
 		endif;
-		element = controlToElement ( control, Context );
+		element = controlToElement ( control, Context, false );
 		Elements.Add ( element );
 		if ( next.Count () > 0 ) then
 			if ( TypeOf ( control ) = Type ( "TestedFormTable" ) ) then
 				element.Insert ( "Columns", tableColumns ( next, Context ) );
 			endif;
-			element.Insert ( "ChildObjects", new Array () );
-			prepareElements ( element.ChildObjects, next, Context );
-			if ( element.ChildObjects.Count () = 0 ) then
-				element.Delete ( "ChildObjects" );
+			element.Insert ( "Items", new Array () );
+			prepareElements ( element.Items, next, Context );
+			if ( element.Items.Count () = 0 ) then
+				element.Delete ( "Items" );
 			endif;
 		endif;
 	enddo;
@@ -1030,8 +1129,8 @@ function tableColumns ( Objects, Context )
 		i = i - 1;
 		object = Objects [ i ];
 		if ( TypeOf ( object ) = textField
-			and not isInvisible ( object, Context.ClientControls ) ) then
-			columns.Add ( controlToElement ( object, Context ) );
+			and not isInvisible ( object, Context ) ) then
+			columns.Insert  ( 0, controlToElement ( object, Context, true ) );
 			Objects.Delete ( i );
 		endif;
 	enddo;
@@ -1039,7 +1138,7 @@ function tableColumns ( Objects, Context )
 
 endfunction
 
-function isInvisible ( Control, ClientControls )
+function isInvisible ( Control, Context )
 
 	type = TypeOf ( Control );
 	if ( type = Type ( "TestedFormField" )
@@ -1051,9 +1150,12 @@ function isInvisible ( Control, ClientControls )
 		// There are some weird controls (such as type selector) which don't
 		// have implementation of basic testing methods
 		name = Control.Name;
-		if ( ClientControls <> undefined and ClientControls.Property ( name ) ) then
-			item = ClientControls [ name ];
-			return item.Visible = false or item.Enabled = false;
+		clientControls = Context.ClientControls;
+		if ( clientControls <> undefined and clientControls.Property ( name ) ) then
+			item = clientControls [ name ];
+			disabledForUser = Context.Metadata <> undefined
+				and Context.Metadata.InvisibleFields.Find ( name ) <> undefined;
+			return disabledForUser or item.Visible = false or item.Enabled = false;
 		else
 			try
 				return not ( Control.CurrentVisible () and Control.CurrentEnable () );
@@ -1065,7 +1167,7 @@ function isInvisible ( Control, ClientControls )
 
 endfunction
 
-function controlToElement ( Control, Context )
+function controlToElement ( Control, Context, ColumnDescription )
 
 	type = TypeOf ( Control );
 	if ( type = Type ( "TestedClientApplicationWindow" ) ) then
@@ -1075,17 +1177,10 @@ function controlToElement ( Control, Context )
 		clientControls = Context.ClientControls;
 		element = new Structure ( "Name, TitleText, Type" );
 		FillPropertyValues ( element, Control );
-		currentElement = injectCurrentItem ( Control, element );
-		if ( Context.CurrentDropList = undefined and currentElement <> undefined ) then
-			Context.CurrentDropList = determineDropList ( currentElement );
-		endif;
 		if ( type = Type ( "TestedCommandInterfaceButton" ) ) then
 			element.Insert ( "URL", Control.URL );
 		elsif ( type = Type ( "TestedForm" ) ) then
-			name = Control.FormName;
-			element.Name = name;
-			Context.FormName = name;
-			injectEntityInfo ( element, Context );
+			formElement ( element, Context );
 		else
 			injectTooltip ( Control, element, Context );
 			if ( type = Type ( "TestedFormButton" ) ) then
@@ -1103,13 +1198,14 @@ function controlToElement ( Control, Context )
 					element.Insert ( "DecorationType", String ( Control.Type ) );
 				endif;
 			elsif ( type = Type ( "TestedFormField" ) ) then
-				fieldElement ( Control, element, Context );
+				fieldElement ( Control, element, Context, ColumnDescription );
 			elsif ( type = Type ( "TestedFormTable" ) ) then
 				tableElement ( Control, element, Context );
 			elsif ( type = Type ( "TestedFormItemAddition" )
 				and Control.Type = FormItemAdditionType.SearchStringRepresentation ) then
 					element.Insert ( "SearchString", true );
 			endif;
+			removeTitleText ( Element, clientControls );
 		endif;
 	endif;
 	injectType ( element, Control, clientControls );
@@ -1128,64 +1224,19 @@ function controlChecked ( Control, ClientControls )
 
 endfunction
 
-function determineDropList ( Control )
+procedure formElement ( Element, Context )
 
-	open = false;
-	type = typeOfControl ( Control );
-	if ( type = FormFieldType.InputField ) then
-		try
-			open = Control.DropListIsOpen ();
-		except
-		endtry;
-	endif;
-	return ? ( open, Control, undefined );
-
-endfunction
-
-function typeOfControl ( Control )
-
-	type = TypeOf ( Control );
-	if ( type = Type ( "TestedFormField" )
-		or type = Type ( "TestedFormGroup" )
-		or type = Type ( "TestedFormButton" )
-		or type = Type ( "TestedFormDecoration" )
-		or type = Type ( "TestedFormItemAddition" ) ) then
-		return Control.Type;
-	endif;
-
-endfunction
-
-function injectCurrentItem ( Source, Element )
-
-	type = TypeOf ( Source );
-	if ( type = Type ( "TestedForm" ) ) then
-		try
-			// There are tricky windows (Type selection) which will
-			// throw an exception in this case
-			control = Source.GetCurrentItem ();
-		except
-			return undefined;
-		endtry;
-		signature = "ActiveControl";
-	elsif ( type = Type ( "TestedFormTable" ) ) then
-		control = Source.GetCurrentItem ();
-		signature = "ActiveColumn";
-	endif;
-	if ( control <> undefined ) then
-		Element.Insert ( signature,
-			new Structure ( "Name, Title", control.Name, control.TitleText ) );
-	endif;
-	return control;
-
-endfunction
-
-procedure injectEntityInfo ( Element, Context )
-
+	var info;
+	Element.Name = Context.FormName;
 	clientControls = Context.ClientControls;
-	info = undefined;
 	if ( clientControls <> undefined
 		and clientControls.Property ( Enum.ConstantsEntityInfoMark (), info ) ) then
 		Element.Insert ( "EntityShortDescription", info );
+	endif;
+	control = Context.CurrentControl;
+	if ( control <> undefined ) then
+		Element.Insert ( "CurrentControl",
+			new Structure ( "Name, Title", control.Name, control.TitleText ) );
 	endif;
 
 endprocedure
@@ -1247,11 +1298,12 @@ procedure groupElement ( Control, Element, Context )
 
 endprocedure
 
-procedure fieldElement ( Control, Element, Context )
+procedure fieldElement ( Control, Element, Context, ColumnDescription )
 
 	clientControls = Context.ClientControls;
-	if ( clientControls <> undefined and clientControls.Property ( Control.Name ) ) then
-		clientField = clientControls [ Control.Name ];
+	controlName = Control.Name;
+	if ( clientControls <> undefined and clientControls.Property ( controlName ) ) then
+		clientField = clientControls [ controlName ];
 	endif;
 	type = Control.Type;
 	dataType = undefined;
@@ -1262,15 +1314,27 @@ procedure fieldElement ( Control, Element, Context )
 		and clientField.Property ( "DataType", dataType ) ) then
 		Element.Insert ( "DataType", dataType );
 	endif;
-	if ( type = FormFieldType.SpreadsheetDocumentField ) then
-		data = spreadsheetInfo ( Control );
-	else
-		data = getDisplayedText ( Control, clientField );
-	endif;
-	if ( not IsBlankString ( data ) ) then
-		Element.Insert ( "Value", data );
+	if ( not ColumnDescription ) then
+		if ( type = FormFieldType.SpreadsheetDocumentField ) then
+			data = spreadsheetInfo ( Control );
+		else
+			data = getDisplayedText ( Control, clientField );
+			if ( numericClientField ( clientField ) ) then
+				data = toNumber ( data );
+			elsif ( TypeOf ( data ) = Type ( "String" ) ) then
+				data = CoreExtension.GetLibrary ( "Root" )
+					.NormalizeNumber ( data, LatestSeparatorsInfo.Fractions, LatestSeparatorsInfo.Groups );
+			endif;
+		endif;
+		if ( not IsBlankString ( data ) or type = FormFieldType.InputField ) then
+			Element.Insert ( "Value", data );
+		endif;
 	endif;
 	if ( clientField <> undefined ) then
+		if ( clientField.ValueListInField = true ) then
+			Element.Insert ( "AdditionalInfo",
+					Output.ValuesListFieldHint ( new Structure ( "Name", "#" + controlName ) ) );
+		endif;
 		if ( clientField.ReadOnly = true ) then
 			Element.Insert ( "ReadOnly", true );
 		endif;
@@ -1287,23 +1351,41 @@ procedure fieldElement ( Control, Element, Context )
 		endif;
 	endif;
 	if ( type = FormFieldType.InputField ) then
+		metaInfo = undefined;
+		if ( clientField <> undefined
+			and clientField.ReadOnly <> true
+			and Context.Metadata <> undefined
+			and Context.Metadata.fields.Property ( controlName, metaInfo )
+			and metaInfo.FillChecking = "ShowError" ) then
+			Element.Insert ( "Mandatory", true );
+		endif;
 		if ( Control = Context.CurrentDropList ) then
 			list = new Array ();
 			dropList = Control.GetChoiceListPresentation ();
+			index = 0;
 			for each item in dropList do
-				index = item.DataPresentation;
-				value = item.DisplayedText;
-				if ( index = value ) then
-					list.Add ( value );
-				else
-					list.Add ( new Structure ( "Index, Value", index, value ) );
-				endif;
+				list.Add ( new Structure ( "Index, Value", index, item.DisplayedText ) );
+				index = index + 1;
 			enddo;
 			Element.Insert ( "DropList", list );
 		endif;
+	elsif ( type = FormFieldType.RadioButtonField ) then
+		Element.Insert ( "AvailableValues", Control.GetChoiceListPresentation () );
+	elsif ( type = FormFieldType.TrackBarField
+		and clientField <> undefined ) then
+		Element.Insert ( "MinValue", clientField.MinValue );
+		Element.Insert ( "MaxValue", clientField.MaxValue );
+		Element.Insert ( "Step", clientField.Step );
 	endif;
 
 endprocedure
+
+function isNumber ( String )
+
+	return TypeOf ( String ) = Type ( "String" )
+		and CoreExtension.GetLibrary ( "Root" ).IsNumber ( String );
+
+endfunction
 
 function spreadsheetInfo ( Control )
 
@@ -1320,17 +1402,24 @@ endfunction
 
 procedure tableElement ( Control, Element, Context )
 
-	var table;
-
+	var table, field, dataType;
+	column = Control.GetCurrentItem ();
+	if ( column <> undefined ) then
+		Element.Insert ( "CurrentColumn", new Structure ( "Name, Title", column.Name, column.TitleText ) );
+	endif;
 	clientControls = Context.ClientControls;
 	if ( clientControls = undefined
 		or not clientControls.Property ( Control.Name, table ) ) then
 		return;
 	endif;
+	if ( table.TableIsInChoiceMode = true ) then
+		Element.Insert ( "TableIsInChoiceMode", true );
+	endif;
 	representation = table.Representation;
+	isTree = ( representation = "Tree" );
 	if ( representation = "HierarchicalList" ) then
 		Element.Insert ( "TableIsHierarchicalList", true );
-	elsif ( representation = "Tree" ) then
+	elsif ( isTree ) then
 		Element.Insert ( "TableIsTree", true );
 	endif;
 	if ( table.AutoInsertNewRow and table.ChangeRowSet ) then
@@ -1338,14 +1427,95 @@ procedure tableElement ( Control, Element, Context )
 	elsif ( not table.ChangeRowSet ) then
 		Element.Insert ( "ChangeRowSet", false );
 	endif;
-	Element.Insert ( "TableData", table.TableData );
+	tableData = table.TableData;
+	if ( tableData <> undefined ) then
+		rows = tableData.Rows;
+		if ( rows <> undefined ) then
+			for each row in rows do
+				adjustTableRow ( row, clientControls );
+			enddo;
+			Element.Insert ( "RowCount", rows.Count () );
+			Element.Insert ( "Rows", rows );
+		endif;
+		if ( tableData.Info <> undefined ) then
+			Element.Insert ( "RowsInfo", tableData.Info );
+		endif;
+	endif;
+	currentRow = table.TableCurrentRow;
+	if ( currentRow <> undefined ) then
+		if ( isTree ) then
+			row = currentRow;
+			while ( row <> undefined ) do
+				adjustTableRow ( row.Data, ClientControls );
+				row = row.Parent;
+			enddo;
+		else
+			adjustTableRow ( currentRow, ClientControls );
+		endif;
+		Element.Insert ( "CurrentRowData", currentRow );
+	endif;
+	systemFields = table.TableCurrentRowSystemFields;
+	if ( systemFields <> undefined ) then
+		Element.Insert ( "CurrentRowSystemFields", systemFields );
+	endif;
+	currentParent = table.TableCurrentParent;
+	if ( currentParent <> undefined ) then
+		Element.Insert ( "CurrentRowParent", currentParent );
+	endif;
+	systemFields = table.TableCurrentParentSystemFields;
+	if ( systemFields <> undefined ) then
+		Element.Insert ( "CurrentRowParentSystemFields", systemFields );
+	endif;
+
+endprocedure
+
+procedure adjustTableRow ( Row, ClientControls )
+
+	var field;
+	for each entry in row do
+		if ( clientControls.Property ( entry.Key, field )
+			and numericClientField ( field ) ) then
+			row [ entry.Key ] = toNumber ( entry.Value );
+		endif;
+	enddo;
+
+endprocedure
+
+function numericClientField ( Field )
+
+	var type;
+	return Field <> undefined
+		and Field.Property ( "DataType", type )
+		and StrFind ( type, "Number(");
+
+endfunction
+
+function toNumber ( Value )
+
+	try
+		return Conversion.LocalStringToNumber ( Value,
+			LatestSeparatorsInfo.Fractions, LatestSeparatorsInfo.Groups
+		);
+	except
+		return Value;
+	endtry;
+
+endfunction
+
+procedure removeTitleText ( Element, ClientControls )
+
+	var field;
+	if ( ClientControls <> undefined
+		and ClientControls.Property ( Element.Name, field )
+		and field.Notitle ) then
+		Element.Delete ( "TitleText" );
+	endif;
 
 endprocedure
 
 procedure injectType ( Element, Control, ClientControls )
 
 	var field, type;
-
 	if ( ClientControls <> undefined ) then
 		conrolType = TypeOf ( Control );
 		if ( conrolType = Type ( "TestedClientApplicationWindow" ) ) then
@@ -1433,8 +1603,9 @@ function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
 	else
 		target = Fields.GetControl ( Table, Forms.FindSource ( Source ), "Table" ).Field;
 	endif;
+	finishEditing ( target );
 	if ( FromStart ) then
-		gotoFirstRow ( target );
+		activateFirstRow ( target );
 	endif;
 	if ( isID ( Column ) ) then
 		data = Fields.Retrieve ( Column, Source );
@@ -1458,7 +1629,7 @@ function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
 		endif;
 	endif;
 	if ( MCPRequestProcessing = true ) then
-		gotoFirstRow ( target );
+		activateFirstRow ( target );
 		raise Output.CannotGotoRow ( new Structure ( "Value, Column, Table",
 			Value, Column, Table ) );
 	endif;
@@ -1471,11 +1642,80 @@ function NavigateToRow ( Table, Column, Value, FromStart, Source ) export
 
 endfunction
 
-procedure gotoFirstRow ( Table )
+procedure activateFirstRow ( Table )
 
 	try
 		Table.GotoFirstRow ( false );
 	except
 	endtry;
+
+endprocedure
+
+procedure NavigateToTableRow ( Table, Source, Row ) export
+
+	if ( TypeOf ( Table ) = Type ( "TestedFormTable" ) ) then
+		target = Table;
+	else
+		target = Fields.GetControl ( Table, Forms.FindSource ( Source ), "Table" ).Field;
+	endif;
+	finishEditing ( target );
+	if ( Row = "First" ) then
+		target.GotoFirstRow ( false );
+	elsif ( Row = "Last" ) then
+		target.GotoLastRow ( false );
+	elsif ( Row = "Next" ) then
+		try
+			target.GotoNextRow ( false );
+		except
+			raise Output.GotoNextRowFailed ();
+		endtry;
+	elsif ( Row = "Previous" ) then
+		try
+			target.GotoPreviousRow ( false );
+		except
+			raise Output.GotoPreviousRowFailed ();
+		endtry
+	endif;
+
+endprocedure
+
+procedure SetTreeRow ( Table, Source, Closed ) export
+
+	if ( TypeOf ( Table ) = Type ( "TestedFormTable" ) ) then
+		target = Table;
+	else
+		target = Fields.GetControl ( Table, Forms.FindSource ( Source ), "Table" ).Field;
+	endif;
+	finishEditing ( target );
+	expanded = target.Expanded ();
+	if ( Closed and expanded ) then
+		target.Collapse ();
+	elsif ( not ( Closed or expanded ) ) then
+		target.Expand ();
+	endif;
+
+endprocedure
+
+procedure GotoTableLevel ( Table, Source, Direction ) export
+
+	if ( TypeOf ( Table ) = Type ( "TestedFormTable" ) ) then
+		target = Table;
+	else
+		target = Fields.GetControl ( Table, Forms.FindSource ( Source ), "Table" ).Field;
+	endif;
+	finishEditing ( target );
+	if ( Direction = 1 ) then
+		try
+			target.GoOneLevelDown ();
+		except
+			raise Output.GoOneLevelDownFailed ();
+		endtry;
+	else
+		try
+			target.GoOneLevelUp ();
+		except
+			raise Output.GoOneLevelUpFailed ();
+		endtry;
+	endif;
 
 endprocedure

@@ -363,3 +363,29 @@ function CodeToNumber ( Number ) export
 	return Format ( value, "NG=" );
 	
 endfunction
+
+function NormalizeNumber ( Text, DecimalSeparator, GroupSeparator ) export
+
+	lib = CoreExtension.GetLibrary ( "Root" );
+	try
+		return lib.NormalizeNumber ( Text, DecimalSeparator, GroupSeparator );
+	except
+		raise lib.Problem ();
+	endtry
+
+endfunction
+
+function LocalStringToNumber ( String, DecimalSeparator, GroupSeparator ) export
+
+	number = Conversion.NormalizeNumber ( String, DecimalSeparator, GroupSeparator );
+	decimalSeparatorAfterNormalizing = ".";
+	position = StrFind ( number, decimalSeparatorAfterNormalizing );
+	if ( position = 0 ) then
+		return Number ( number );
+	else
+		factor = pow ( 10, StrLen ( number ) - position );
+		integer = Number ( StrReplace ( number, decimalSeparatorAfterNormalizing, "" ) );
+		return integer / factor;
+	endif;
+
+endfunction

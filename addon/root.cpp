@@ -61,6 +61,14 @@ Root::Root () : Extender ( L"Root" ) {
 								[ & ] ( tVariant* Params, tVariant* Result ) {
 									return getStringHash ( Params, Result );
 								} );
+	addFunction ( L"NormalizeNumber", L"НормализоватьЧисло", 3,
+								[ & ] ( tVariant* Params, tVariant* Result ) {
+									return normalizeNumber ( Params, Result );
+								} );
+	addFunction ( L"IsNumber", L"ЭтоЧисло", 3,
+								[ & ] ( tVariant* Params, tVariant* Result ) {
+									return isNumber ( Params, Result );
+								} );
 	addFunction ( L"CompareJSON", L"СравнитьJSON", 2,
 								[ & ] ( tVariant* Params, tVariant* Result ) {
 									return compareJSON ( Params, Result );
@@ -265,6 +273,50 @@ bool Root::getStringHash ( tVariant* Params, tVariant* Result ) {
 	}
 	const auto addBOM = Params [ 1 ].bVal;
 	returnString ( Result, std::to_wstring ( strings::toHash ( data, addBOM ) ) );
+	return true;
+}
+
+bool Root::normalizeNumber ( tVariant* Params, tVariant* Result ) {
+	std::wstring string;
+	wchar_t decimalDelimiter, groupDelimiter;
+	if ( !readNumberParams ( Params, string, decimalDelimiter, groupDelimiter ) ) {
+		return false;
+	}
+	returnString (
+			Result, strings::toNumber ( string, decimalDelimiter, groupDelimiter ) );
+	return true;
+}
+
+bool Root::isNumber ( tVariant* Params, tVariant* Result ) {
+	std::wstring string;
+	wchar_t decimalDelimiter, groupDelimiter;
+	if ( !readNumberParams ( Params, string, decimalDelimiter, groupDelimiter ) ) {
+		return false;
+	}
+	returnBool ( Result,
+							 strings::isNumber ( string, decimalDelimiter, groupDelimiter ) );
+	return true;
+}
+
+bool Root::readNumberParams ( tVariant* Params, std::wstring& string,
+															wchar_t& decimalDelimiter,
+															wchar_t& groupDelimiter ) {
+	std::wstring decimalSeparator, groupSeparator;
+	if ( !readWideString ( Params [ 0 ], string, "string" ) ||
+			 !readWideString ( Params [ 1 ], decimalSeparator, "decimalSeparator" ) ||
+			 !readWideString ( Params [ 2 ], groupSeparator, "groupSeparator" ) ) {
+		return false;
+	}
+	if ( decimalSeparator.size () > 1 ) {
+		SetError ( "Wrong parameter: decimalSeparator" );
+		return false;
+	}
+	if ( groupSeparator.size () > 1 ) {
+		SetError ( "Wrong parameter: groupSeparator" );
+		return false;
+	}
+	decimalDelimiter = decimalSeparator.empty () ? L'\0' : decimalSeparator [ 0 ];
+	groupDelimiter = groupSeparator.empty () ? L'\0' : groupSeparator [ 0 ];
 	return true;
 }
 

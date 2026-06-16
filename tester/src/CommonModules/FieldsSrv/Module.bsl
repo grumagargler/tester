@@ -11,3 +11,11 @@ function XLSXData ( MXLData ) export
 	return data;
 
 endfunction
+
+function Separators () export
+
+	settings = GetSessionRegionalSettings ();
+	return new Structure ( "Fractions, Groups",
+		settings.NumbersDecimalSeparator, settings.NumbersDigitGroupSeparator );
+
+endfunction
