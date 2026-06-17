@@ -768,6 +768,20 @@ function getPosition ( Area )
 
 endfunction
 
+procedure ShowValueInInputField ( Name, Source = undefined ) export
+
+	data = Fields.Focus ( Name, Source, Type ( "TestedFormField" ) );
+	field = data.Field;
+	if ( field.Type <> FormFieldType.InputField ) then
+		raise Output.FailedToOpenValue ();
+	else
+		table = editRow ( data, Source );
+		field.Open ();
+		finishEditing ( table );
+	endif;
+
+endprocedure
+
 function FetchSpreadsheetContent ( Field, Source = undefined ) export
 
 	controlType = Type ( "TestedFormField" );
@@ -786,7 +800,7 @@ endfunction
 
 function fetchSpreadsheet ( Field )
 
-#if ( not WebClient ) then
+	#if ( not WebClient ) then
 		mxl = GetTempFileName ( "mxl" );
 		xlsx = GetTempFileName ( "xlsx" );
 		App.SetFileDialogResult ( true, mxl );
@@ -809,7 +823,7 @@ function fetchSpreadsheet ( Field )
 		data.Write ( xlsx );
 		DeleteFilesAsync ( mxl );
 		return xlsx;
-#endif
+	#endif
 
 endfunction
 

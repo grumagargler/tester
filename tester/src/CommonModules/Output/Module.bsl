@@ -2533,3 +2533,10 @@ function GoOneLevelUpFailed () export
 	return NStr ( "en = 'Failed to move to the upper level. The current row is probably already the root, or the table is empty or unavailable';ru = 'Не удалось перейти на уровень выше. Текущая строка, вероятно, уже корневая, либо таблица пуста или недоступна'" );
 
 endfunction
+
+&atclient
+function FailedToOpenValue () export
+
+	return NStr ( "en = 'The specified control is not an input field';ru = 'Указанный элемент управления не является полем ввода'" );
+
+endfunction

@@ -1,12 +1,12 @@
 &atclient
-procedure Connect ( ClearErrors = true, Port = undefined, Computer = undefined ) export
+procedure Connect ( ClearErrors = undefined, Port = undefined, Computer = undefined ) export
 	
 	Test.ConnectClient ( ClearErrors, Port, Computer );
 	
 endprocedure 
 
 &atclient
-procedure Подключить ( ClearErrors = true, Port = undefined, Computer = undefined ) export
+procedure Подключить ( ClearErrors = undefined, Port = undefined, Computer = undefined ) export
 	
 	Connect ( ClearErrors, Port, Computer );
 	
@@ -1088,6 +1088,7 @@ endprocedure
 &atclient
 procedure GoOneLevelDown ( Table, Source = undefined ) export
 
+	Test.CheckConnection ();
 	Fields.GotoTableLevel ( Table, Source, 1 );
 
 endprocedure
@@ -1102,6 +1103,7 @@ endprocedure
 &atclient
 procedure GoOneLevelUp ( Table, Source = undefined ) export
 
+	Test.CheckConnection ();
 	Fields.GotoTableLevel ( Table, Source, -1 );
 
 endprocedure
@@ -1112,6 +1114,22 @@ procedure ПерейтиНаУровеньВыше ( Table, Source = undefined )
 	GoOneLevelUp ( Table, Source );
 
 endprocedure
+
+&atclient
+function OpenValueInInputField ( Name, Source = undefined ) export
+
+	Test.CheckConnection ();
+	Fields.ShowValueInInputField ( Name, Source );
+	return With ();
+
+endfunction
+
+&atclient
+function ОткрытьЗначениеВПолеВвода ( Name, Source = undefined ) export
+
+	return OpenValueInInputField ( Name, Source );
+
+endfunction
 
 #if ( not webclient ) then
 

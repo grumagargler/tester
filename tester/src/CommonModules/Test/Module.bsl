@@ -59,17 +59,18 @@ procedure DisconnectClient ( Close = false ) export
 	
 endprocedure 
 
-procedure ConnectClient ( ClearErrors = true, Port = undefined, Computer = undefined ) export
+procedure ConnectClient ( ClearErrors = undefined, Port = undefined, Computer = undefined ) export
 	
 	#if ( ThinClient or ThickClientManagedApplication ) then
+		clear = ? ( ClearErrors = undefined, MCPRequestProcessing <> true, ClearErrors );
 		try
-			tryConnect ( ClearErrors, Port, Computer );
+			tryConnect ( clear, Port, Computer );
 		except
 			try
 				Disconnect ();
 			except
 			endtry;
-			tryConnect ( ClearErrors, Port, Computer );
+			tryConnect ( clear, Port, Computer );
 		endtry;
 	#endif
 
