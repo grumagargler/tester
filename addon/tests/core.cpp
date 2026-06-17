@@ -1016,6 +1016,38 @@ TEST_SUITE ( "current" ) {
 								"type" ) == "String(50)" );
 	}
 
+	TEST_CASE (
+			"Read form info for a Russian reconciliation document form in designer format" ) {
+		const auto result = readFormInfoFrom (
+				cyrillicDesignerTooltipSources (),
+				"Документ.АктСверкиВзаиморасчетов.Форма.ФормаДокумента", "ru" );
+		CHECK ( result.at ( "fields" ).at ( "Номер" ).at ( "type" ) ==
+						"String(11)" );
+		CHECK ( result.at ( "fields" ).at ( "Дата" ).at ( "type" ) ==
+						"Date" );
+		CHECK ( result.at ( "fields" ).at ( "Организация" ).at ( "type" ) ==
+						"CatalogRef.Организации" );
+		CHECK ( result.at ( "fields" ).at ( "Организация" ).at (
+								"fillChecking" ) == "ShowError" );
+		CHECK ( result.at ( "fields" ).at ( "Контрагент" ).at ( "type" ) ==
+						"CatalogRef.Контрагенты" );
+		CHECK ( result.at ( "fields" ).at ( "ДатаНачала" ).at ( "tooltip" ) ==
+						"Дата начала периода сверки" );
+		CHECK ( result.at ( "fields" ).at ( "ДатаНачала" ).at ( "type" ) ==
+						"Date" );
+		CHECK ( result.at ( "fields" ).at ( "ОстатокНаНачало" ).at ( "type" ) ==
+						"Number(15,2)" );
+		CHECK ( result.at ( "tables" )
+								.at ( "ПоДаннымОрганизации" )
+								.at ( "ПоДаннымОрганизацииДебет" )
+								.at ( "type" ) == "Number(15,2)" );
+		CHECK ( result.at ( "tables" )
+								.at ( "Сверка" )
+								.at ( "СверкаДебетПоДаннымОрганизации" )
+								.at ( "type" ) == "Number(15,2)" );
+		CHECK_FALSE ( result.contains ( "dataPaths" ) );
+	}
+
 	TEST_CASE ( "Read common form data paths" ) {
 		const auto edt = readFormDataPaths ( "CommonForm.Report" );
 		CHECK ( jsonArrayContainsDataPath ( edt, "Result", "Result" ) );
