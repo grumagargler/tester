@@ -1,4 +1,6 @@
 #pragma once
+#include "chars.h"
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -212,5 +214,23 @@ inline std::string referenceType ( const MetadataType& type ) {
 		return {};
 	}
 	return prefix->second + type.name;
+}
+
+inline std::filesystem::path utf8PathSegment ( const std::string& value ) {
+#ifdef _WIN32
+	return Chars::wideToPath ( Chars::stringToWide ( value ) );
+#else
+	return std::filesystem::path ( value );
+#endif
+}
+
+inline std::string pathToUTF8 ( const std::filesystem::path& path ) {
+	const auto value = path.u8string ();
+#ifdef __cpp_char8_t
+	return std::string ( reinterpret_cast<const char*> ( value.data () ),
+											 value.size () );
+#else
+	return value;
+#endif
 }
 }

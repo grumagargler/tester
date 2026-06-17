@@ -166,13 +166,14 @@ std::filesystem::path formPath ( const std::filesystem::path& sources,
 		if ( parts.size () != 2 ) {
 			return {};
 		}
-		return sources / folder->second / parts [ 1 ] / "Ext" / "Form.xml";
+		return sources / folder->second / utf8PathSegment ( parts [ 1 ] ) /
+					 "Ext" / "Form.xml";
 	}
 	if ( parts.size () < 4 ) {
 		return {};
 	}
-	return sources / folder->second / parts [ 1 ] / "Forms" / parts [ 3 ] /
-				 "Ext" / "Form.xml";
+	return sources / folder->second / utf8PathSegment ( parts [ 1 ] ) /
+				 "Forms" / utf8PathSegment ( parts [ 3 ] ) / "Ext" / "Form.xml";
 }
 
 class Repository {
@@ -215,7 +216,7 @@ public:
 private:
 	std::shared_ptr<const pugi::xml_document>
 	loadDocument ( const std::filesystem::path& path ) {
-		const auto key = path.string ();
+		const auto key = pathToUTF8 ( path );
 		if ( const auto found = documents.find ( key );
 				 found != documents.end () ) {
 			return found->second;
@@ -234,7 +235,8 @@ private:
 		if ( folder == SourceFolders.end () ) {
 			return {};
 		}
-		return sources / folder->second / ( type.name + ".xml" );
+		return sources / folder->second /
+					 utf8PathSegment ( type.name + ".xml" );
 	}
 
 	std::optional<MetadataType>
@@ -262,8 +264,9 @@ private:
 			if ( type.starts_with ( "DefinedType." ) ) {
 				const auto definedName =
 						type.substr ( std::string { "DefinedType." }.size () );
-				const auto defined = loadDocument ( sources / "DefinedTypes" /
-																						( definedName + ".xml" ) );
+				const auto defined = loadDocument (
+						sources / "DefinedTypes" /
+						utf8PathSegment ( definedName + ".xml" ) );
 				if ( defined ) {
 					const auto object =
 							firstElementChild ( defined->document_element () );

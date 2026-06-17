@@ -147,7 +147,7 @@ public:
 private:
 	std::shared_ptr<const pugi::xml_document>
 	loadDocument ( const std::filesystem::path& path ) {
-		const auto key = path.string ();
+		const auto key = pathToUTF8 ( path );
 		if ( const auto found = documents.find ( key );
 				 found != documents.end () ) {
 			return found->second;
@@ -166,7 +166,8 @@ private:
 		if ( folder == SourceFolders.end () ) {
 			return {};
 		}
-		return sources / folder->second / type.name / ( type.name + ".mdo" );
+		return sources / folder->second / utf8PathSegment ( type.name ) /
+					 utf8PathSegment ( type.name + ".mdo" );
 	}
 
 	std::optional<MetadataType>
@@ -192,8 +193,9 @@ private:
 			if ( type.starts_with ( "DefinedType." ) ) {
 				const auto definedName =
 						type.substr ( std::string { "DefinedType." }.size () );
-				const auto path =
-						sources / "DefinedTypes" / definedName / ( definedName + ".mdo" );
+				const auto path = sources / "DefinedTypes" /
+													utf8PathSegment ( definedName ) /
+													utf8PathSegment ( definedName + ".mdo" );
 				const auto defined = loadDocument ( path );
 				if ( defined ) {
 					for ( const auto& resolved : formatTypes (
@@ -753,14 +755,14 @@ std::filesystem::path formPath ( const std::filesystem::path& sources,
 		if ( parts.size () != 2 ) {
 			return {};
 		}
-		return sources / folder->second / parts [ 1 ] / "Form.form";
+		return sources / folder->second / utf8PathSegment ( parts [ 1 ] ) /
+					 "Form.form";
 	}
 	if ( parts.size () < 4 ) {
 		return {};
 	}
-	return ( sources / folder->second / parts [ 1 ] / "Forms" / parts [ 3 ] /
-					 "Form.form" )
-			.string ();
+	return sources / folder->second / utf8PathSegment ( parts [ 1 ] ) /
+				 "Forms" / utf8PathSegment ( parts [ 3 ] ) / "Form.form";
 }
 }
 

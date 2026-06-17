@@ -1,19 +1,20 @@
 #include "metadata.h"
 #include "designer.h"
 #include "edt.h"
+#include "internal.h"
 #include <filesystem>
 #include <utility>
 
 namespace {
-bool designerSources ( const std::string& sources ) {
-	return std::filesystem::exists ( std::filesystem::path { sources } /
-																	 "Configuration.xml" );
+bool designerSources ( const std::filesystem::path& sources ) {
+	return std::filesystem::exists ( sources / "Configuration.xml" );
 }
 }
 
 Metadata1C::Metadata1C ( std::string sources, std::string formName,
 												 std::string language )
-		: sources ( std::move ( sources ) ), formName ( std::move ( formName ) ),
+		: sources ( metadata::internal::utf8PathSegment ( sources ) ),
+			formName ( std::move ( formName ) ),
 			language ( std::move ( language ) ) {
 }
 

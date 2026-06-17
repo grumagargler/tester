@@ -76,7 +76,7 @@ std::string pathAsUTF8 ( const std::filesystem::path& path ) {
 nlohmann::json readFormInfoFrom ( const std::filesystem::path& sources,
 																	const std::string& formName,
 																	const std::string& language = "en" ) {
-	Metadata1C metadata ( sources.string (), formName, language );
+	Metadata1C metadata ( pathAsUTF8 ( sources ), formName, language );
 	const auto body = metadata.getFormInfo ();
 	REQUIRE_FALSE ( body.empty () );
 	return nlohmann::json::parse ( body );
@@ -93,7 +93,7 @@ nlohmann::json readDesignerFormInfo ( const std::string& formName,
 
 nlohmann::json readFormDataPathsFrom ( const std::filesystem::path& sources,
 																			 const std::string& formName ) {
-	Metadata1C metadata ( sources.string (), formName );
+	Metadata1C metadata ( pathAsUTF8 ( sources ), formName );
 	const auto body = metadata.getFormDataPaths ();
 	REQUIRE_FALSE ( body.empty () );
 	return nlohmann::json::parse ( body );
@@ -143,6 +143,18 @@ bool jsonArrayContainsDataPathName ( const nlohmann::json& array,
 				return itemName != item.end () && itemName->is_string () &&
 							 itemName->template get<std::string> () == name;
 			} );
+}
+
+void copyFixtureFile ( const std::filesystem::path& sourceRoot,
+											 const std::filesystem::path& targetRoot,
+											 const std::filesystem::path& relativePath ) {
+	const auto target = targetRoot / relativePath;
+	std::filesystem::create_directories ( target.parent_path () );
+	std::ifstream source ( sourceRoot / relativePath, std::ios::binary );
+	REQUIRE ( source );
+	std::ofstream destination ( target, std::ios::binary );
+	REQUIRE ( destination );
+	destination << source.rdbuf ();
 }
 
 void setStringVariant ( tVariant& Variant, const std::string& Value ) {
@@ -1046,6 +1058,30 @@ TEST_SUITE ( "current" ) {
 								.at ( "СверкаДебетПоДаннымОрганизации" )
 								.at ( "type" ) == "Number(15,2)" );
 		CHECK_FALSE ( result.contains ( "dataPaths" ) );
+	}
+
+	TEST_CASE ( "Read form info from a Cyrillic designer sources path" ) {
+		const auto testRoot = std::filesystem::temp_directory_path () /
+													unicodePathSegment ( "tester-metadata-кириллица",
+																							 L"tester-metadata-кириллица" );
+		const auto sources =
+				testRoot / unicodePathSegment ( "источники", L"источники" );
+		std::filesystem::remove_all ( testRoot );
+		copyFixtureFile ( designerTooltipSources (), sources,
+											"Configuration.xml" );
+		copyFixtureFile ( designerTooltipSources (), sources,
+											"Documents/Invoice.xml" );
+		copyFixtureFile ( designerTooltipSources (), sources,
+											"Documents/Invoice/Forms/Form/Ext/Form.xml" );
+
+		const auto result =
+				readFormInfoFrom ( sources, "Document.Invoice.Form.Form" );
+		CHECK ( result.at ( "explanation" ) ==
+						"Document which records sale of items to the customer" );
+		CHECK ( result.at ( "fields" ).at ( "Customer" ).at ( "type" ) ==
+						"CatalogRef.Organizations" );
+
+		std::filesystem::remove_all ( testRoot );
 	}
 
 	TEST_CASE ( "Read common form data paths" ) {

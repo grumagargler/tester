@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <string>
 
 class Metadata1C {
@@ -10,5 +11,6 @@ public:
 	std::string getFormDataPaths ();
 
 private:
-	std::string sources, formName, language;
+	std::filesystem::path sources;
+	std::string formName, language;
 };
