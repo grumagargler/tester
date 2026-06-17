@@ -1002,6 +1002,18 @@ Goes one level down from the current row of a hierarchical list or tree table.
 
 Goes one level up in a hierarchical list or tree table.
 
+## OpenValueInInputField
+
+`Object = OpenValueInInputField ( Name, Source = undefined )`
+
+| Parameter | Type | Value |
+| --------- | ---- | ----- |
+|Object|Tested object|The opened form, set as [CurrentSource](#currentsource)|
+|Name|String|Identifier or title of the input field. The name can use the `!` or `#` prefix to search by field identifier. A full path to the field can be specified.|
+|Source|String \| TestedObject|String with the form title or the form object itself. If no value is specified, the global variable [CurrentSource](#currentsource) will be used as the source.|
+
+Opens the value stored in an input field using the standard platform action and sets the opened form as current. This method is applicable only to input fields. If the found control is not an input field, it throws an exception.
+
 ## Commando
 
 `Object = Commando ( Action, Activate = true )`

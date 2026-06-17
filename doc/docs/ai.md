@@ -54,7 +54,7 @@ enabled = true
 возврат ПолучитьИзмененияОкна ();
 ```
 
-Для таких сценариев полезны методы [ПолучитьГлавноеМеню](api.md#getmainmenu), [ПолучитьЭлементыАктивногоОкна](api.md#getactivewindowcontrols), [ПолучитьИзмененияОкна](api.md#getactivewindowchanges), [ВнестиЗначение](api.md#entervalue), [ПолучитьСодержимоеТаблицы](api.md#gettablecontent), [ПолучитьСодержимоеТабличногоДокумента](api.md#getspreadsheetcontent), [ПерейтиКСледующейСтроке](api.md#gotonextrow), [ПерейтиКПредыдущейСтроке](api.md#gotopreviousrow), [ПерейтиНаУровеньНиже](api.md#gooneleveldown) и [ПерейтиНаУровеньВыше](api.md#goonelevelup).
+Для таких сценариев полезны методы [ПолучитьГлавноеМеню](api.md#getmainmenu), [ПолучитьЭлементыАктивногоОкна](api.md#getactivewindowcontrols), [ПолучитьИзмененияОкна](api.md#getactivewindowchanges), [ВнестиЗначение](api.md#entervalue), [ОткрытьЗначениеВПолеВвода](api.md#openvalueininputfield), [ПолучитьСодержимоеТаблицы](api.md#gettablecontent), [ПолучитьСодержимоеТабличногоДокумента](api.md#getspreadsheetcontent), [ПерейтиКСледующейСтроке](api.md#gotonextrow), [ПерейтиКПредыдущейСтроке](api.md#gotopreviousrow), [ПерейтиНаУровеньНиже](api.md#gooneleveldown) и [ПерейтиНаУровеньВыше](api.md#goonelevelup).
 
 Готовое окружение
 -----------------
