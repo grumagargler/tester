@@ -4,7 +4,7 @@
 
 ## Сводка
 
-Текущая версия: **1.3.5.18** [История релизов](releases.md)
+[История версий](releases.md)
 
 Последние обновления: <https://github.com/grumagargler/tester>
 
