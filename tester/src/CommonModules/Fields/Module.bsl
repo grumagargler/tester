@@ -947,7 +947,7 @@ function GetWindowControls () export
 	context = prepareContext ( window, form );
 	applyMetadata ( context );
 	elements = new Array ();
-	prepareElements ( elements, controls, context );
+	prepareElements ( elements, controls, context, false );
 	LastActiveWindowControls = Conversion.ToJSON ( elements, false );
 	return new Structure ( "ActiveForm, Elements", form,
 		? ( elements.Count () = 1, elements [ 0 ], elements ) );
@@ -1103,7 +1103,7 @@ function getMetadata ( Context )
 
 endfunction
 
-procedure prepareElements ( Elements, Objects, Context )
+procedure prepareElements ( Elements, Objects, Context, TableItems )
 
 	// What is CurrentDropList for?
 	// As soon as a drop-down list is opened in a field, all input fields will report
@@ -1118,14 +1118,11 @@ procedure prepareElements ( Elements, Objects, Context )
 		if ( isInvisible ( control, Context ) ) then
 			continue;
 		endif;
-		element = controlToElement ( control, Context, false );
+		element = controlToElement ( control, Context, TableItems );
 		Elements.Add ( element );
 		if ( next.Count () > 0 ) then
-			if ( TypeOf ( control ) = Type ( "TestedFormTable" ) ) then
-				element.Insert ( "Columns", tableColumns ( next, Context ) );
-			endif;
 			element.Insert ( "Items", new Array () );
-			prepareElements ( element.Items, next, Context );
+			prepareElements ( element.Items, next, Context, TypeOf ( control ) = Type ( "TestedFormTable" ) );
 			if ( element.Items.Count () = 0 ) then
 				element.Delete ( "Items" );
 			endif;
@@ -1133,24 +1130,6 @@ procedure prepareElements ( Elements, Objects, Context )
 	enddo;
 
 endprocedure
-
-function tableColumns ( Objects, Context )
-
-	columns = new Array ();
-	textField = Type ( "TestedFormField" );
-	i = Objects.Count ();
-	while ( i > 0 ) do
-		i = i - 1;
-		object = Objects [ i ];
-		if ( TypeOf ( object ) = textField
-			and not isInvisible ( object, Context ) ) then
-			columns.Insert  ( 0, controlToElement ( object, Context, true ) );
-			Objects.Delete ( i );
-		endif;
-	enddo;
-	return columns;
-
-endfunction
 
 function isInvisible ( Control, Context )
 
@@ -1429,12 +1408,8 @@ procedure tableElement ( Control, Element, Context )
 	if ( table.TableIsInChoiceMode = true ) then
 		Element.Insert ( "TableIsInChoiceMode", true );
 	endif;
-	representation = table.Representation;
-	isTree = ( representation = "Tree" );
-	if ( representation = "HierarchicalList" ) then
-		Element.Insert ( "TableIsHierarchicalList", true );
-	elsif ( isTree ) then
-		Element.Insert ( "TableIsTree", true );
+	if ( table.Representation <> undefined ) then
+		Element.Insert ( "TableRepresentation", table.Representation );
 	endif;
 	if ( table.AutoInsertNewRow and table.ChangeRowSet ) then
 		Element.Insert ( "AutoAddNewRow", true );
@@ -1457,7 +1432,7 @@ procedure tableElement ( Control, Element, Context )
 	endif;
 	currentRow = table.TableCurrentRow;
 	if ( currentRow <> undefined ) then
-		if ( isTree ) then
+		if ( tableData <> undefined and tableData.ValueTree ) then
 			row = currentRow;
 			while ( row <> undefined ) do
 				adjustTableRow ( row.Data, ClientControls );

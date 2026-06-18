@@ -21,7 +21,7 @@
   <usePurposes>PersonalComputer</usePurposes>
   <defaultRoles>Role.User</defaultRoles>
   <vendor>Reshitko Dmitry</vendor>
-  <version>1.3.5.18</version>
+  <version>1.3.5.19</version>
   <includeHelpInContents>true</includeHelpInContents>
   <help>
     <pages>
