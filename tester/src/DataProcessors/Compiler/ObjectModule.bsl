@@ -160,9 +160,9 @@ procedure finalize(Scope, SyntaxOnly)
 		|	if ( _oldSource <> undefined
 		|		and _oldSource <> CurrentSource ) then
 		|		With ( _oldSource );
-		|		CurrentSource = _oldSource;
-		|		ТекущийОбъект = CurrentSource;
 		|	endif;
+		|	CurrentSource = _oldSource;
+		|	ТекущийОбъект = CurrentSource;
 		|endif;
 		|" + Clauses.IfEnd;
 	endif;
