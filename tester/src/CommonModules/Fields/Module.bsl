@@ -1559,7 +1559,7 @@ endprocedure
 function FetchMainMenu () export
 
 	menu = callClient ( "getMenu", undefined );
-	fromCache = menu <> undefined and menu.success and menu.content <> undefined;
+	fromCache = menu <> undefined and menu.success and menu.Property ( "content" );
 	if ( fromCache ) then
 		return menu.content;
 	endif;
