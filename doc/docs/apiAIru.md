@@ -749,9 +749,9 @@
 {!id/header.md!}
 |элементы|Структура|Иерархическая структура визуальных элементов активного окна|
 
-Возвращает дерево элементов только активного окна тестируемого приложения. Верхний результат обычно является структурой формы. Элементы содержат стандартные поля `Type`, `Name`, `TitleText`, дочерние элементы хранятся в поле `Items`, а колонки таблиц - в поле `Columns`.
+Возвращает дерево элементов только активного окна тестируемого приложения. Верхний результат обычно является структурой формы. Элементы содержат стандартные поля `Type`, `ID`, `TitleText`, дочерние элементы хранятся в поле `Items`, а колонки таблиц - в поле `Columns`.
 
-Если доступны данные тестируемого клиента и метаданные формы, элементы дополнительно могут содержать поля `ToolTip`, `DataType`, `Value`, `Mandatory`, `ReadOnly`, `InputHint`, `WarningOnEdit`, `DropList`, `Rows`, `RowCount`, `CurrentRowData`, `CurrentColumn`, `TableIsTree`, `TableIsHierarchicalList` и другие признаки состояния формы.
+Если доступны данные тестируемого клиента и метаданные формы, элементы дополнительно могут содержать поля `ToolTip`, `DataType`, `Value`, `Mandatory`, `ReadOnly`, `InputHint`, `WarningOnEdit`, `DropList`, `Rows`, `RowCount`, `CurrentRowData`, `CurrentControl`, `CurrentColumn`, `CurrentVisibleTab`, `TableIsTree`, `TableIsHierarchicalList` и другие признаки состояния формы.
 
 Пример:
 

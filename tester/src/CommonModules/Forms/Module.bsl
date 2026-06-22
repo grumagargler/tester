@@ -403,7 +403,7 @@ procedure ResetBaseline ( Hard = true ) export
 		for each entry in entries do
 			if ( entry.Property ( "Type", type )
 				and type = "TestedForm" ) then
-				if ( entry.Property ( "Name", name )
+				if ( entry.Property ( "ID", name )
 					and name <> currentForm ) then
 					LastActiveWindowControls = undefined;
 				endif;

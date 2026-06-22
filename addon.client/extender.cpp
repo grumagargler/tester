@@ -110,7 +110,7 @@ bool Extender::setMemManager ( void *Pointer ) {
 }
 
 long Extender::GetInfo () {
-	return 9039;
+	return 9040;
 }
 
 bool Extender::RegisterExtensionAs ( WCHAR_T **Entry ) {

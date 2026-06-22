@@ -11,8 +11,8 @@ namespace JSON {
 namespace {
 using Json = nlohmann::json;
 
-const std::set<std::string> NamedCollections { "ChildObjects", "Columns" };
-const std::set<std::string> SummaryKeys { "Name", "TitleText", "Type" };
+const std::set<std::string> NamedCollections { "ChildObjects", "Items", "Columns" };
+const std::set<std::string> SummaryKeys { "ID", "TitleText", "Type" };
 
 std::string normalizePath ( const std::string& path ) {
 	if ( path.empty () ) {
@@ -38,13 +38,13 @@ std::string indexPath ( const std::string& path, size_t index ) {
 }
 
 bool isNamedNode ( const Json& value ) {
-	return value.is_object () && value.contains ( "Name" ) &&
-				 value.at ( "Name" ).is_string ();
+	return value.is_object () && value.contains ( "ID" ) &&
+				 value.at ( "ID" ).is_string ();
 }
 
 std::string nodeName ( const Json& value ) {
 	if ( isNamedNode ( value ) ) {
-		return value.at ( "Name" ).get<std::string> ();
+		return value.at ( "ID" ).get<std::string> ();
 	}
 	return {};
 }

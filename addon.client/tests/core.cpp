@@ -6,23 +6,23 @@
 TEST_CASE ( "JSON::compare returns structured property changes" ) {
 	const std::string previous = R"json([
 		{
-			"Name":"Catalog.Organizations.Form.Form",
+			"ID":"Catalog.Organizations.Form.Form",
 			"TitleText":"Контрагенты (create)",
 			"Type":"TestedForm",
-			"ChildObjects":[
+			"Items":[
 				{
-					"Name":"EntityGroup",
+					"ID":"EntityGroup",
 					"TitleText":"Entity group",
 					"Type":"TestedFormGroup",
-					"ChildObjects":[
+					"Items":[
 						{
-							"Name":"FullDescription",
+							"ID":"FullDescription",
 							"TitleText":"Официальное",
 							"Type":"TestedFormField",
 							"Value":""
 						},
 						{
-							"Name":"Description",
+							"ID":"Description",
 							"TitleText":"Короткое",
 							"Type":"TestedFormField",
 							"Value":""
@@ -35,23 +35,23 @@ TEST_CASE ( "JSON::compare returns structured property changes" ) {
 
 	const std::string current = R"json([
 		{
-			"Name":"Catalog.Organizations.Form.Form",
+			"ID":"Catalog.Organizations.Form.Form",
 			"TitleText":"Контрагенты (create)",
 			"Type":"TestedForm",
-			"ChildObjects":[
+			"Items":[
 				{
-					"Name":"EntityGroup",
+					"ID":"EntityGroup",
 					"TitleText":"Entity group",
 					"Type":"TestedFormGroup",
-					"ChildObjects":[
+					"Items":[
 						{
-							"Name":"FullDescription",
+							"ID":"FullDescription",
 							"TitleText":"Официальное",
 							"Type":"TestedFormField",
 							"Value":"SRL TechVision Moldova"
 						},
 						{
-							"Name":"Description",
+							"ID":"Description",
 							"TitleText":"Короткое",
 							"Type":"TestedFormField",
 							"Value":"SRL TechVision Moldova"
@@ -81,26 +81,26 @@ TEST_CASE ( "JSON::compare returns structured property changes" ) {
 	CHECK ( second.at ( "NewValue" ) == "SRL TechVision Moldova" );
 }
 
-TEST_CASE ( "JSON::compare matches named controls independently from order" ) {
+TEST_CASE ( "JSON::compare matches identified controls independently from order" ) {
 	const std::string previous = R"json([
 		{
-			"Name":"Form",
+			"ID":"Form",
 			"TitleText":"Window",
 			"Type":"TestedForm",
-			"ChildObjects":[
-				{ "Name":"A", "TitleText":"A", "Type":"TestedFormField", "Value":"1" },
-				{ "Name":"B", "TitleText":"B", "Type":"TestedFormField", "Value":"2" }
+			"Items":[
+				{ "ID":"A", "TitleText":"A", "Type":"TestedFormField", "Value":"1" },
+				{ "ID":"B", "TitleText":"B", "Type":"TestedFormField", "Value":"2" }
 			]
 		}
 	])json";
 	const std::string current = R"json([
 		{
-			"Name":"Form",
+			"ID":"Form",
 			"TitleText":"Window",
 			"Type":"TestedForm",
-			"ChildObjects":[
-				{ "Name":"B", "TitleText":"B", "Type":"TestedFormField", "Value":"2" },
-				{ "Name":"A", "TitleText":"A", "Type":"TestedFormField", "Value":"1" }
+			"Items":[
+				{ "ID":"B", "TitleText":"B", "Type":"TestedFormField", "Value":"2" },
+				{ "ID":"A", "TitleText":"A", "Type":"TestedFormField", "Value":"1" }
 			]
 		}
 	])json";

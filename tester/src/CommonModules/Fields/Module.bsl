@@ -721,7 +721,10 @@ function ClickField ( Name, Source = undefined, Type = undefined ) export
 		try
 			field.Expand ();
 		except
-			field.Collapse ();
+			try
+				field.Collapse ();
+			except
+			endtry;
 		endtry;
 	elsif ( type = Type ( "TestedFormButton" ) ) then
 		try
@@ -862,24 +865,10 @@ function getTable ( Field, Source )
 
 endfunction
 
-function getColumns ( Table )
-
-	items = Table.GetChildObjects ();
-	columns = new Array ();
-	fieldType = Type ( "TestedFormField" );
-	for each item in items do
-		if ( TypeOf ( item ) = fieldType ) then
-			columns.Add ( new Structure ( "Name, Title", item.Name, item.TitleText ) );
-		endif;
-	enddo;
-	return columns;
-
-endfunction
-
 function tableData ( Control, Rows )
 
 	table = new Array ();
-	columns = getColumns ( Control );
+	columns = getColumns ( Control.GetChildObjects () );
 	selected = Rows.Count ();
 	selectAllAllowed = ( selected > 1 );
 	if ( selectAllAllowed ) then
@@ -907,6 +896,23 @@ function tableData ( Control, Rows )
 		Control.GotoFirstRow ();
 	endif;
 	return table;
+
+endfunction
+
+function getColumns ( Objects )
+
+	columns = new Array ();
+	for each item in Objects do
+		type = TypeOf ( item );
+		if ( type = Type ( "TestedFormField" ) ) then
+			columns.Add ( new Structure ( "Name, Title", item.Name, item.TitleText ) );
+		elsif ( type = Type ( "TestedFormGroup" ) ) then
+			for each column in getColumns ( item.GetChildObjects () ) do
+				columns.Add ( column );
+			enddo;
+		endif;
+	enddo;
+	return columns;
 
 endfunction
 
@@ -1027,8 +1033,8 @@ endfunction
 
 function clientContext ( Context, FormCaption )
 
-	address = StrSplit ( TesterAgentConnectionString, ":" );
-	if ( address.Count () <> 2 ) then
+	profile = clientProfile ();
+	if ( profile = undefined ) then
 		return undefined;
 	endif;
 	formName = Context.FormName;
@@ -1040,18 +1046,42 @@ function clientContext ( Context, FormCaption )
 			RuntimeSrv.LogException ( "ExternalMeta", ExternalMeta.Problem (), "Warning" );
 		endtry;
 	endif;
+	result = callClient ( "getControls", new Structure (
+		"Caption, Form, DataPaths", FormCaption, formName, dataPaths ),
+		profile );
+	if ( result.success ) then
+		content = result.content;
+		return new Structure ( "Items, Language, Separators",
+			content.items, content.language, content.separators );
+	endif;
+
+endfunction
+
+function clientProfile ()
+
+	address = StrSplit ( TesterAgentConnectionString, ":" );
+	if ( address.Count () = 2 ) then
+		return address;
+	endif;
+
+endfunction
+
+function callClient ( Command, Parameters, Profile = undefined )
+
+	if ( Profile = undefined ) then
+		address = clientProfile ();
+		if ( address = undefined ) then
+			return undefined;
+		endif;
+	else
+		address = Profile;
+	endif;
 	connection = new HTTPConnection ( address [ 0 ], Number ( address [ 1 ] ) );
 	request = new HTTPRequest ();
-	p = new Structure ( "command, parameters",
-		"getControls", new Structure ( "Caption, Form, DataPaths",
-		FormCaption, formName, dataPaths ) );
+	p = new Structure ( "command, parameters", Command, Parameters );
 	request.SetBodyFromString ( Conversion.ToJSON ( p ) );
 	response = connection.Post ( request );
-	result = Conversion.FromJson ( response.GetBodyAsString () );
-	if ( result.success ) then
-		return new Structure ( "Items, Language, Separators",
-			result.content.items, result.content.language, result.content.separators );
-	endif;
+	return Conversion.FromJson ( response.GetBodyAsString () );
 
 endfunction
 
@@ -1168,19 +1198,20 @@ function controlToElement ( Control, Context, ColumnDescription )
 		FillPropertyValues ( element, Control );
 	else
 		clientControls = Context.ClientControls;
-		element = new Structure ( "Name, TitleText, Type" );
+		element = new Structure ( "ID, TitleText, Type" );
 		FillPropertyValues ( element, Control );
 		if ( type = Type ( "TestedCommandInterfaceButton" ) ) then
 			element.Insert ( "URL", Control.URL );
 		elsif ( type = Type ( "TestedForm" ) ) then
 			formElement ( element, Context );
 		else
+			element.ID = Control.Name;
 			injectTooltip ( Control, element, Context );
 			if ( type = Type ( "TestedFormButton" ) ) then
 				try
 					// Select Type dialog is weird and breaks the documented execution
 					if ( controlChecked ( Control, clientControls ) ) then
-						Element.Insert ( "PressedOrChecked", true );
+						element.Insert ( "PressedOrChecked", true );
 					endif;
 				except
 				endtry;
@@ -1198,7 +1229,7 @@ function controlToElement ( Control, Context, ColumnDescription )
 				and Control.Type = FormItemAdditionType.SearchStringRepresentation ) then
 					element.Insert ( "SearchString", true );
 			endif;
-			removeTitleText ( Element, clientControls );
+			removeTitleText ( element, clientControls );
 		endif;
 	endif;
 	injectType ( element, Control, clientControls );
@@ -1220,7 +1251,7 @@ endfunction
 procedure formElement ( Element, Context )
 
 	var info;
-	Element.Name = Context.FormName;
+	Element.ID = Context.FormName;
 	clientControls = Context.ClientControls;
 	if ( clientControls <> undefined
 		and clientControls.Property ( Enum.ConstantsEntityInfoMark (), info ) ) then
@@ -1229,7 +1260,7 @@ procedure formElement ( Element, Context )
 	control = Context.CurrentControl;
 	if ( control <> undefined ) then
 		Element.Insert ( "CurrentControl",
-			new Structure ( "Name, Title", control.Name, control.TitleText ) );
+			new Structure ( "ID, Title", control.Name, control.TitleText ) );
 	endif;
 
 endprocedure
@@ -1279,7 +1310,8 @@ procedure groupElement ( Control, Element, Context )
 		return;
 	endif;
 	name = Control.Name;
-	if ( clientControls [ name ].Collapsible ) then
+	item = clientControls [ name ];
+	if ( item.Collapsible ) then
 		element.Insert ( "GroupType", Output.CollapsibleGroup () );
 		// Looks like bug in 1C 8.3.27, `CurrentOpened` forks in opposite way
 		groupIsClosed = Control.CurrentOpened ();
@@ -1287,6 +1319,9 @@ procedure groupElement ( Control, Element, Context )
 			element.Insert ( "SystemHint", Output.CollapsibleGroupSystemHint (
 				new Structure ( "Name", name ) ) );
 		endif;
+	endif;
+	if ( item.CurrentTab <> undefined ) then
+		element.Insert ( "CurrentVisibleTab", item.CurrentTab );
 	endif;
 
 endprocedure
@@ -1398,7 +1433,7 @@ procedure tableElement ( Control, Element, Context )
 	var table, field, dataType;
 	column = Control.GetCurrentItem ();
 	if ( column <> undefined ) then
-		Element.Insert ( "CurrentColumn", new Structure ( "Name, Title", column.Name, column.TitleText ) );
+		Element.Insert ( "CurrentColumn", new Structure ( "ID, Title", column.Name, column.TitleText ) );
 	endif;
 	clientControls = Context.ClientControls;
 	if ( clientControls = undefined
@@ -1495,7 +1530,7 @@ procedure removeTitleText ( Element, ClientControls )
 
 	var field;
 	if ( ClientControls <> undefined
-		and ClientControls.Property ( Element.Name, field )
+		and ClientControls.Property ( Element.ID, field )
 		and field.Notitle ) then
 		Element.Delete ( "TitleText" );
 	endif;
@@ -1511,7 +1546,7 @@ procedure injectType ( Element, Control, ClientControls )
 			type = String ( Type ( "ClientApplicationWindow" ) );
 		elsif ( conrolType = Type ( "TestedForm" ) ) then
 			type = String ( Type ( "ClientApplicationForm" ) );
-		elsif ( ClientControls.Property ( Element.Name, field ) ) then
+		elsif ( ClientControls.Property ( Element.ID, field ) ) then
 			type = ? ( field.ControlType = undefined, field.Type, field.ControlType );
 		else
 			type = String ( Control );
@@ -1523,6 +1558,11 @@ endprocedure
 
 function FetchMainMenu () export
 
+	menu = callClient ( "getMenu", undefined );
+	fromCache = menu <> undefined and menu.success and menu.content <> undefined;
+	if ( fromCache ) then
+		return menu.content;
+	endif;
 	interface = MainWindow.GetCommandInterface ();
 	sections = interface.FindObject ( , "Sections panel" );
 	if ( sections = undefined ) then
@@ -1581,6 +1621,7 @@ function FetchMainMenu () export
 	if ( lastSection <> undefined ) then
 		lastSection.Click ();
 	endif;
+	callClient ( "keepMenu", commandInterface );
 	return commandInterface;
 
 endfunction

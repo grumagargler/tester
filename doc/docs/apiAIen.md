@@ -743,9 +743,9 @@ Examples:
 | --------- | ---- | ----- |
 |controls|Structure|Hierarchical structure of visual controls from the active window|
 
-Returns a tree of controls from only the active window of the tested application. The top-level result is usually the form structure. Elements contain the standard fields `Type`, `Name`, `TitleText`; child controls are stored in `Items`, and table columns are stored in `Columns`.
+Returns a tree of controls from only the active window of the tested application. The top-level result is usually the form structure. Elements contain the standard fields `Type`, `ID`, `TitleText`; child controls are stored in `Items`, and table columns are stored in `Columns`.
 
-When tested-client data and form metadata are available, elements can also contain `ToolTip`, `DataType`, `Value`, `Mandatory`, `ReadOnly`, `InputHint`, `WarningOnEdit`, `DropList`, `Rows`, `RowCount`, `CurrentRowData`, `CurrentColumn`, `TableIsTree`, `TableIsHierarchicalList`, and other form state fields.
+When tested-client data and form metadata are available, elements can also contain `ToolTip`, `DataType`, `Value`, `Mandatory`, `ReadOnly`, `InputHint`, `WarningOnEdit`, `DropList`, `Rows`, `RowCount`, `CurrentRowData`, `CurrentControl`, `CurrentColumn`, `CurrentVisibleTab`, `TableIsTree`, `TableIsHierarchicalList`, and other form state fields.
 
 Example:
 
