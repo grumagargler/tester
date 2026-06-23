@@ -963,7 +963,8 @@ endfunction
 function prepareContext ( Window, Form )
 
 	context = new Structure (
-		"FormName, CurrentControl, CurrentDropList, ClientControls, Language, Metadata, SourcesFolder",
+		"FormName, CurrentControl, CurrentControlEditingText, CurrentDropList, ClientControls, "
+		"Language, Metadata, SourcesFolder",
 		Form.FormName );
 	currentControl = getCurrentControl ( Form );
 	if ( currentControl <> undefined ) then
@@ -971,6 +972,10 @@ function prepareContext ( Window, Form )
 		dropList = false;
 		type = typeOfControl ( currentControl );
 		if ( type = FormFieldType.InputField ) then
+			try
+				context.CurrentControlEditingText = currentControl.GetDisplayedText ();
+			except
+			endtry;
 			try
 				dropList = currentControl.DropListIsOpen ();
 			except
@@ -1259,8 +1264,11 @@ procedure formElement ( Element, Context )
 	endif;
 	control = Context.CurrentControl;
 	if ( control <> undefined ) then
-		Element.Insert ( "CurrentControl",
-			new Structure ( "ID, Title", control.Name, control.TitleText ) );
+		info = new Structure ( "ID, Title", control.Name, control.TitleText );
+		if ( Context.CurrentControlEditingText <> undefined ) then
+			info.Insert ( "EditingText", Context.CurrentControlEditingText );
+		endif;
+		Element.Insert ( "CurrentControl", info );
 	endif;
 
 endprocedure
@@ -1430,10 +1438,15 @@ endfunction
 
 procedure tableElement ( Control, Element, Context )
 
-	var table, field, dataType;
+	var table;
 	column = Control.GetCurrentItem ();
 	if ( column <> undefined ) then
-		Element.Insert ( "CurrentColumn", new Structure ( "ID, Title", column.Name, column.TitleText ) );
+		info = new Structure ( "ID, Title", column.Name, column.TitleText );
+		if ( column = Context.CurrentControl
+			and Context.CurrentControlEditingText <> undefined ) then
+			info.Insert ( "EditingText", Context.CurrentControlEditingText );
+		endif;
+		Element.Insert ( "CurrentColumn", info );
 	endif;
 	clientControls = Context.ClientControls;
 	if ( clientControls = undefined
