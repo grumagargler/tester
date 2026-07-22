@@ -25,6 +25,7 @@ nav:
 - Разветвленная разработка, git: git.md
 - Visual Studio Code: vscode.md
 - AI-агенты и MCP: ai.md
+- Виртуальный пользователь: virtualuser.md
 - Механизм заданий: jobs.md
 - Тестирование веб-клиента: webclient.md
 - Частые вопросы:
