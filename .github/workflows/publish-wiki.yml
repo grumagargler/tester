@@ -1,0 +1,66 @@
+name: Publish documentation to Wiki
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/publish-wiki.yml
+      - doc/docs/**
+      - doc/mkdocs.yml
+      - doc/scripts/build_wiki.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-tester-wiki
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'grumagargler/tester' &&
+      github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out documentation sources
+        uses: actions/checkout@v6
+
+      - name: Build Wiki-compatible documentation
+        run: >-
+          python3 doc/scripts/build_wiki.py
+          --output "$RUNNER_TEMP/wiki-build"
+          --repository "$GITHUB_REPOSITORY"
+          --branch "$GITHUB_REF_NAME"
+
+      - name: Clone Wiki repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >-
+          git clone
+          "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git"
+          "$RUNNER_TEMP/wiki"
+
+      - name: Synchronize and publish Wiki
+        run: |
+          rsync --archive --delete --exclude=.git/ \
+            "$RUNNER_TEMP/wiki-build/" "$RUNNER_TEMP/wiki/"
+
+          git -C "$RUNNER_TEMP/wiki" config \
+            user.name "github-actions[bot]"
+          git -C "$RUNNER_TEMP/wiki" config \
+            user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$RUNNER_TEMP/wiki" add --all
+
+          if git -C "$RUNNER_TEMP/wiki" diff --cached --quiet; then
+            echo "Wiki is already up to date."
+            exit 0
+          fi
+
+          git -C "$RUNNER_TEMP/wiki" commit \
+            -m "Update documentation from ${GITHUB_SHA::12}"
+          git -C "$RUNNER_TEMP/wiki" push origin HEAD
