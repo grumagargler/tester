@@ -2378,7 +2378,7 @@ endfunction
 &atclient
 function TableIsTooBig () export
 	
-	return NStr ( "en = 'The table is too big. Please try to filter it first using the search field or the table filters. If applicable, try to export the table to a spreadsheet document and then use GetSpreadsheetContent() to get the data in a Microsoft Excel file';ru = 'Таблица слишком большая. Пожалуйста, попробуйте сначала отфильтровать её с помощью поля поиска или фильтров таблицы. Если возможно, попробуйте экспортировать таблицу в документ электронной таблицы, а затем используйте ПолучитьСодержимоеТабличногоДокумента() для получения данных в файле Microsoft Excel'" );
+	return NStr ( "en = 'The table is too big. You can try to filter it, or, if applicable, export the table to a spreadsheet document and then use the method GetSpreadsheetContent to get the data as a Microsoft Excel file';ru = 'Таблица слишком большая. Вы можете попробовать отфильтровать данные или, если применимо, экспортировать таблицу в документ электронной таблицы, а затем использовать метод ПолучитьСодержимоеТабличногоДокумента для получения данных в виде файла Microsoft Excel'" );
 	
 endfunction
 

@@ -567,8 +567,18 @@ procedure putValue ( FieldData, Value, ChooseValue, TestSelection )
 	except
 		error = ErrorProcessing.BriefErrorDescription ( ErrorInfo () );
 		readonly = field.CurrentReadOnly ();
-		raise error + ? ( StrEndsWith ( error, "." ), " ", ". " )
-			+ ? ( readonly, Output.FieldIsReadOnly (), Output.SetValueFailed () );
+		if ( not readonly ) then
+			try
+				if ( not field.DropListIsOpen () ) then
+					field.OpenDropList ();
+				endif;
+				field.ExecuteChoiceFromChoiceList ( Value );
+				return;
+			except
+				raise error + ? ( StrEndsWith ( error, "." ), " ", ". " )
+					+ ? ( readonly, Output.FieldIsReadOnly (), Output.SetValueFailed () );
+			endtry;
+		endif;
 	endtry;
 	if ( ChooseValue ) then
 		try
@@ -1157,7 +1167,10 @@ procedure prepareElements ( Elements, Objects, Context, TableItems )
 		Elements.Add ( element );
 		if ( next.Count () > 0 ) then
 			element.Insert ( "Items", new Array () );
-			prepareElements ( element.Items, next, Context, TypeOf ( control ) = Type ( "TestedFormTable" ) );
+			controlType = TypeOf ( control );
+			columnsDescription = controlType = Type ( "TestedFormTable" )
+				or ( controlType = Type ( "TestedFormGroup" ) and control.Type = FormGroupType.ColumnGroup );
+			prepareElements ( element.Items, next, Context, columnsDescription );
 			if ( element.Items.Count () = 0 ) then
 				element.Delete ( "Items" );
 			endif;
@@ -1373,6 +1386,8 @@ procedure fieldElement ( Control, Element, Context, ColumnDescription )
 		endif;
 		if ( clientField.ReadOnly = true ) then
 			Element.Insert ( "ReadOnly", true );
+		elsif ( clientField.TextEdit = false ) then
+			Element.Insert ( "AllowsTextInput", false );
 		endif;
 		hint = clientField.InputHint;
 		if ( not IsBlankString ( hint ) ) then
@@ -1448,6 +1463,10 @@ procedure tableElement ( Control, Element, Context )
 		endif;
 		Element.Insert ( "CurrentColumn", info );
 	endif;
+	if ( Control.CurrentModeIsEdit () ) then
+		Element.Insert ( "TableRowIsEditingNow", true );
+	endif;
+
 	clientControls = Context.ClientControls;
 	if ( clientControls = undefined
 		or not clientControls.Property ( Control.Name, table ) ) then

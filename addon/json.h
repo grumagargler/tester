@@ -82,6 +82,6 @@ public:
 	void Presentation ( std::wstring* Result ) override;
 };
 
-std::string compare ( const std::string& first, const std::string& second );
+std::string compare ( const std::string& firstJSON, const std::string& secondJSON );
 }
 #endif

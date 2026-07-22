@@ -250,7 +250,7 @@ std::string callComponentMethod ( IComponentBase* Component,
 }
 }
 
-TEST_CASE ( "JSON::compare returns structured property changes" ) {
+TEST_CASE ( "JSON::compare renders nested property changes for an LLM" ) {
 	const std::string previous = R"json([
 		{
 			"ID":"Catalog.Organizations.Form.Form",
@@ -308,27 +308,13 @@ TEST_CASE ( "JSON::compare returns structured property changes" ) {
 			]
 		}
 	])json";
-	const auto result =
-			nlohmann::json::parse ( JSON::compare ( previous, current ) );
-	REQUIRE ( result.at ( "Mode" ) == "Delta" );
-	REQUIRE ( result.at ( "WindowChanged" ) == false );
-	REQUIRE ( result.at ( "ChangeCount" ) == 2 );
-	REQUIRE ( result.at ( "Changes" ).is_array () );
-	const auto& first = result.at ( "Changes" ).at ( 0 );
-	const auto& second = result.at ( "Changes" ).at ( 1 );
-	CHECK ( first.at ( "Path" ) ==
-					"Catalog.Organizations.Form.Form/EntityGroup/Description" );
-	CHECK ( first.at ( "Property" ) == "Value" );
-	CHECK ( first.at ( "OldValue" ) == "" );
-	CHECK ( first.at ( "NewValue" ) == "SRL TechVision Moldova" );
-	CHECK ( second.at ( "Path" ) ==
-					"Catalog.Organizations.Form.Form/EntityGroup/FullDescription" );
-	CHECK ( second.at ( "Property" ) == "Value" );
-	CHECK ( second.at ( "OldValue" ) == "" );
-	CHECK ( second.at ( "NewValue" ) == "SRL TechVision Moldova" );
+	const std::string expected =
+			R"diff(~ Items[EntityGroup].Items[Description].Value: "" -> "SRL TechVision Moldova"
+~ Items[EntityGroup].Items[FullDescription].Value: "" -> "SRL TechVision Moldova")diff";
+	CHECK ( JSON::compare ( previous, current ) == expected );
 }
 
-TEST_CASE ( "JSON::compare matches identified controls independently from order" ) {
+TEST_CASE ( "JSON::compare reports reordered identified controls" ) {
 	const std::string previous = R"json([
 		{
 			"ID":"Form",
@@ -351,10 +337,71 @@ TEST_CASE ( "JSON::compare matches identified controls independently from order"
 			]
 		}
 	])json";
-	const auto result =
-			nlohmann::json::parse ( JSON::compare ( previous, current ) );
-	CHECK ( result.at ( "ChangeCount" ) == 0 );
-	CHECK ( result.at ( "Changes" ).empty () );
+	CHECK ( JSON::compare ( previous, current ) ==
+					"* Items: order ['A', 'B'] -> ['B', 'A']" );
+}
+
+TEST_CASE ( "JSON::compare keeps different form identifiers in paths" ) {
+	const std::string previous = R"json([{"ID":"OldForm","Value":1}])json";
+	const std::string current = R"json([{"ID":"NewForm","Value":1}])json";
+	const std::string expected =
+			R"diff(+ [NewForm]: {"ID": "NewForm", "Value": 1}
+- [OldForm]: {"ID": "OldForm", "Value": 1})diff";
+	CHECK ( JSON::compare ( previous, current ) == expected );
+}
+
+TEST_CASE ( "JSON::compare matches table rows and preserves complete subtrees" ) {
+	const std::string previous = R"json({
+		"Rows":[
+			{ "RowLineNumber":1, "Value":"old" },
+			{ "RowLineNumber":2, "Value":"same" }
+		],
+		"Gone":{ "Title":"Panel", "x":1, "y":2 },
+		"Same":"\u2003value\u00a0"
+	})json";
+	const std::string current = R"json({
+		"Rows":[
+			{ "RowLineNumber":2, "Value":"same" },
+			{ "RowLineNumber":1, "Value":"new" },
+			{ "RowLineNumber":3, "TitleText":"Third", "Value":"z" }
+		],
+		"Added":[1, 2],
+		"Same":"value"
+	})json";
+	const std::string expected = R"diff(+ Added: [1, 2]
+- Gone: {"Title": "Panel", "x": 1, "y": 2}
+* Rows: order [1, 2] -> [2, 1]
+~ Rows[1].Value: "old" -> "new"
++ Rows[3]: {"RowLineNumber": 3, "TitleText": "Third", "Value": "z"})diff";
+	CHECK ( JSON::compare ( previous, current ) == expected );
+}
+
+TEST_CASE (
+		"JSON::compare falls back to list indexes and handles type changes" ) {
+	const std::string previous =
+			R"json({"Values":[" one ",{"a":1}],"Kind":{"a":1}})json";
+	const std::string current =
+			R"json({"Values":["one",{"a":2},true],"Kind":[1]})json";
+	const std::string expected = R"diff(~ Kind: {"a": 1} -> [1]
+~ Values[1].a: 1 -> 2
++ Values[2]: true)diff";
+	CHECK ( JSON::compare ( previous, current ) == expected );
+}
+
+TEST_CASE ( "JSON::compare preserves complete long string values" ) {
+	std::string longValue;
+	for ( size_t index = 0; index < 81; ++index ) {
+		longValue += "я";
+	}
+	const auto previous = nlohmann::json { { "Removed", longValue } }.dump ();
+	const auto current = nlohmann::json::object ().dump ();
+	CHECK ( JSON::compare ( previous, current ) ==
+					"- Removed: \"" + longValue + "\"" );
+}
+
+TEST_CASE ( "JSON::compare reports no cosmetic string changes" ) {
+	CHECK ( JSON::compare ( R"json({"Value":"\u2003Привет\u00a0"})json",
+													R"json({"Value":"Привет"})json" ) == "No changes." );
 }
 
 TEST_CASE ( "SafeValue stores non-comparable optionals" ) {

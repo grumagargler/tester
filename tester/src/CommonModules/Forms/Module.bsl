@@ -386,7 +386,7 @@ function GetChanges () export
 	if ( newForm ) then
 		return data.Elements;
 	else
-		return Conversion.FromJSON ( ExternalLibrary.CompareJSON ( old, LastActiveWindowControls ) );
+		return ExternalLibrary.CompareJSON ( old, LastActiveWindowControls );
 	endif;
 
 endfunction

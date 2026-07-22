@@ -1,286 +1,446 @@
 #include "json.h"
 #include <algorithm>
-#include <map>
+#include <cstdint>
+#include <iterator>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include <set>
-#include <sstream>
+#include <optional>
+#include <string_view>
+#include <utf8.h>
 #include <utility>
+#include <vector>
 
 namespace JSON {
 namespace {
-using Json = nlohmann::json;
+using Json = nlohmann::ordered_json;
 
-const std::set<std::string> NamedCollections { "ChildObjects", "Items", "Columns" };
-const std::set<std::string> SummaryKeys { "ID", "TitleText", "Type" };
+enum class Operation { changed, added, removed, reordered };
 
-std::string normalizePath ( const std::string& path ) {
-	if ( path.empty () ) {
-		return "Root";
-	}
-	return path;
+struct Change {
+	Operation operation;
+	std::string path;
+	Json oldValue;
+	Json newValue;
+};
+
+bool isBlank ( std::uint32_t character ) {
+	return ( character >= 0x0009 && character <= 0x000D ) ||
+				 ( character >= 0x001C && character <= 0x0020 ) ||
+				 character == 0x0085 || character == 0x00A0 || character == 0x1680 ||
+				 ( character >= 0x2000 && character <= 0x200A ) ||
+				 character == 0x2028 || character == 0x2029 || character == 0x202F ||
+				 character == 0x205F || character == 0x3000;
 }
 
-std::string joinPath ( const std::string& path, const std::string& segment ) {
-	if ( path.empty () ) {
-		return segment;
+std::string trim ( const std::string& value ) {
+	auto first = value.cbegin ();
+	const auto end = value.cend ();
+	while ( first != end ) {
+		auto next = first;
+		if ( !isBlank ( utf8::next ( next, end ) ) ) {
+			break;
+		}
+		first = next;
 	}
-	if ( segment.empty () ) {
-		return path;
+	auto last = end;
+	while ( first != last ) {
+		auto previous = last;
+		if ( !isBlank ( utf8::prior ( previous, first ) ) ) {
+			break;
+		}
+		last = previous;
 	}
-	return path + "/" + segment;
+	return { first, last };
+}
+
+bool theSame ( const Json& first, const Json& second ) {
+	if ( first.is_string () && second.is_string () ) {
+		return trim ( first.get_ref<const std::string&> () ) ==
+					 trim ( second.get_ref<const std::string&> () );
+	}
+	if ( first.is_boolean () && second.is_number () ) {
+		return Json ( first.get<bool> () ? 1 : 0 ) == second;
+	}
+	if ( first.is_number () && second.is_boolean () ) {
+		return first == Json ( second.get<bool> () ? 1 : 0 );
+	}
+	if ( first.is_array () && second.is_array () ) {
+		if ( first.size () != second.size () ) {
+			return false;
+		}
+		for ( size_t i = 0; i < first.size (); ++i ) {
+			if ( !theSame ( first.at ( i ), second.at ( i ) ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+	if ( first.is_object () && second.is_object () ) {
+		if ( first.size () != second.size () ) {
+			return false;
+		}
+		for ( auto item = first.begin (); item != first.end (); ++item ) {
+			if ( !second.contains ( item.key () ) ||
+					 !theSame ( item.value (), second.at ( item.key () ) ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+	return first == second;
+}
+
+bool uniqueValues ( const Json& items, std::string_view field ) {
+	std::vector<const Json*> values;
+	for ( const auto& item : items ) {
+		if ( !item.contains ( field ) ) {
+			return false;
+		}
+		const auto& value = item.at ( field );
+		if ( std::ranges::any_of ( values, [ & ] ( const Json* other ) {
+					 return theSame ( value, *other );
+				 } ) ) {
+			return false;
+		}
+		values.push_back ( &value );
+	}
+	return true;
+}
+
+std::optional<std::string> findListKey ( const Json& items ) {
+	if ( !items.is_array () || items.empty () ||
+			 !std::ranges::all_of (
+					 items, [] ( const Json& item ) { return item.is_object (); } ) ) {
+		return std::nullopt;
+	}
+	if ( uniqueValues ( items, "ID" ) ) {
+		return "ID";
+	}
+	for ( auto field = items.front ().begin (); field != items.front ().end ();
+				++field ) {
+		if ( field.key ().ends_with ( "LineNumber" ) &&
+				 uniqueValues ( items, field.key () ) ) {
+			return field.key ();
+		}
+	}
+	return std::nullopt;
+}
+
+std::string pythonJson ( const Json& value ) {
+	if ( value.is_array () ) {
+		std::string result = "[";
+		for ( size_t index = 0; index < value.size (); ++index ) {
+			if ( index > 0 ) {
+				result += ", ";
+			}
+			result += pythonJson ( value.at ( index ) );
+		}
+		return result + "]";
+	}
+	if ( value.is_object () ) {
+		std::string result = "{";
+		bool next = false;
+		for ( auto item = value.begin (); item != value.end (); ++item ) {
+			if ( next ) {
+				result += ", ";
+			}
+			result +=
+					Json ( item.key () ).dump () + ": " + pythonJson ( item.value () );
+			next = true;
+		}
+		return result + "}";
+	}
+	return value.dump ();
+}
+
+std::string pythonStringRepresentation ( const std::string& value ) {
+	const auto quote = value.find ( '\'' ) != std::string::npos &&
+														 value.find ( '"' ) == std::string::npos
+												 ? '"'
+												 : '\'';
+	std::string result ( 1, quote );
+	constexpr char Hexadecimal [] = "0123456789abcdef";
+	for ( const auto character : value ) {
+		const auto byte = static_cast<unsigned char> ( character );
+		if ( character == '\\' || character == quote ) {
+			result.push_back ( '\\' );
+			result.push_back ( character );
+		} else if ( character == '\t' ) {
+			result += "\\t";
+		} else if ( character == '\n' ) {
+			result += "\\n";
+		} else if ( character == '\r' ) {
+			result += "\\r";
+		} else if ( byte < 0x20 || byte == 0x7F ) {
+			result += "\\x";
+			result.push_back ( Hexadecimal [ byte >> 4 ] );
+			result.push_back ( Hexadecimal [ byte & 0x0F ] );
+		} else {
+			result.push_back ( character );
+		}
+	}
+	result.push_back ( quote );
+	return result;
+}
+
+std::string pythonRepresentation ( const Json& value ) {
+	if ( value.is_string () ) {
+		return pythonStringRepresentation ( value.get_ref<const std::string&> () );
+	}
+	if ( value.is_null () ) {
+		return "None";
+	}
+	if ( value.is_boolean () ) {
+		return value.get<bool> () ? "True" : "False";
+	}
+	if ( value.is_array () ) {
+		std::string result = "[";
+		for ( size_t index = 0; index < value.size (); ++index ) {
+			if ( index > 0 ) {
+				result += ", ";
+			}
+			result += pythonRepresentation ( value.at ( index ) );
+		}
+		return result + "]";
+	}
+	if ( value.is_object () ) {
+		std::string result = "{";
+		bool next = false;
+		for ( auto item = value.begin (); item != value.end (); ++item ) {
+			if ( next ) {
+				result += ", ";
+			}
+			result += pythonStringRepresentation ( item.key () ) + ": " +
+								pythonRepresentation ( item.value () );
+			next = true;
+		}
+		return result + "}";
+	}
+	return value.dump ();
+}
+
+std::string keyText ( const Json& value ) {
+	if ( value.is_string () ) {
+		return value.get<std::string> ();
+	}
+	return pythonRepresentation ( value );
+}
+
+std::string objectPath ( const std::string& path, const std::string& key ) {
+	return path.empty () ? key : path + "." + key;
+}
+
+std::string listPath ( const std::string& path, const Json& key ) {
+	return path + "[" + keyText ( key ) + "]";
 }
 
 std::string indexPath ( const std::string& path, size_t index ) {
-	std::ostringstream result;
-	result << normalizePath ( path ) << "[" << index << "]";
-	return result.str ();
+	return path + "[" + std::to_string ( index ) + "]";
 }
 
-bool isNamedNode ( const Json& value ) {
-	return value.is_object () && value.contains ( "ID" ) &&
-				 value.at ( "ID" ).is_string ();
-}
+struct KeyedItem {
+	Json key;
+	const Json* value;
+};
 
-std::string nodeName ( const Json& value ) {
-	if ( isNamedNode ( value ) ) {
-		return value.at ( "ID" ).get<std::string> ();
+using KeyedItems = std::vector<KeyedItem>;
+
+KeyedItems keyedItems ( const Json& items, std::string_view field ) {
+	KeyedItems result;
+	for ( const auto& item : items ) {
+		if ( !item.is_object () || !item.contains ( field ) ) {
+			continue;
+		}
+		const auto& key = item.at ( field );
+		auto found = std::ranges::find_if ( result, [ & ] ( const auto& entry ) {
+			return theSame ( entry.key, key );
+		} );
+		if ( found == result.end () ) {
+			result.push_back ( { key, &item } );
+		} else {
+			found->value = &item;
+		}
 	}
-	return {};
+	return result;
 }
 
-bool hasUniqueNames ( const Json& value ) {
-	if ( !value.is_array () ) {
+const KeyedItem* findItem ( const KeyedItems& items, const Json& key ) {
+	const auto found = std::ranges::find_if (
+			items, [ & ] ( const auto& item ) { return theSame ( item.key, key ); } );
+	return found == items.end () ? nullptr : &*found;
+}
+
+std::vector<Json> itemOrder ( const Json& items, std::string_view field ) {
+	std::vector<Json> result;
+	for ( const auto& item : items ) {
+		if ( item.is_object () && item.contains ( field ) ) {
+			result.push_back ( item.at ( field ) );
+		}
+	}
+	return result;
+}
+
+bool sameOrder ( const std::vector<Json>& first,
+								 const std::vector<Json>& second ) {
+	if ( first.size () != second.size () ) {
 		return false;
 	}
-	std::set<std::string> names;
-	for ( const auto& item : value ) {
-		if ( !isNamedNode ( item ) ) {
-			return false;
-		}
-		if ( !names.insert ( nodeName ( item ) ).second ) {
+	for ( size_t index = 0; index < first.size (); ++index ) {
+		if ( !theSame ( first [ index ], second [ index ] ) ) {
 			return false;
 		}
 	}
 	return true;
 }
 
-Json nodeSummary ( const Json& node ) {
-	auto result = Json::object ();
-	if ( !node.is_object () ) {
-		return result;
-	}
-	for ( const auto& key : SummaryKeys ) {
-		if ( node.contains ( key ) ) {
-			result [ key ] = node.at ( key );
-		}
+Json jsonArray ( const std::vector<Json>& values ) {
+	auto result = Json::array ();
+	for ( const auto& value : values ) {
+		result.push_back ( value );
 	}
 	return result;
 }
 
-Json windowSummary ( const Json& root ) {
-	if ( root.is_array () && !root.empty () && root.at ( 0 ).is_object () ) {
-		return nodeSummary ( root.at ( 0 ) );
+void diff ( const Json& first, const Json& second, const std::string& path,
+						std::vector<Change>* changes );
+
+void diffObjects ( const Json& first, const Json& second,
+									 const std::string& path, std::vector<Change>* changes ) {
+	for ( auto item = first.begin (); item != first.end (); ++item ) {
+		const auto fullPath = objectPath ( path, item.key () );
+		if ( second.contains ( item.key () ) ) {
+			diff ( item.value (), second.at ( item.key () ), fullPath, changes );
+		} else {
+			changes->push_back (
+					{ Operation::removed, fullPath, item.value (), {} } );
+		}
 	}
-	if ( root.is_object () ) {
-		return nodeSummary ( root );
+	for ( auto item = second.begin (); item != second.end (); ++item ) {
+		if ( !first.contains ( item.key () ) ) {
+			changes->push_back ( { Operation::added,
+													 objectPath ( path, item.key () ),
+													 {},
+													 item.value () } );
+		}
 	}
-	return nullptr;
 }
 
-void appendNodeMetadata ( Json* change, const Json& node ) {
-	if ( !node.is_object () ) {
+void diffKeyedLists ( const Json& oldValue, const Json& newValue,
+											const std::string& path, std::string_view field,
+											std::vector<Change>* changes ) {
+	const auto oldItems = keyedItems ( oldValue, field );
+	const auto newItems = keyedItems ( newValue, field );
+	for ( const auto& oldItem : oldItems ) {
+		const auto sub = listPath ( path, oldItem.key );
+		const auto newItem = findItem ( newItems, oldItem.key );
+		if ( newItem == nullptr ) {
+			changes->push_back (
+					{ Operation::removed, sub, *oldItem.value, {} } );
+		} else {
+			diff ( *oldItem.value, *newItem->value, sub, changes );
+		}
+	}
+	for ( const auto& newItem : newItems ) {
+		if ( findItem ( oldItems, newItem.key ) == nullptr ) {
+			changes->push_back ( { Operation::added,
+													 listPath ( path, newItem.key ),
+													 {},
+													 *newItem.value } );
+		}
+	}
+
+	const auto oldOrder = itemOrder ( oldValue, field );
+	const auto newOrder = itemOrder ( newValue, field );
+	std::vector<Json> commonOld;
+	std::vector<Json> commonNew;
+	std::ranges::copy_if ( oldOrder, std::back_inserter ( commonOld ),
+												 [ & ] ( const auto& key ) {
+													 return findItem ( newItems, key ) != nullptr;
+												 } );
+	std::ranges::copy_if ( newOrder, std::back_inserter ( commonNew ),
+												 [ & ] ( const auto& key ) {
+													 return findItem ( oldItems, key ) != nullptr;
+												 } );
+	if ( !sameOrder ( commonOld, commonNew ) ) {
+		changes->push_back ( { Operation::reordered, path, jsonArray ( commonOld ),
+													 jsonArray ( commonNew ) } );
+	}
+}
+
+void diffLists ( const Json& oldValue, const Json& newValue,
+								 const std::string& path, std::vector<Change>* changes ) {
+	auto key = findListKey ( oldValue );
+	if ( !key ) {
+		key = findListKey ( newValue );
+	}
+	if ( key ) {
+		diffKeyedLists ( oldValue, newValue, path, *key, changes );
 		return;
 	}
-	for ( const auto& key : SummaryKeys ) {
-		if ( node.contains ( key ) ) {
-			( *change ) [ key ] = node.at ( key );
+	const auto count = std::max ( oldValue.size (), newValue.size () );
+	for ( size_t index = 0; index < count; ++index ) {
+		const auto sub = indexPath ( path, index );
+		if ( index >= newValue.size () ) {
+			changes->push_back ( { Operation::removed,
+													 sub,
+													 oldValue.at ( index ),
+													 {} } );
+		} else if ( index >= oldValue.size () ) {
+			changes->push_back (
+					{ Operation::added, sub, {}, newValue.at ( index ) } );
+		} else {
+			diff ( oldValue.at ( index ), newValue.at ( index ), sub, changes );
 		}
 	}
 }
 
-void addPropertyChange ( Json* changes, const std::string& path,
-												 const Json& node, const std::string& kind,
-												 const std::string& property, const Json* oldValue,
-												 const Json* newValue ) {
-	auto change = Json::object ();
-	change [ "Path" ] = normalizePath ( path );
-	change [ "ChangeKind" ] = kind;
-	change [ "Property" ] = property;
-	appendNodeMetadata ( &change, node );
-	change [ "OldValue" ] = oldValue ? *oldValue : Json ( nullptr );
-	change [ "NewValue" ] = newValue ? *newValue : Json ( nullptr );
-	changes->push_back ( std::move ( change ) );
-}
-
-void addNodeChange ( Json* changes, const std::string& path,
-										 const std::string& kind, const Json& node ) {
-	auto change = Json::object ();
-	change [ "Path" ] = normalizePath ( path );
-	change [ "ChangeKind" ] = kind;
-	appendNodeMetadata ( &change, node );
-	change [ "Node" ] = node;
-	changes->push_back ( std::move ( change ) );
-}
-
-void addNodeReplace ( Json* changes, const std::string& path,
-											const Json& before, const Json& after ) {
-	auto change = Json::object ();
-	change [ "Path" ] = normalizePath ( path );
-	change [ "ChangeKind" ] = "NodeReplaced";
-	appendNodeMetadata ( &change, after.is_object () ? after : before );
-	change [ "OldNode" ] = before;
-	change [ "NewNode" ] = after;
-	changes->push_back ( std::move ( change ) );
-}
-
-void compareNodes ( const std::string& path, const Json& before,
-										const Json& after, Json* changes );
-
-void compareArrays ( const std::string& path, const Json& before,
-										 const Json& after, Json* changes ) {
-	if ( hasUniqueNames ( before ) && hasUniqueNames ( after ) ) {
-		std::map<std::string, const Json*> beforeItems;
-		std::map<std::string, const Json*> afterItems;
-		for ( const auto& item : before ) {
-			beforeItems.emplace ( nodeName ( item ), &item );
-		}
-		for ( const auto& item : after ) {
-			afterItems.emplace ( nodeName ( item ), &item );
-		}
-		std::set<std::string> names;
-		for ( const auto& [ name, _ ] : beforeItems ) {
-			names.insert ( name );
-		}
-		for ( const auto& [ name, _ ] : afterItems ) {
-			names.insert ( name );
-		}
-		for ( const auto& name : names ) {
-			const auto currentPath = joinPath ( path, name );
-			const auto beforeIt = beforeItems.find ( name );
-			const auto afterIt = afterItems.find ( name );
-			if ( beforeIt == beforeItems.end () ) {
-				addNodeChange ( changes, currentPath, "ControlAdded",
-												*afterIt->second );
-				continue;
-			}
-			if ( afterIt == afterItems.end () ) {
-				addNodeChange ( changes, currentPath, "ControlRemoved",
-												*beforeIt->second );
-				continue;
-			}
-			compareNodes ( currentPath, *beforeIt->second, *afterIt->second,
-										 changes );
-		}
-		return;
-	}
-
-	const auto common = std::min ( before.size (), after.size () );
-	for ( size_t index = 0; index < common; ++index ) {
-		compareNodes ( indexPath ( path, index ), before.at ( index ),
-									 after.at ( index ), changes );
-	}
-	for ( size_t index = common; index < before.size (); ++index ) {
-		addNodeChange ( changes, indexPath ( path, index ), "ItemRemoved",
-										before.at ( index ) );
-	}
-	for ( size_t index = common; index < after.size (); ++index ) {
-		addNodeChange ( changes, indexPath ( path, index ), "ItemAdded",
-										after.at ( index ) );
+void diff ( const Json& first, const Json& second, const std::string& path,
+						std::vector<Change>* changes ) {
+	if ( first.is_object () && second.is_object () ) {
+		diffObjects ( first, second, path, changes );
+	} else if ( first.is_array () && second.is_array () ) {
+		diffLists ( first, second, path, changes );
+	} else if ( !theSame ( first, second ) ) {
+		changes->push_back ( { Operation::changed, path, first, second } );
 	}
 }
 
-void compareObjects ( const std::string& path, const Json& before,
-											const Json& after, Json* changes ) {
-	std::set<std::string> keys;
-	for ( auto it = before.begin (); it != before.end (); ++it ) {
-		keys.insert ( it.key () );
-	}
-	for ( auto it = after.begin (); it != after.end (); ++it ) {
-		keys.insert ( it.key () );
-	}
-
-	for ( const auto& key : keys ) {
-		const auto beforeHas = before.contains ( key );
-		const auto afterHas = after.contains ( key );
-		if ( !beforeHas ) {
-			if ( after.at ( key ).is_primitive () || after.at ( key ).is_null () ) {
-				addPropertyChange ( changes, path, after, "PropertyAdded", key, nullptr,
-														&after.at ( key ) );
-			} else {
-				addNodeChange ( changes, joinPath ( path, key ), "NodeAdded",
-												after.at ( key ) );
-			}
-			continue;
-		}
-		if ( !afterHas ) {
-			if ( before.at ( key ).is_primitive () || before.at ( key ).is_null () ) {
-				addPropertyChange ( changes, path, before, "PropertyRemoved", key,
-														&before.at ( key ), nullptr );
-			} else {
-				addNodeChange ( changes, joinPath ( path, key ), "NodeRemoved",
-												before.at ( key ) );
-			}
-			continue;
-		}
-
-		if ( NamedCollections.contains ( key ) ) {
-			compareArrays ( path, before.at ( key ), after.at ( key ), changes );
-			continue;
-		}
-
-		const auto& beforeValue = before.at ( key );
-		const auto& afterValue = after.at ( key );
-		if ( beforeValue.type () != afterValue.type () ) {
-			if ( beforeValue.is_primitive () || beforeValue.is_null () ||
-					 afterValue.is_primitive () || afterValue.is_null () ) {
-				addPropertyChange ( changes, path, after, "PropertyChanged", key,
-														&beforeValue, &afterValue );
-			} else {
-				addNodeReplace ( changes, joinPath ( path, key ), beforeValue,
-												 afterValue );
-			}
-			continue;
-		}
-		if ( beforeValue.is_object () ) {
-			compareObjects ( joinPath ( path, key ), beforeValue, afterValue,
-											 changes );
-			continue;
-		}
-		if ( beforeValue.is_array () ) {
-			compareArrays ( joinPath ( path, key ), beforeValue, afterValue,
-											changes );
-			continue;
-		}
-		if ( beforeValue != afterValue ) {
-			addPropertyChange ( changes, path, after, "PropertyChanged", key,
-													&beforeValue, &afterValue );
-		}
-	}
+bool commonRoot ( const Json& first, const Json& second ) {
+	return first.is_array () && second.is_array () && first.size () == 1 &&
+				 second.size () == 1 && first.front ().is_object () &&
+				 second.front ().is_object () && first.front ().contains ( "ID" ) &&
+				 second.front ().contains ( "ID" ) &&
+				 theSame ( first.front ().at ( "ID" ), second.front ().at ( "ID" ) );
 }
 
-void compareNodes ( const std::string& path, const Json& before,
-										const Json& after, Json* changes ) {
-	if ( before.type () != after.type () ) {
-		addNodeReplace ( changes, path, before, after );
-		return;
+std::string renderText ( const std::vector<Change>& changes ) {
+	if ( changes.empty () ) {
+		return "No changes.";
 	}
-	if ( before.is_object () ) {
-		compareObjects ( path, before, after, changes );
-		return;
+	std::string result;
+	for ( const auto& change : changes ) {
+		if ( !result.empty () ) {
+			result.push_back ( '\n' );
+		}
+		switch ( change.operation ) {
+		case Operation::changed:
+			result += "~ " + change.path + ": " + pythonJson ( change.oldValue ) +
+								" -> " + pythonJson ( change.newValue );
+			break;
+		case Operation::added:
+			result += "+ " + change.path + ": " + pythonJson ( change.newValue );
+			break;
+		case Operation::removed:
+			result += "- " + change.path + ": " + pythonJson ( change.oldValue );
+			break;
+		case Operation::reordered:
+			result += "* " + change.path + ": order " +
+								pythonRepresentation ( change.oldValue ) + " -> " +
+								pythonRepresentation ( change.newValue );
+			break;
+		}
 	}
-	if ( before.is_array () ) {
-		compareArrays ( path, before, after, changes );
-		return;
-	}
-	if ( before != after ) {
-		auto change = Json::object ();
-		change [ "Path" ] = normalizePath ( path );
-		change [ "ChangeKind" ] = "ValueChanged";
-		change [ "OldValue" ] = before;
-		change [ "NewValue" ] = after;
-		changes->push_back ( std::move ( change ) );
-	}
+	return result;
 }
 }
 
@@ -388,22 +548,20 @@ void Array::Presentation ( std::wstring* Result ) {
 	Result->push_back ( L']' );
 }
 
-std::string compare ( const std::string& first, const std::string& second ) {
-	const auto before = Json::parse ( first );
-	const auto after = Json::parse ( second );
-	auto result = Json::object ();
-	result [ "Mode" ] = "Delta";
-	result [ "PreviousWindow" ] = windowSummary ( before );
-	result [ "CurrentWindow" ] = windowSummary ( after );
-	result [ "WindowChanged" ] =
-			result.at ( "PreviousWindow" ) != result.at ( "CurrentWindow" );
-	result [ "Changes" ] = Json::array ();
-
-	compareNodes ( "", before, after, &result [ "Changes" ] );
-	result [ "ChangeCount" ] = result.at ( "Changes" ).size ();
-	if ( result.at ( "ChangeCount" ) == 0 && !result.at ( "WindowChanged" ) ) {
-		result [ "Mode" ] = "Equal";
+std::string compare ( const std::string& firstJSON,
+											const std::string& secondJSON ) {
+	const auto first = Json::parse ( firstJSON );
+	const auto second = Json::parse ( secondJSON );
+	std::vector<Change> changes;
+	if ( commonRoot ( first, second ) ) {
+		diff ( first.front (), second.front (), "", &changes );
+	} else {
+		diff ( first, second, "", &changes );
 	}
-	return result.dump ();
+	std::stable_sort ( changes.begin (), changes.end (),
+										 [] ( const auto& firstChange, const auto& secondChange ) {
+											 return firstChange.path < secondChange.path;
+										 } );
+	return renderText ( changes );
 }
 }
